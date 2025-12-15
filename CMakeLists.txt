@@ -3,4 +3,5 @@ project(liblnm3 C)
 
 set(CMAKE_C_STANDARD 23)
 
-add_library(liblnm3 STATIC library.c)
+add_library(liblnm3 STATIC lib.c
+        src/types.h)
