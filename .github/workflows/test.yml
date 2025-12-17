@@ -1,4 +1,4 @@
-name: test
+name: LibLNM3 CI
 
 on:
   push:
@@ -7,6 +7,12 @@ on:
   pull_request:
     branches:
       - master
+
+env:
+  MIX_ENV: test
+
+permissions:
+  contents: read
 
 jobs:
   test:
@@ -17,14 +23,18 @@ jobs:
         with:
           otp-version: "28"
           elixir-version: "1.19"
-      - uses: action/cache@v3
+      - name: Cache deps and build
+        uses: actions/cache@v3
         with:
-          path: _build
-          key: ${{ runner.os }}-mix-${{ env.cache-name }}-${{hashFiles('**/mix.lock') }}
+          path: |
+            deps
+            _build
+          key: ${{ runner.os }}-mix-v1-${{ hashFiles('**/mix.lock') }}
           restore-keys: |
-            ${{ runner.os }}-mix-${{ env.cache-name }}-
-            ${{ runner.os }}-mix-
+            ${{ runner.os }}-mix-v1-
+
 
       - run: mix deps.get
       - run: mix deps.unlock --check-unused
-      - run mix compile --warnings-as-errors
+      - run: mix compile --warnings-as-errors
+      - run: mix test
