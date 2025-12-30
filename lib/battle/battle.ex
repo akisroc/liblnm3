@@ -1,17 +1,80 @@
 defmodule Battle do
 
-  # Hardcoded kill rate for performance. Might consider a function some day
-  # if logic gets more complex
-  # @b1 %{archetype: 1, power: 4.0,  defense: 7.0,  speed: 85.0, kill_rate: 4.0 / 7.0,   distance?: false}
-  # @b2 %{archetype: 2, power: 3.0,  defense: 5.0,  speed: 86.0, kill_rate: 3.0 / 5.0,   distance?: true}
-  # @b3 %{archetype: 3, power: 5.0,  defense: 9.0,  speed: 95.0, kill_rate: 5.0 / 9.0,   distance?: false}
-  # @b4 %{archetype: 4, power: 5.0,  defense: 7.0,  speed: 84.0, kill_rate: 5.0 / 7.0,   distance?: true}
-  # @b5 %{archetype: 5, power: 18.0, defense: 8.0,  speed: 80.0, kill_rate: 18.0 / 8.0,  distance?: false}
-  # @b6 %{archetype: 6, power: 10.0, defense: 7.0,  speed: 98.0, kill_rate: 10.0 / 7.0,  distance?: true}
-  # @b7 %{archetype: 7, power: 24.0, defense: 16.0, speed: 88.0, kill_rate: 24.0 / 16.0, distance?: false}
-  # @b8 %{archetype: 8, power: 19.0, defense: 13.0, speed: 90.0, kill_rate: 19.0 / 13.0, distance?: true}
+  @moduledoc """
+  Handle battles.
 
-  # @archetypes [@b1, @b2, @b3, @b4, @b5, @b6, @b7, @b8]
+  The game uses string notations for recording logs and solving battles.
+
+  --------
+
+  The notation for a **unit** of pieces looks like this:
+
+  "0000995"
+
+  This represents a unit of 995 pieces.
+
+  Leading zeros allow for a fix string length while keeping large enough
+  possibilites to never become a constraint (players will never get to
+  troups of 9 millons pieces).
+
+  --------
+
+  The notation for a **troup** looks like this:
+
+  "0000995/0000020/0000600/0000400/0000030/0000000/0000060/0000020"
+
+  This example features a troup of 995 B1s, 20 B2s, 600 B3s, 400 B4s,
+  30 B5s, no B6s, 60 B7s and 20 B8s, all delimited by a slash character `/`.
+
+  --------
+
+  The notation for a **battle state** looks like this:
+
+  "0000995/0000020/0000600/0000400/0000030/0000000/0000060/0000020 0000995/0000020/0000600/0000400/0000030/0000000/0000060/0000020"
+
+  This represents the state of the two fighting troup at a given time.
+  First group is the attacker troup, in the same format as a troup notation.
+  Second group, after a space delimiter ` `, is the defender troup.
+
+  --------
+
+  @todo Complete this section example with generated log as soon as the battle solving works
+
+  The notation for a **battle log** looks like this
+
+  ```
+  0000995/0000400/0000600/0000800/0001200/0000660/0000450/0000020 0001500/0000135/0001000/0000100/0000200/0000000/0000600/0000100\n
+  B6/b3/923 B3/b7/89 b3/B1/406 B8/b5/72 b8/B2/400 B7/b1/1500 b7/B3/600 b2/B6/37 B2/b4/59\n
+  0000623/0000000/0000020/0000450/0000000/0000589/0000800/0001200 0000000/0000077/0000100/0000511/0000135/0000000/0000041/0000128\n
+  1
+  ```
+
+  Lines end in line breaks `\n`.
+
+  - First line is the initial battle state.
+  - Next line is for the successive salvos. Each salvo is cut as follows:
+      - Which piece archetype strikes (uppercase pieces (ex: B1) for attacker,
+        lowercase (ex: b4) for defender)
+      - Delimiter `/` then which piece archetype is stricken (same case
+        convention for attacker and defender)
+      - Delimiter `/` then how many pieces are killed
+  – Next line is the final battle state.
+  - Last line is the result as a digit. 1 if attacker won. 0 if defender won.
+    No trailing line break.
+
+  ----
+
+  /?\
+  Why the `B` letter for a piece archetype? (:
+  Ex: B1, B2, B3, etc.
+  Years ago, when LNM was a popular PHP game in France, what I call now "pieces"
+  by convention were soldiers trained in barracks. The word used in french for
+  these barracks is "Bâtiment", so players were used to design these soldiers
+  archetypes by B1, B3, B8, etc.
+  "Une armée de B1 et B3" was a thing!
+  I kept this naming tradition in the codebase by respect to the old LNM,
+  and because it’s convinient.
+  """
 
   @doc """
   Solve a battle.
@@ -20,21 +83,8 @@ defmodule Battle do
   """
   @spec solve_battle(String.t()) :: String.t()
   def solve_battle(battle_state_notation) do
-
-    # Format battle data, filter empty units, sort by speed
-    # [attacker_troup, defender_troup] = battle_state_notation
-    units = battle_state_notation
-    |> Notation.parse()
-    |> Stream.with_index()
-    |> Enum.map(fn {troup, position} ->  # Why position: attacker is first in battle state notation
-      troup
-      |> Stream.with_index()
-      |> Enum.map(fn {v, k} ->
-        Battle.Unit.new(Battle.Unit.archetype(k), v, position === 0)
-      end)
-      # |> Enum.sort_by(&(&1.speed), :desc)
-    end)
-    |> List.flatten()
+    units = Battle.BattleState.new(battle_state_notation)
+    |> Battle.BattleState.units()
     |> Enum.shuffle()  # Naturally randomize striking order on speed equality
     |> Enum.sort_by(&(&1.speed), :desc)
 
@@ -48,18 +98,20 @@ defmodule Battle do
       fn u1, acc ->
         case u1 |> choose_target(acc.units) do
           nil ->
-            notation = acc.units
-            |> Enum.split_with(&(&1).attacker?)
-            |> Tuple.to_list()
-            |> Enum.map(&Enum.map(&1, fn u -> u.count end))
-            |> Notation.serialise()
+            {a_units, b_units} = acc.units |> Enum.split_with(&(&1).attacker?)
+            a_troup = Battle.Troup.new(a_units, true)
+            b_troup = Battle.Troup.new(b_units, false)
+            notation = Battle.BattleState.new(a_troup, b_troup)
+            |> Battle.BattleState.to_notation!()
 
             {
               :halt,
               %{
-                log: (acc.log |> String.trim_trailing())
-                  <> "\n"
-                  <> notation,
+                log: [
+                  acc.log |> IO.iodata_to_binary() |> String.trim_trailing(), "\n",
+                  notation, "\n",
+                  (if attacker_wins?(a_troup, b_troup), do: "1", else: "0")
+                ],
                 units: acc.units
               }
             }
@@ -69,16 +121,13 @@ defmodule Battle do
             else
               kill_count = kill_count(u1, u2)
               damaged_u2 = %{u2 | count: u2.count - kill_count}
+
               {
                 :cont,
                 %{
-                  log: acc.log
-                    <> u1.label
-                    <> "/"
-                    <> u2.label
-                    <> "/"
-                    <> (kill_count |> Integer.to_string())
-                    <> " ",
+                  log: [
+                    acc.log, u1.label, "/", u2.label, "/", (kill_count |> Integer.to_string()), " "
+                  ],
                   units: acc.units
                     |> Enum.map(fn unit ->
                       cond do
@@ -95,7 +144,7 @@ defmodule Battle do
         end
       end
     )
-    |> Map.fetch!(:log)
+    |> Map.fetch!(:log) |> IO.iodata_to_binary()
   end
 
 
@@ -145,6 +194,11 @@ defmodule Battle do
   end
   defp pick_random_or_nil([]), do: nil
   defp pick_random_or_nil(list), do: list |> Enum.random()
+
+  @spec attacker_wins?(Battle.Troup.t(), Battle.Troup.t()) :: boolean()
+  defp attacker_wins?(t1, t2) do
+    (Battle.Troup.total_power(t1) / Battle.Troup.total_defense(t2)) >= 1.6
+  end
 
   @spec same_unit?(map(), map()) :: boolean()
   defp same_unit?(a, b) do

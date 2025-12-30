@@ -40,7 +40,12 @@ defmodule Battle.Unit do
 
   @archetypes [@b1, @b2, @b3, @b4, @b5, @b6, @b7, @b8]
 
+  @doc """
+  Construct a Unit from archetype.
+  """
   @spec new(map(), non_neg_integer(), boolean(), boolean(), boolean()) :: t()
+  @spec new(map(), non_neg_integer(), boolean(), boolean()) :: t()
+  @spec new(map(), non_neg_integer(), boolean()) :: t()
   def new(archetype, count, attacker?, stroke? \\ false, stricken? \\ false) do
     new(
       archetype.id,
@@ -55,6 +60,9 @@ defmodule Battle.Unit do
     )
   end
 
+  @doc """
+  Construct a Unit manually.
+  """
   @spec new(non_neg_integer(), non_neg_integer(), non_neg_integer(), non_neg_integer(), boolean(), non_neg_integer(), boolean(), boolean(), boolean()) :: t()
   def new(id, power, defense, speed, distance?, count, attacker?, stroke? \\ false, stricken? \\ false) do
     %__MODULE__{
@@ -72,7 +80,29 @@ defmodule Battle.Unit do
     }
   end
 
-  @spec to_notation!(__MODULE__.t()) :: String.t()
+  @doc """
+  Parse notation to data.
+
+  ## Examples
+
+    iex> Battle.Unit.parse_notation!("0000045")
+    45
+
+    iex> Battle.Unit.parse_notation!("-0022")
+    ** (ArgumentError) Invalid notation format
+  """
+  @spec parse_notation!(String.t()) :: non_neg_integer()
+  def parse_notation!(a) do
+    cond do
+      valid_notation?(a) -> a |> String.to_integer()
+      true -> raise ArgumentError, message: "Invalid notation format"
+    end
+  end
+
+  @doc """
+  Serialise data to notation.
+  """
+  @spec to_notation!(t()) :: String.t()
   def to_notation!(%__MODULE__{count: c}) when c in 0..9_999_999 do
     c |> Integer.to_string() |> String.pad_leading(7, "0")
   end
@@ -83,10 +113,10 @@ defmodule Battle.Unit do
 
   ## Examples
 
-    iex> __MODULE__.valid_notation?("0000995")
+    iex> Battle.Unit.valid_notation?("0000995")
     true
 
-    iex> __MODULE__.valid_notation?("ABCD")
+    iex> Battle.Unit.valid_notation?("ABCD")
     false
   """
   @spec valid_notation?(String.t()) :: boolean()
@@ -97,9 +127,15 @@ defmodule Battle.Unit do
     end
   end
 
+  @doc """
+  Get all archetypes.
+  """
   @spec archetypes() :: [map()]
   def archetypes(), do: @archetypes
 
+  @doc """
+  Get an archetype by key.
+  """
   @spec archetype(non_neg_integer()) :: map()
   def archetype(key), do: @archetypes |> Enum.fetch!(key)
 end

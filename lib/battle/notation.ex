@@ -177,7 +177,7 @@ defmodule Notation do
   def battle_state_list?(l), do: is_list(l) && length(l) === 2 && l |> Enum.all?(&troup_list?/1)
 
   @doc """
-  Parse notation to data
+  Parse notation to data.
 
   ## Examples
 
