@@ -44,13 +44,14 @@ services:
      container_name: lnm3_platform
      restart: unless-stopped
      environment:
+       SERVER_NAME: :80
        DATABASE_URL: postgresql://user:pass@db-platform:5432/lnm3_platform?serverVersion=16&charset=utf8
 #       AUTH_SERVICE_ADDR: auth:50051 # gRPC
        APP_SECRET: ${APP_SECRET:-e9d7855c4fd2ff4d9cdc0b17b2602bce}
        CADDY_GLOBAL_OPTIONS: debug
      volumes:
-       - ./services/platform:/app:rw
-#       - ./services/platform/docker/caddy/Caddyfile:/etc/caddy/Caddyfile
+       - ./services/platform:/app:rw,z
+       - ./services/platform/docker/caddy:/config/caddy:rw,z
        - platform_data:/app/var
      ports:
        - "8080:80" # HTTP
