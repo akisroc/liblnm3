@@ -1,40 +1,5 @@
 services:
 
-  # --- SERVICE AUTH ---
-#  auth:
-#    build:
-#      context: ./services/auth
-#      dockerfile: Dockerfile
-#    container_name: service-auth
-#    volumes:
-#      - ./services/auth:/app
-#    environment:
-#      - DATABASE_URL=postgres://postgres:auth_pass@db-auth:5432/auth_db?sslmode=disable
-#      - SECRET_KEY=auth_secret
-#      - PORT=50051
-#    depends_on:
-#      db-auth:
-#        condition: service_healthy
-#    ports:
-#      - "50051:50051" # gRPC
-#
-#  db-auth:
-#    image: postgres:18-alpine
-#    container_name: db-auth
-#    environment:
-#      POSTGRES_DB: user
-#      POSTGRES_USER: user
-#      POSTGRES_PASSWORD: auth_pass
-#    ports:
-#      - "5431:5432"
-#    volumes:
-#      - auth_data:/var/lib/postgresql/data
-#    healthcheck:
-#      test: ["CMD-SHELL", "pg_isready -U postgres -d auth_db"]
-#      interval: 5s
-#      timeout: 5s
-#      retries: 5
-
   # --- SERVICE PLATFORM ---
    platform:
      build:
@@ -46,7 +11,6 @@ services:
      environment:
        SERVER_NAME: :80
        DATABASE_URL: postgresql://user:pass@db-platform:5432/lnm3_platform?serverVersion=16&charset=utf8
-#       AUTH_SERVICE_ADDR: auth:50051 # gRPC
        APP_SECRET: ${APP_SECRET:-e9d7855c4fd2ff4d9cdc0b17b2602bce}
        CADDY_GLOBAL_OPTIONS: debug
      volumes:
@@ -103,6 +67,5 @@ services:
   #     - platform
 
 volumes:
-#  auth_data:
    platform_data:
    db_data:
