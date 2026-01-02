@@ -12,7 +12,7 @@ use Symfony\Component\PasswordHasher\Hasher\SodiumPasswordHasher;
 
 class UserFixtures extends Fixture
 {
-    public const COUNT = 30;
+    public const int COUNT = 30;
 
     public function load(ObjectManager $manager): void
     {
@@ -20,31 +20,23 @@ class UserFixtures extends Fixture
 
         $hasher = new SodiumPasswordHasher();
 
-        $users = [];
-
-        $users[] = [
-            'username' => 'adrien',
-            'email' => $faker->unique()->safeEmail(),
-            'password' => 'adrien',
-            'roles' => ['ROLE_USER', 'ROLE_GM', 'ROLE_ADMIN'],
-        ];
+        $user = new User();
+        $user->username = 'adrien';
+        $user->email = $faker->unique()->safeEmail();
+        $user->password = $hasher->hash('adrien');
+        $user->roles = ['ROLE_USER', 'ROLE_GM', 'ROLE_ADMIN'];
+        $this->setReference('user_admin', $user);
+        $manager->persist($user);
 
         for ($i = 0; $i < self::COUNT; ++$i) {
-            $users[] = [
-                'username' => $faker->unique()->firstName,
-                'email' => $faker->unique()->safeEmail,
-                'password' => $faker->password(8, 100),
-                'roles' => ['ROLE_USER']
-            ];
-        }
-
-        for ($i = 0, $c = count($users); $i < $c; ++$i) {
             $user = new User();
 
-            $user->username = $users[$i]['username'];
-            $user->email = $users[$i]['email'];
-            $user->password = $hasher->hash($users[$i]['password']);
-            $user->addRoles($users[$i]['roles']);
+            $user->username = $faker->unique()->firstName;
+            $user->email = $faker->unique()->safeEmail;
+            $user->password = $hasher->hash(
+                $faker->password(8, 100)
+            );
+            $user->addRoles(['ROLE_USER']);
             $user->isEnabled = $faker->boolean(92);
             $user->profilePicture = $faker->imageUrl();
 

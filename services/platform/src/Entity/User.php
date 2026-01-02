@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -21,16 +22,16 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 class User extends AbstractEntity implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Column(type: 'string', length: 31, unique: true, nullable: false)]
-    #[Assert\NotBlank(message: 'violation.name.blank')]
+    #[Assert\NotBlank(message: 'violation.username.blank')]
     #[Assert\Regex(
         pattern: '/^[ a-zA-Z0-9éÉèÈêÊëËäÄâÂàÀïÏöÖôÔüÜûÛçÇ\'’\-]+$/',
-        message: 'violation.name.invalid_characters',
+        message: 'violation.username.invalid_characters',
     )]
     #[Assert\Length(
         min: 1,
         max: 30,
-        minMessage: 'violation.name.too_short',
-        maxMessage: 'violation.name.too_long'
+        minMessage: 'violation.username.too_short',
+        maxMessage: 'violation.username.too_long'
     )]
     public ?string $username = null;
 
@@ -52,24 +53,6 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     #[ORM\Column(type: 'string', length: 511, nullable: false)]
     public ?string $password = null;
 
-//    #[Assert\NotBlank(message: 'violation.password.blank')]
-//     #[Assert\Length(
-//         min: 8,
-//         max: 4000,
-//         minMessage: 'violation.password.too_short',
-//         maxMessage: 'violation.password.too_long'
-//     )]
-//    public ?string $plainPassword = null {
-//        get { return $this->plainPassword; }
-//        set { $this->plainPassword = $value; }
-//    }
-
-//    #[ORM\Column(type: 'string', length: 127, nullable: false)]
-//     public ?string $salt = null {
-//        get { return $this->salt; }
-//        set { $this->salt = $value; }
-//    }
-
     #[ORM\Column(type: 'json', length: 31, nullable: false)]
     #[Assert\NotBlank]
     public array $roles = ['ROLE_USER'];
@@ -81,10 +64,8 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     #[ORM\Column(type: 'boolean', nullable: false)]
      public bool $isEnabled = true;
 
-    public function __construct()
-     {
-//         $this->salt = $this->generateSalt();
-     }
+    #[ORM\OneToOne(targetEntity: 'Kingdom', inversedBy: 'user')]
+    public Kingdom $kingdom;
 
      public function getRoles(): array
      {
@@ -124,16 +105,6 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     {
         return $this->password;
     }
-
-//    public function eraseCredentials(): void
-//    {
-//        $this->plainPassword = null;
-//    }
-
-//     private function generateSalt(): string
-//     {
-//         return substr(base64_encode(random_bytes(64)), 8, 72);
-//     }
 
     #[Assert\Callback]
     public function validateRoles(ExecutionContextInterface $context, array $payload): void
