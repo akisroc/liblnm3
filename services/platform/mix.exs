@@ -52,9 +52,11 @@ defmodule Platform.MixProject do
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.2.0"},
       {:bandit, "~> 1.5"},
-      {:uniq, "~> 0.6"}, # Lib for UUID v7
-      {:slugger, "~> 0.3"}, # Lib to slugify
-      {:argon2_elixir, "~> 4.1"}
+      {:uuid_v7, "~> 0.6"},
+      {:slugger, "~> 0.3"},
+      {:argon2_elixir, "~> 4.1"},
+      {:ecto_network, "~> 1.6"},
+      {:cors_plug, "~> 3.0"}
     ]
   end
 

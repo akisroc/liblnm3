@@ -49,4 +49,11 @@ defmodule PlatformWeb.Endpoint do
   plug Plug.Head
   plug Plug.Session, @session_options
   plug PlatformWeb.Router
+
+  plug CORSPlug,
+    origin: ["http://localhost:8000"],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    headers: ["Authorization", "Content-Type", "Accept", "Origin", "User-Agent", "DNT", "Cache-Control", "X-Mx-ReqToken", "Keep-Alive", "X-Requested-With", "If-Modified-Since"],
+    expose: ["set-cookie"]
 end

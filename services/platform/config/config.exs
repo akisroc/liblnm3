@@ -15,10 +15,6 @@ config :platform, Platform.Repo,
   migration_primary_key: [name: :id, type: :binary_id],
   migration_foreign_key: [type: :binary_id]
 
-config :platform, :generators,
-  binary_id: true,
-  sample_binary_id: "01889000-0000-7000-8000-000000000000" # UUID v7 example
-
 # Configures the endpoint
 config :platform, PlatformWeb.Endpoint,
   url: [host: "localhost"],

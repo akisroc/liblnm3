@@ -15,7 +15,7 @@ CREATE TABLE "users" (
   "platform_theme" platform_theme_enum NOT NULL DEFAULT 'dark',
   "is_enabled" bool NOT NULL DEFAULT (true),
   "is_removed" bool NOT NULL DEFAULT (false),
-  "created_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+  "inserted_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
   "updated_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
   CONSTRAINT "chk_users_username_format" CHECK (username ~ '^[ a-zA-Z0-9éÉèÈêÊëËäÄâÂàÀïÏöÖôÔüÜûÛçÇ''’\-]+$'),
   CONSTRAINT "chk_users_email_format" CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'),
@@ -33,7 +33,7 @@ CREATE TABLE "kingdoms" (
   "attack_troup" jsonb NOT NULL DEFAULT ('{"b1": 0, "b2": 0, "b3": 0, "b4": 0, "b5": 0, "b6": 0, "b7": 0, "b8": 0}'),
   "is_active" bool NOT NULL DEFAULT (false),
   "is_removed" bool NOT NULL DEFAULT (false),
-  "created_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+  "inserted_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
   "updated_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
   CONSTRAINT "chk_kingdoms_name_format" CHECK (name ~ '^[ a-zA-Z0-9éÉèÈêÊëËäÄâÂàÀïÏöÖôÔüÜûÛçÇ''’\-]+$'),
   CONSTRAINT "chk_kingdoms_fame_positive" CHECK (fame >= 0.0),
@@ -69,7 +69,7 @@ CREATE TABLE "protagonists" (
   "profile_picture" varchar(511),
   "biography" text,
   "is_removed" bool NOT NULL DEFAULT (false),
-  "created_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+  "inserted_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
   "updated_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
   CONSTRAINT "chk_protagonists_biography_length" CHECK (char_length(biography) <= 500000),
   CONSTRAINT "chk_protagonists_fame_positive" CHECK (fame >= 0.0),
@@ -82,7 +82,7 @@ CREATE TABLE "missives" (
   "receiver_id" uuid NOT NULL,
   "content" text NOT NULL,
   "is_read" bool NOT NULL DEFAULT (false),
-  "created_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+  "inserted_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
   "updated_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
   CONSTRAINT "chk_missives_content_length" CHECK (char_length(content) <= 10000),
   CONSTRAINT "chk_missives_sender_is_not_receiver" CHECK (sender_id <> receiver_id)
@@ -96,7 +96,7 @@ CREATE TABLE "chronicles" (
   "slug" varchar(127) UNIQUE NOT NULL,
   "description" text,
   "is_removed" bool NOT NULL DEFAULT (false),
-  "created_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+  "inserted_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
   "updated_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
   CONSTRAINT "chk_chronicles_description_length" CHECK (char_length(description) <= 15000),
   CONSTRAINT "chk_chronicles_title_format" CHECK (title ~ '^[ a-zA-Z0-9éÉèÈêÊëËäÄâÂàÀïÏöÖôÔüÜûÛçÇ''’\-]+$'),
@@ -114,7 +114,7 @@ CREATE TABLE "chapters" (
   "chronicle_id" uuid NOT NULL,
   "protagonist_id" uuid NOT NULL,
   "content" text NOT NULL,
-  "created_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+  "inserted_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
   "updated_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
   CONSTRAINT "chk_chapters_content_length" CHECK (char_length(content) <= 25000)
 );
@@ -122,7 +122,7 @@ CREATE TABLE "chapters" (
 CREATE TABLE "chapters_views" (
   "chapter_id" uuid,
   "user_id" uuid,
-  "created_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+  "inserted_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
   PRIMARY KEY ("chapter_id", "user_id")
 );
 
@@ -133,7 +133,7 @@ CREATE TABLE "boards" (
   "description" varchar(511) NOT NULL,
   "slug" varchar(127) UNIQUE NOT NULL,
   "is_removed" bool NOT NULL DEFAULT (false),
-  "created_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+  "inserted_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
   "updated_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
   CONSTRAINT "chk_boards_slug_format" CHECK (slug ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$')
 );
@@ -145,7 +145,7 @@ CREATE TABLE "threads" (
   "title" varchar(63) NOT NULL,
   "slug" varchar(127) UNIQUE NOT NULL,
   "is_removed" bool NOT NULL DEFAULT (false),
-  "created_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+  "inserted_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
   "updated_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
   CONSTRAINT "chk_threads_slug_format" CHECK (slug ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$')
 );
@@ -156,6 +156,16 @@ CREATE TABLE "posts" (
   "thread_id" uuid NOT NULL,
   "content" text NOT NULL,
   CONSTRAINT "chk_posts_content_length" CHECK (char_length(content) <= 10000)
+);
+
+CREATE TABLE "sessions" (
+  "id" uuid PRIMARY KEY,
+  "user_id" uuid NOT NULL,
+  "token" bytea UNIQUE NOT NULL,
+  "context" varchar(31) NOT NULL DEFAULT ('session'),
+  "ip_address" inet,
+  "user_agent" varchar(511),
+  "inserted_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP)
 );
 
 CREATE UNIQUE INDEX "idx_only_one_active_kingdom_per_user" ON "kingdoms" ("user_id") WHERE "is_active" = true;
@@ -191,6 +201,8 @@ CREATE INDEX "idx_threads_board_id" ON "threads" ("board_id");
 CREATE INDEX "idx_posts_user_id" ON "posts" ("user_id");
 
 CREATE INDEX "idx_posts_thread_id" ON "posts" ("thread_id");
+
+CREATE INDEX "sessions_user_id" ON "sessions" ("user_id");
 
 ALTER TABLE "kingdoms" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 
@@ -231,3 +243,5 @@ ALTER TABLE "threads" ADD FOREIGN KEY ("board_id") REFERENCES "boards" ("id");
 ALTER TABLE "posts" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 
 ALTER TABLE "posts" ADD FOREIGN KEY ("thread_id") REFERENCES "threads" ("id");
+
+ALTER TABLE "sessions" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");

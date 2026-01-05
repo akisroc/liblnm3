@@ -5,8 +5,23 @@ defmodule PlatformWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :auth do
+    # Todo
+  end
+
+  # --- Public routes ---
   scope "/api", PlatformWeb do
     pipe_through :api
+
+    post "/register", UserController, :create
+    post "/login", SessionController, :login
+  end
+
+  # --- Private routes ---
+  scope "/api", PlatformWeb do
+    pipe_through [:api, :auth]
+
+    # get "/me", UserController, :me
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development

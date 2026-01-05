@@ -3,7 +3,4 @@ defmodule Platform.Repo do
     otp_app: :platform,
     adapter: Ecto.Adapters.Postgres
 
-  def autogenerate(:binary_id) do
-    Uniq.UUID.uuid7()
-  end
 end

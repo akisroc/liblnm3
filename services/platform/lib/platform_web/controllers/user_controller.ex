@@ -1,0 +1,24 @@
+defmodule PlatformWeb.UserController do
+  use PlatformWeb, :controller
+
+  def create(conn, %{"user" => user_params}) do
+    case Platform.Accounts.register_user(user_params) do
+      {:ok, user} ->
+      conn
+      |> put_status(:created)
+      |> json(%{message: "User created", slug: user.slug})
+
+    {:error, %Ecto.Changeset{} = changeset} ->
+      errors = Ecto.Changeset.traverse_errors(changeset, fn {msg, opts} ->
+        # Transform error to JSON
+        Regex.replace(~r"%{(\w+)}", msg, fn _, key ->
+          inspect(get_in(opts, [String.to_existing_atom(key)]))
+        end)
+      end)
+
+      conn
+      |> put_status(:unprocessable_entity)
+      |> json(%{errors: errors})
+    end
+  end
+end
