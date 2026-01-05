@@ -4,6 +4,6 @@ defmodule Platform.Repo do
     adapter: Ecto.Adapters.Postgres
 
   def autogenerate(:binary_id) do
-    Uniq.UUID.uuidv7()
+    Uniq.UUID.uuid7()
   end
 end

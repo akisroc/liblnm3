@@ -1,32 +1,33 @@
 services:
 
   # --- SERVICE PLATFORM ---
-   platform:
-     build:
-       context: ./services/platform
-       dockerfile: Dockerfile
-       target: dev
-     container_name: lnm3_platform
-     restart: unless-stopped
-     environment:
-       SERVER_NAME: :80
-       DATABASE_URL: postgresql://user:pass@db-platform:5432/lnm3_platform?serverVersion=16&charset=utf8
-       APP_SECRET: ${APP_SECRET:-e9d7855c4fd2ff4d9cdc0b17b2602bce}
-       CADDY_GLOBAL_OPTIONS: debug
-     volumes:
-       - ./services/platform:/app:rw,z
-       - ./services/platform/docker/caddy:/config/caddy:rw,z
-       - platform_data:/app/var
-     ports:
-       - "8080:80" # HTTP
-       - "8443:443" # HTTPS
-       - "443:443/udp" # HTTP/3
-     depends_on:
-       db-platform:
-         condition: service_healthy
-     links:
-       - db-platform
+  #  platform:
+  #    build:
+  #      context: ./services/platform
+  #      dockerfile: Dockerfile
+  #      target: dev
+  #    container_name: lnm3_platform
+  #    restart: unless-stopped
+  #    environment:
+  #      SERVER_NAME: :80
+  #      DATABASE_URL: postgresql://user:pass@db-platform:5432/lnm3_platform?serverVersion=16&charset=utf8
+  #      APP_SECRET: ${APP_SECRET:-e9d7855c4fd2ff4d9cdc0b17b2602bce}
+  #      CADDY_GLOBAL_OPTIONS: debug
+  #    volumes:
+  #      - ./services/platform:/app:rw,z
+  #      - ./services/platform/docker/caddy:/config/caddy:rw,z
+  #      - platform_data:/app/var
+  #    ports:
+  #      - "8080:80" # HTTP
+  #      - "8443:443" # HTTPS
+  #      - "443:443/udp" # HTTP/3
+  #    depends_on:
+  #      db-platform:
+  #        condition: service_healthy
+  #    links:
+  #      - db-platform
 
+  # Todo: Add Phoenix to Docker
    db-platform:
      image: postgres:18-alpine
      container_name: lnm3_platform_db
@@ -34,6 +35,8 @@ services:
        POSTGRES_USER: user
        POSTGRES_PASSWORD: pass
        POSTGRES_DB: lnm3_platform
+     ports:
+       - "5432:5432"
      volumes:
        - db_data:/var/lib/postgresql/data
      healthcheck:
@@ -67,5 +70,5 @@ services:
   #     - platform
 
 volumes:
-   platform_data:
+  #  platform_data:
    db_data:

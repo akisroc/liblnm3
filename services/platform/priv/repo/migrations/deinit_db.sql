@@ -1,0 +1,13 @@
+DROP TABLE IF EXISTS posts;
+DROP TABLE IF EXISTS threads;
+DROP TABLE IF EXISTS boards;
+DROP TABLE IF EXISTS chapters_views;
+DROP TABLE IF EXISTS chapters;
+DROP TABLE IF EXISTS protagonists_chronicles;
+DROP TABLE IF EXISTS chronicles;
+DROP TABLE IF EXISTS missives;
+DROP TABLE IF EXISTS kingdoms CASCADE;
+DROP TABLE IF EXISTS protagonists;
+DROP TABLE IF EXISTS users;
+DROP TYPE IF EXISTS platform_theme_enum;
+DROP EXTENSION IF EXISTS "uuid-ossp";

@@ -53,7 +53,8 @@ defmodule Platform.MixProject do
       {:dns_cluster, "~> 0.2.0"},
       {:bandit, "~> 1.5"},
       {:uniq, "~> 0.6"}, # Lib for UUID v7
-      {:slugger, "~> 0.3"} # Lib to slugify
+      {:slugger, "~> 0.3"}, # Lib to slugify
+      {:argon2_elixir, "~> 4.1"}
     ]
   end
 

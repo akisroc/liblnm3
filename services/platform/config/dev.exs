@@ -2,10 +2,10 @@ import Config
 
 # Configure your database
 config :platform, Platform.Repo,
-  username: "postgres",
-  password: "postgres",
-  hostname: "localhost",
-  database: "platform_dev",
+  username: "user",
+  password: "pass",
+  hostname: "localhost", # Todo: Add Phoenix to Docker
+  database: "lnm3_platform",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
