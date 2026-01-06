@@ -39,6 +39,10 @@ defmodule Platform.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      # Dev
+      {:faker, "~> 0.18", only: :dev},
+
+      # All
       {:phoenix, "~> 1.8.1"},
       {:phoenix_ecto, "~> 4.5"},
       {:ecto_sql, "~> 3.13"},
@@ -56,6 +60,7 @@ defmodule Platform.MixProject do
       {:slugger, "~> 0.3"},
       {:argon2_elixir, "~> 4.1"},
       {:ecto_network, "~> 1.6"},
+      {:remote_ip, "~> 1.2"},
       {:cors_plug, "~> 3.0"}
     ]
   end

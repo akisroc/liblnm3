@@ -2,17 +2,10 @@ defmodule Platform.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
 
-  @username_regex ~r/^[ a-zA-Z0-9éÉèÈêÊëËäÄâÂàÀïÏöÖôÔüÜûÛçÇ\'’\-]+$/
+  @username_regex ~r/^[ a-zA-Z0-9éÉèÈêÊëËäÄâÂàÀïÏöÖôÔüÜûÛçÇ\'’\-_\.]+$/
   @email_regex ~r/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/
   @url_regex ~r/^https?:\/\/[\w\d\-._~:?#\[\]@!$&'()*+,;=%\/]+$/
   @slug_regex ~r/^[a-z0-9]+(?:-[a-z0-9]+)*$/
-
-  @argon2_config [
-    t_cost: 4,
-    m_cost: 18,  # 2^18 KiB => 256MiB
-    parallelism: 8,
-    argon2_type: 2  # Argon2id
-  ]
 
   @primary_key {:id, Platform.EctoTypes.UUIDv7, autogenerate: true}
   @foreign_key_type Platform.EctoTypes.UUIDv7
@@ -62,7 +55,7 @@ defmodule Platform.Accounts.User do
 
   defp hash_password(changeset) do
     if password = get_change(changeset, :password) do
-      put_change(changeset, :password, Argon2.hash_pwd_salt(password, @argon2_config))
+      put_change(changeset, :password, Argon2.hash_pwd_salt(password, argon2_config()))
     else
       changeset
     end
@@ -73,6 +66,25 @@ defmodule Platform.Accounts.User do
       put_change(changeset, :slug, Slugger.slugify_downcase(username))
     else
       changeset
+    end
+  end
+
+  # Todo: Could (should?) be in global configs
+  defp argon2_config() do
+    if Mix.env() in [:test, :dev] do
+      [
+        t_cost: 1,
+        m_cost: 8,
+        parallelism: System.schedulers_online(),
+        argon2_type: 2
+      ]
+    else
+      [
+        t_cost: 4,
+        m_cost: 18,  # 2^18 KiB => 256MiB
+        parallelism: System.schedulers_online(),
+        argon2_type: 2  # Argon2id
+      ]
     end
   end
 end

@@ -25,5 +25,5 @@ defmodule Platform.Accounts do
     |> Platform.Repo.insert()
   end
 
-  defdelegate generate_session_token(user), to: Platform.Accounts.Session
+  defdelegate generate_session_token(user, ip_address, user_agent), to: Platform.Accounts.Session
 end

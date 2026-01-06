@@ -48,7 +48,6 @@ defmodule PlatformWeb.Endpoint do
   plug Plug.MethodOverride
   plug Plug.Head
   plug Plug.Session, @session_options
-  plug PlatformWeb.Router
 
   plug CORSPlug,
     origin: ["http://localhost:8000"],
@@ -56,4 +55,8 @@ defmodule PlatformWeb.Endpoint do
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     headers: ["Authorization", "Content-Type", "Accept", "Origin", "User-Agent", "DNT", "Cache-Control", "X-Mx-ReqToken", "Keep-Alive", "X-Requested-With", "If-Modified-Since"],
     expose: ["set-cookie"]
+
+  plug PlatformWeb.Router
+
+  plug RemoteIp, headers: ["x-forwarded-for"]
 end

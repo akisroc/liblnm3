@@ -46,7 +46,7 @@ CREATE TABLE "users" (
   "is_removed" bool NOT NULL DEFAULT (false),
   "inserted_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
   "updated_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
-  CONSTRAINT "chk_users_username_format" CHECK (username ~ '^[ a-zA-Z0-9éÉèÈêÊëËäÄâÂàÀïÏöÖôÔüÜûÛçÇ''’\-]+$'),
+  CONSTRAINT "chk_users_username_format" CHECK (username ~ '^[ a-zA-Z0-9éÉèÈêÊëËäÄâÂàÀïÏöÖôÔüÜûÛçÇ''’\-_\.]+$'),
   CONSTRAINT "chk_users_email_format" CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'),
   CONSTRAINT "chk_users_slug_format" CHECK (slug ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$')
 );
@@ -204,6 +204,7 @@ CREATE TABLE "sessions" (
   "context" varchar(31) NOT NULL DEFAULT ('session'),
   "ip_address" inet,
   "user_agent" varchar(511),
+  "expires_at" timestamp NOT NULL,
   "inserted_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP)
 );
 
