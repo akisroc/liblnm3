@@ -9,7 +9,7 @@ defmodule Platform.Accounts do
       user && Argon2.verify_pass(password, user.password) && user.is_enabled && !user.is_removed ->
         {:ok, user}
 
-      user && user.is_removed -> [:error, :removed]
+      user && user.is_removed -> {:error, :removed}
 
       user && !user.is_enabled -> {:error, :disabled}
 

@@ -121,7 +121,7 @@ defmodule Platform.AccountsTest do
 
       Repo.update!(User.changeset(user, %{is_removed: true}))
 
-      assert [:error, :removed] =
+      assert {:error, :removed} =
         Accounts.authenticate_user("removed@example.com", "password123")
     end
   end
