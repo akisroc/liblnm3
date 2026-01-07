@@ -10,7 +10,7 @@ defmodule PlatformWeb.Router do
   end
 
   # --- Public routes ---
-  scope "/api", PlatformWeb do
+  scope "/", PlatformWeb do
     pipe_through :api
 
     post "/register", UserController, :create
@@ -18,7 +18,7 @@ defmodule PlatformWeb.Router do
   end
 
   # --- Private routes ---
-  scope "/api", PlatformWeb do
+  scope "/", PlatformWeb do
     pipe_through [:api, :auth]
 
     # get "/me", UserController, :me
