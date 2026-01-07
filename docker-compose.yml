@@ -1,3 +1,5 @@
 include:
   - services/platform/docker-compose.yml
   - services/archive/docker-compose.yml
+  - services/frontend/docker-compose.yml
+  - infrastructure/reverse_proxy/docker-compose.yml

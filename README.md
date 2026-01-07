@@ -1,15 +1,18 @@
 # LNM3 Project
 
-Multi-service application with Phoenix backend and frontend.
+Multi-service application with Phoenix backend, Nuxt frontend, and archive API, orchestrated with Nginx reverse proxy.
 
 ## Architecture
 
 ```
 lnm3/
+├── docker-compose.yml          # Global orchestration
+├── infrastructure/
+│   └── reverse_proxy/          # Nginx reverse proxy
 └── services/
-    ├── frontend/          # Frontend applications (Nuxt app)
-    ├── platform/          # Platform API (Elixir/Phoenix/PostgreSQL)
-    └── archive/           # Archive API (PHP/Symfony/SQLite)
+    ├── frontend/               # Nuxt frontend (Bun runtime)
+    ├── platform/               # Platform API (Elixir/Phoenix/PostgreSQL)
+    └── archive/                # Archive API (PHP/Symfony/SQLite)
 ```
 
 ## Quick Start
@@ -35,35 +38,50 @@ docker-compose logs -f
 docker-compose down
 ```
 
-### Services
+### Services & Access
 
-| Service | Port | Description |
-|---------|------|-------------|
-| **platform** | 4000 | Phoenix API backend |
-| **db-platform** | 5432 | PostgreSQL database |
-| **adminer** | 8081 | Database admin UI |
+All services are accessed through **Nginx reverse proxy** on port 80:
+
+| Service | URL | Description |
+|---------|-----|-------------|
+| **Frontend** | http://www.localhost | Nuxt frontend application |
+| **Platform API** | http://platform.localhost | Phoenix API backend |
+| **Archive API** | http://archive.localhost | Legacy forum archives (read-only) |
+| **Adminer** | http://adminer.localhost | Database admin UI |
+
+> **Note**: For production, replace `.localhost` with your actual domain names.
 
 ### API Endpoints
 
-**Platform API** - `http://localhost:4000`
+**Platform API** - `http://platform.localhost`
 
 ```bash
 # Register a new user
-curl -X POST http://localhost:4000/register \
+curl -X POST http://platform.localhost/register \
   -H "Content-Type: application/json" \
   -d '{"user":{"username":"john","email":"john@example.com","password":"password123"}}'
 
 # Login
-curl -X POST http://localhost:4000/login \
+curl -X POST http://platform.localhost/login \
   -H "Content-Type: application/json" \
   -d '{"email":"john@example.com","password":"password123"}'
 ```
 
+**Archive API** - `http://archive.localhost`
+
+```bash
+# Get all topics
+curl http://archive.localhost/topics
+
+# Get specific topic
+curl http://archive.localhost/topics/123
+```
+
 ### Database Access
 
-**Adminer** - `http://localhost:8081`
+**Adminer** - `http://adminer.localhost`
 - System: PostgreSQL
-- Server: `db-platform`
+- Server: `db`
 - Username: `user`
 - Password: `pass`
 - Database: `lnm3_platform`
@@ -94,16 +112,25 @@ docker-compose up
 Create a `.env` file at the root for custom configuration:
 
 ```bash
-# Platform
+# Platform API
 SECRET_KEY_BASE=your_secret_key_here
-PHX_HOST=localhost
-CORS_ORIGINS=http://localhost:8000,http://localhost:3000
+PHX_HOST=platform.localhost
+CORS_ORIGINS=http://www.localhost,http://localhost
+
+# Archive API
+ARCHIVE_APP_SECRET=your_archive_secret_here
+
+# Frontend
+NUXT_PUBLIC_API_URL=http://platform.localhost
 ```
 
-Generate a secret key:
+Generate secrets:
 ```bash
-cd services/platform
-mix phx.gen.secret
+# Platform secret
+cd services/platform && mix phx.gen.secret
+
+# Archive secret (any random string)
+openssl rand -hex 32
 ```
 
 ## Production Deployment
@@ -135,12 +162,15 @@ Each service can be deployed independently. See service-specific documentation:
 - ✅ User registration & authentication
 - ✅ Session management with secure tokens
 - ✅ CORS configuration
-- ✅ Database migrations & seeds
+- ✅ Database migrations & seeds (auto-run on startup)
 - ✅ Comprehensive test suite (30+ tests)
-- ✅ Docker & Docker Compose setup
+- ✅ Docker & Docker Compose multi-service setup
+- ✅ Nginx reverse proxy with subdomain routing
+- ✅ Archive API (legacy forum read-only access)
+- ✅ Frontend (Nuxt with Bun runtime)
 
 ### In Progress
-- 🚧 Frontend integration
+- 🚧 Frontend-backend integration
 - 🚧 Authentication middleware
 - 🚧 Protected routes
 

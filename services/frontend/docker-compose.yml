@@ -1,0 +1,10 @@
+services:
+  frontend:
+    build:
+      dockerfile: Dockerfile
+    container_name: lnm3_frontend
+    restart: unless-stopped
+    environment:
+      NUXT_PUBLIC_API_URL: ${NUXT_PUBLIC_API_URL:-http://localhost:4000}
+    expose:
+      - "3000"
