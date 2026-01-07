@@ -24,7 +24,7 @@ config :platform, PlatformWeb.Endpoint,
     layout: false
   ],
   pubsub_server: Platform.PubSub,
-  live_view: [signing_salt: "MPQxWtZn"]
+  live_view: [signing_salt: "platform_liveview"]
 
 # Configures the mailer
 #

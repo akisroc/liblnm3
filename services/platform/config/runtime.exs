@@ -20,6 +20,13 @@ if System.get_env("PHX_SERVER") do
   config :platform, PlatformWeb.Endpoint, server: true
 end
 
+if config_env() == :dev do
+  # Allow overriding database config with environment variables in dev
+  if database_url = System.get_env("DATABASE_URL") do
+    config :platform, Platform.Repo, url: database_url
+  end
+end
+
 if config_env() == :prod do
   database_url =
     System.get_env("DATABASE_URL") ||

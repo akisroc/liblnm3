@@ -7,7 +7,7 @@ defmodule PlatformWeb.Endpoint do
   @session_options [
     store: :cookie,
     key: "_platform_key",
-    signing_salt: "NNdcwVWx",
+    signing_salt: "platform_session",
     same_site: "Lax"
   ]
 
