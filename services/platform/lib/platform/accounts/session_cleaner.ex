@@ -36,9 +36,6 @@ defmodule Platform.Accounts.SessionCleaner do
 
       {:ok, 0} ->
         Logger.debug("No expired sessions to clean up")
-
-      {:error, reason} ->
-        Logger.error("Failed to clean up expired sessions: #{inspect(reason)}")
     end
   end
 end
