@@ -47,7 +47,6 @@ All services are accessed through **Nginx reverse proxy** on port 80:
 | **Frontend** | http://www.localhost | Nuxt frontend application |
 | **Platform API** | http://platform.localhost | Phoenix API backend |
 | **Archive API** | http://archive.localhost | Legacy forum archives (read-only) |
-| **Adminer** | http://adminer.localhost | Database admin UI |
 
 > **Note**: For production, replace `.localhost` with your actual domain names.
 
@@ -79,7 +78,6 @@ curl http://archive.localhost/topics/123
 
 ### Database Access
 
-**Adminer** - `http://adminer.localhost`
 - System: PostgreSQL
 - Server: `db`
 - Username: `user`

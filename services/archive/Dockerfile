@@ -8,10 +8,11 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 WORKDIR /app
 
 # Copy dependency files
-COPY composer.json composer.lock symfony.lock ./
+COPY composer.json symfony.lock ./
 
-# Install dependencies
-RUN composer install --no-dev --no-scripts --no-autoloader --optimize-autoloader --prefer-dist && \
+# Update and install dependencies (will generate lock file)
+RUN composer update --no-scripts --no-autoloader --prefer-dist && \
+    composer install --no-dev --no-scripts --no-autoloader --optimize-autoloader --prefer-dist && \
     composer clear-cache
 
 # Copy application code

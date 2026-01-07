@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\StreamedJsonResponse;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Attribute\Route;
@@ -16,7 +18,7 @@ class ApiController extends AbstractController
 {
     public function __construct(private Database $db) {}
 
-    #[Route('/topics', name: 'api.topics.list', methods: ['GET'])]
+    #[Route('/topics', name: 'topics.list', methods: ['GET'])]
     public function topics(): StreamedJsonResponse
     {
         $generator = function () {
@@ -40,7 +42,7 @@ class ApiController extends AbstractController
         return new StreamedJsonResponse($generator());
     }
 
-    #[Route('/topics/{id}', name: 'api.topics.view', methods: ['GET'])]
+    #[Route('/topics/{id}', name: 'topics.view', methods: ['GET'])]
     public function topic(string $id): JsonResponse
     {
         $stmt = $this->db->pdo->prepare(
@@ -77,7 +79,7 @@ class ApiController extends AbstractController
         ]);
     }
 
-    #[Route('/posts', name: 'api.posts.list', methods: ['GET'])]
+    #[Route('/posts', name: 'posts.list', methods: ['GET'])]
     public function posts(Request $request): StreamedJsonResponse | JsonResponse {
         $withoutTopicParam = $request->query->get('without_topic');
         $withoutTopic = filter_var(
@@ -112,7 +114,7 @@ class ApiController extends AbstractController
         return new StreamedJsonResponse($generator());
     }
 
-    #[Route('/authors', name: 'api.authors.list', methods: ['GET'])]
+    #[Route('/authors', name: 'authors.list', methods: ['GET'])]
     public function authors(): StreamedJsonResponse
     {
         $generator = function (): iterable {
@@ -129,5 +131,12 @@ class ApiController extends AbstractController
         };
 
         return new StreamedJsonResponse($generator());
+    }
+
+    #[Route('/downloads/database', name: 'downloads.database', methods: ['GET'])]
+    public function downloadDatabase(
+        #[Autowire('%app.db_path%')] string $dbPath
+    ): BinaryFileResponse {
+        return new BinaryFileResponse($dbPath);
     }
 }
