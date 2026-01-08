@@ -41,9 +41,7 @@ class ApiController extends AbstractController
                 ORDER BY last_post_date DESC"
             );
 
-            while ($topic = $stmt->fetch()) {
-                yield $topic;
-            }
+            yield from $stmt;
         };
 
         return $this->createStreamedResponse($generator());
@@ -67,9 +65,7 @@ class ApiController extends AbstractController
             );
             $stmt->execute([$id]);
 
-            while ($post = $stmt->fetch()) {
-                yield $post;
-            }    
+            yield from $stmt;
         };
         
         if ($topic === false) {
@@ -113,9 +109,7 @@ class ApiController extends AbstractController
 
             $stmt = $this->db->pdo->query($sql);
 
-            while ($post = $stmt->fetch()) {
-                yield $post;
-            }
+            yield from $stmt;
         };
 
         return $this->createStreamedResponse($generator());
@@ -131,10 +125,9 @@ class ApiController extends AbstractController
                 WHERE author IS NOT NULL
                 ORDER BY author ASC'
             );
+            $stmt->setFetchMode(\PDO::FETCH_COLUMN, 0);
 
-            while ($author = $stmt->fetch(\PDO::FETCH_COLUMN)) {
-                yield $author;
-            }
+            yield from $stmt;
         };
 
         return $this->createStreamedResponse($generator());
