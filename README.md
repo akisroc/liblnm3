@@ -1,177 +1,113 @@
-# LNM3 Project
+# LNM3
 
-Multi-service application with Phoenix backend, Nuxt frontend, and archive API, orchestrated with Nginx reverse proxy.
+> **Note**
+> 
+> While _Le Nouveau Monde_’s community is french speaking, let’s
+> keep the codebase in english by convention.
 
-## Architecture
+LNM rebirth. (:
+
+Historcally a PHP project, this rebirth runs on an
+Elixir/Phoenix/PostgreSQL backend (REST API), a Nuxt
+frontend, and some PHP/Symfony to serve the legacy
+forum archives.
+
+---
+
+## Project technical overview
+
+### Structure
 
 ```
 lnm3/
-├── docker-compose.yml          # Global orchestration
+├── .env.example                # Example environment variables
+├── docker-compose.yml          # Local development orchestration
+├── Makefile                    # Makefile for local development
 ├── infrastructure/
-│   └── reverse_proxy/          # Nginx reverse proxy
+│   ├── database/               # PostgreSQL database 
+│   └── reverse_proxy/          # Traefik reverse proxy
 └── services/
+    ├── archive/                # Archive API (PHP/Symfony/SQLite)
     ├── frontend/               # Nuxt frontend (Bun runtime)
-    ├── platform/               # Platform API (Elixir/Phoenix/PostgreSQL)
-    └── archive/                # Archive API (PHP/Symfony/SQLite)
+    └── platform/               # Platform API (Elixir/Phoenix/PostgreSQL)
 ```
 
-## Quick Start
+All bricks in `infrastructure/` and `services/` have Dockerfiles.
 
-### Prerequisites
+Depending on the final deployment target, `infrastructure/` might
+not be handled through Docker though. At this stage of the project,
+LNM3 will likely be deployed on an OVH VPS under Coolify, so only
+`services/` would be containerized in this scenario.
 
-- Docker & Docker Compose
-- (Optional) Elixir 1.15+ for local development
+### Networking & routing
 
-### Start All Services
+Traefik is used as reverse proxy.
 
-```bash
-# Start all services
-docker-compose up
+Internal communications follow this schema:
 
-# Start in background
-docker-compose up -d
-
-# View logs
-docker-compose logs -f
-
-# Stop all services
-docker-compose down
+```
+Traefik
+├── domain.example ───────────── lnm3_frontend:3000   # Frontend app
+├── platform.domain.example ──── lnm3_platform:4000   # Platform API
+    └── lnm3_database:5432                            # Postgres DB
+└── archive.domain.example ───── lnm3_archive:9000    # Archive API
 ```
 
-### Services & Access
+The database communicates only with the Platform service through
+a shared `database_network`. It is isolated from the reverse
+proxy’s `front_network` and the external world.
 
-All services are accessed through **Nginx reverse proxy** on port 80:
+So services are accessed through the following URLs:
 
-| Service | URL | Description |
-|---------|-----|-------------|
-| **Frontend** | http://www.localhost | Nuxt frontend application |
-| **Platform API** | http://platform.localhost | Phoenix API backend |
-| **Archive API** | http://archive.localhost | Legacy forum archives (read-only) |
+| Service          | URL                             | Description                       |
+|------------------|---------------------------------|-----------------------------------|
+| **Frontend**     | https://www.domain.example      | Nuxt frontend application         |
+| **Platform API** | https://platform.domain.example | Phoenix API backend               |
+| **Archive API**  | https://archive.domain.example  | Legacy forum archives (read-only) |
 
-> **Note**: For production, replace `.localhost` with your actual domain names.
+In development environment, the following URLs should work by
+default:
 
-### API Endpoints
+- http://localhost
+- http://platform.localhost
+- http://archive.localhost
+- http://localhost:8080/dashboard
 
-**Platform API** - `http://platform.localhost`
+Maybe check your `/etc/hosts` if something doesn’t work as expected.
 
-```bash
-# Register a new user
-curl -X POST http://platform.localhost/register \
-  -H "Content-Type: application/json" \
-  -d '{"user":{"username":"john","email":"john@example.com","password":"password123"}}'
+> **Note**
+> 
+> Traefik exposes its `localhost:8080/dashboard` in the `dev`
+> Docker stage **only**.
+> 
+> This is not to be deployed in production.
 
-# Login
-curl -X POST http://platform.localhost/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"john@example.com","password":"password123"}'
-```
-
-**Archive API** - `http://archive.localhost`
-
-```bash
-# Get all topics
-curl http://archive.localhost/topics
-
-# Get specific topic
-curl http://archive.localhost/topics/123
-```
-
-### Database Access
-
-- System: PostgreSQL
-- Server: `db`
-- Username: `user`
-- Password: `pass`
-- Database: `lnm3_platform`
+---
 
 ## Development
 
-### Platform Service (Phoenix)
+### Prerequisites
 
-See [services/platform/README.md](services/platform/README.md) for detailed documentation.
+- `docker` & `docker compose`
+- `make`
 
-```bash
-cd services/platform
+### Setup
 
-# Local development (without Docker)
-mix deps.get
-mix ecto.setup
-mix phx.server
-
-# Run tests
-mix test
-
-# Docker development
-docker-compose up
-```
-
-### Environment Variables
-
-Create a `.env` file at the root for custom configuration:
+The following command should put you on the rails with
+the whole default dev environment:
 
 ```bash
-# Platform API
-SECRET_KEY_BASE=your_secret_key_here
-PHX_HOST=platform.localhost
-CORS_ORIGINS=http://www.localhost,http://localhost
-
-# Archive API
-ARCHIVE_APP_SECRET=your_archive_secret_here
-
-# Frontend
-NUXT_PUBLIC_API_URL=http://platform.localhost
+make setup
 ```
 
-Generate secrets:
-```bash
-# Platform secret
-cd services/platform && mix phx.gen.secret
-
-# Archive secret (any random string)
-openssl rand -hex 32
-```
+It will copy the `.env.example` file into a newly
+created `.env`. You can customize it if needed, `docker compose`
+will read it.
 
 ## Production Deployment
 
-### Using Docker Compose
-
-```bash
-# Set environment variables
-export SECRET_KEY_BASE=$(cd services/platform && mix phx.gen.secret)
-export PHX_HOST=api.yourdomain.com
-export CORS_ORIGINS=https://yourdomain.com
-
-# Build and start
-docker-compose build
-docker-compose up -d
-
-# Run migrations
-docker-compose exec platform bin/platform eval "Platform.Release.migrate()"
-```
-
-### Individual Services
-
-Each service can be deployed independently. See service-specific documentation:
-- [Platform Service Docker Guide](services/platform/DOCKER_README.md)
-
-## Project Status
-
-### Implemented
-- ✅ User registration & authentication
-- ✅ Session management with secure tokens
-- ✅ CORS configuration
-- ✅ Database migrations & seeds (auto-run on startup)
-- ✅ Comprehensive test suite (30+ tests)
-- ✅ Docker & Docker Compose multi-service setup
-- ✅ Nginx reverse proxy with subdomain routing
-- ✅ Archive API (legacy forum read-only access)
-- ✅ Frontend (Nuxt with Bun runtime)
-
-### In Progress
-- 🚧 Frontend-backend integration
-- 🚧 Authentication middleware
-- 🚧 Protected routes
+🚧 Todo
 
 ## License
 
-[Add your license here]
+[GNU GPL v3](LICENSE)

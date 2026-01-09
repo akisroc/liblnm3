@@ -25,6 +25,14 @@ class ApiController extends AbstractController
         private readonly Database $db
     ) {}
 
+    #[Route('/', name: 'health', methods: ['GET'])]
+    public function health(): JsonResponse
+    {
+        return new JsonResponse([
+            'message' => 'LNM3 Archive API is running and healthy.'
+        ]);
+    }
+
     #[Route('/topics', name: 'topics.list', methods: ['GET'])]
     public function topics(): StreamedJsonResponse
     {
@@ -67,7 +75,7 @@ class ApiController extends AbstractController
 
             yield from $stmt;
         };
-        
+
         if ($topic === false) {
             return new JsonResponse([
                 'message' => "No topic found for id “{$id}”"
