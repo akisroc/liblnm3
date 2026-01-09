@@ -9,6 +9,9 @@ begin
   db = SQLite3::Database.new "lnm_archive.sqlite"
   puts "Database file created."
 
+  db.execute("PRAGMA journal_mode = OFF;")
+  db.execute("PRAGMA synchronous = OFF;")
+
   db.execute_batch <<-SQL
     CREATE TABLE IF NOT EXISTS topics (
       id TEXT PRIMARY KEY,
@@ -16,16 +19,13 @@ begin
     );
     CREATE TABLE IF NOT EXISTS posts (
       id TEXT PRIMARY KEY,
-      topic_id INTEGER,
+      topic_id TEXT,
       place TEXT,
       position INTEGER,
       author TEXT,
-      content BLOB,
+      content TEXT,
       created_at INTEGER
     );
-    CREATE INDEX idx_posts_topic_id ON posts(topic_id);
-    CREATE INDEX idx_posts_created_at ON posts(created_at);
-    CREATE INDEX idx_posts_author ON posts(author);
   SQL
 
   puts "Schema created."
@@ -74,10 +74,26 @@ begin
 
   puts "Data inserted."
 
+  puts "Optimizing database…"
+
+  db.execute_batch <<-SQL
+  CREATE INDEX idx_posts_topic_id ON posts(topic_id);
+  CREATE INDEX idx_posts_created_at ON posts(created_at);
+  CREATE INDEX idx_posts_author ON posts(author);
+  SQL
+
+  db.execute("PRAGMA analyze;")
+  db.execute("VACUUM;")
+  db.execute("PRAGMA secure_delete = OFF;")
+  db.execute("PRAGMA optimize;")
+
+  puts "Database optimized and compacted."
+
 rescue Exception => e
   puts "Error: #{e}"
   puts e.backtrace
 
 ensure
   db.close if db
+  puts "Done."
 end

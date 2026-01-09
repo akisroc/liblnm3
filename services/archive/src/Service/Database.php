@@ -26,7 +26,6 @@ final readonly class Database
         );
 
         // Optimizations
-        $this->pdo->exec('PRAGMA journal_mode = WAL;');
         $this->pdo->exec('PRAGMA synchronous = NORMAL;');
         $this->pdo->exec('PRAGMA cache_size = 10000;');
         $this->pdo->exec('PRAGMA temp_store = MEMORY;');

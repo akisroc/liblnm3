@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -14,22 +15,35 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Service\Database;
+use App\Schema\Topic;
+use App\Schema\Post;
 
+/**
+ * Todo: Might consider using a query builder when
+ * more precise filters will be required by frontend.
+ * Maybe https://github.com/usmanhalalit/pixie .
+ */ 
 class ApiController extends AbstractController
 {
-    // 6 months
-    // Archive ata is static and eternal anyway
-    private const RESPONSES_MAX_AGE = 60 * 60 * 24 * 30 * 6;
+    /**
+     *  6 months
+     * Archive data is static and eternal anyway
+     */
+    private const int RESPONSES_MAX_AGE = 60 * 60 * 24 * 30 * 6;
 
     public function __construct(
         private readonly Database $db
     ) {}
 
     #[Route('/', name: 'health', methods: ['GET'])]
-    public function health(): JsonResponse
+    public function health(RouterInterface $router): JsonResponse
     {
         return new JsonResponse([
-            'message' => 'LNM3 Archive API is running and healthy.'
+            'message' => 'LNM3 Archive API is running and healthy.',
+            'routes' => array_map(
+                fn($route) => $route->getPath(),
+                array_values($router->getRouteCollection()->all())
+            )
         ]);
     }
 
@@ -41,13 +55,14 @@ class ApiController extends AbstractController
                 "SELECT
                 t.id,
                 t.title,
-                REPLACE(GROUP_CONCAT(DISTINCT p.author), ',', ', ') AS authors,
-                MAX(p.created_at) AS last_post_date
+                GROUP_CONCAT(DISTINCT p.author) AS authors,
+                MAX(p.created_at) AS lastPostDate
                 FROM topics t
                 INNER JOIN posts p ON t.id = p.topic_id
                 GROUP BY t.id
-                ORDER BY last_post_date DESC"
+                ORDER BY lastPostDate DESC"
             );
+            $stmt->setFetchMode(\PDO::FETCH_CLASS, Topic::class);
 
             yield from $stmt;
         };
@@ -62,15 +77,17 @@ class ApiController extends AbstractController
             'SELECT id, title FROM topics WHERE id = ?'
         );
         $stmt->execute([$id]);
+        $stmt->setFetchMode(\PDO::FETCH_CLASS, Topic::class);
         $topic = $stmt->fetch();
 
         $generator = function () use ($id) {
             $stmt = $this->db->pdo->prepare(
-                'SELECT id, topic_id, position, author, content, created_at
+                'SELECT id, topic_id AS topicId, position, author, content, created_at AS createdAt
                 FROM posts
-                WHERE topic_id = ?
-                ORDER BY created_at ASC'
+                WHERE topicId = ?
+                ORDER BY createdAt ASC'
             );
+            $stmt->setFetchMode(\PDO::FETCH_CLASS, Post::class);
             $stmt->execute([$id]);
 
             yield from $stmt;
@@ -83,8 +100,8 @@ class ApiController extends AbstractController
         }
 
         return $this->createStreamedResponse([
-            'id' => $topic['id'],
-            'title' => $topic['title'],
+            'id' => $topic->id,
+            'title' => $topic->title,
             'posts' => $generator()
         ]);
     }
@@ -107,15 +124,16 @@ class ApiController extends AbstractController
 
         $generator = function () use ($withoutTopic): iterable {
             $sql = '
-                SELECT id, topic_id, place, author, content, created_at
+                SELECT id, topic_id AS topicId, place, author, content, created_at AS createdAt
                 FROM posts
             ';
 
             if ($withoutTopic === true) {
-                $sql .= ' WHERE topic_id IS NULL';
+                $sql .= ' WHERE topicId IS NULL';
             }
 
             $stmt = $this->db->pdo->query($sql);
+            $stmt->setFetchMode(\PDO::FETCH_CLASS, Post::class);
 
             yield from $stmt;
         };
@@ -141,6 +159,43 @@ class ApiController extends AbstractController
         return $this->createStreamedResponse($generator());
     }
 
+    #[Route('/places', name: 'places.list', methods: ['GET'])]
+    public function places(): StreamedJsonResponse
+    {
+        $generator = function (): iterable {
+            $stmt = $this->db->pdo->query(
+                'SELECT DISTINCT place
+                FROM posts
+                WHERE place IS NOT NULL
+                ORDER BY place ASC'
+            );
+            $stmt->setFetchMode(\PDO::FETCH_COLUMN, 0);
+
+            yield from $stmt;
+        };
+
+        return $this->createStreamedResponse($generator());
+    }
+
+    #[Route('/races', name: 'races.list', methods: ['GET'])]
+    public function races(): JsonResponse
+    {
+        return $this->createStaticResponse([
+            'Arakkoas',
+            'Damnés',
+            'Dragoons',
+            'Elfes sylvains',
+            'Golems',
+            'Humains',
+            'Morts-vivants',
+            'Naggas',
+            'Nains',
+            'Nordiques',
+            'Orcs',
+            'Skavens'
+        ]);
+    }
+
     #[Route('/downloads/database', name: 'downloads.database', methods: ['GET'])]
     public function downloadDatabase(
         #[Autowire('%app.db_path%')] string $dbPath
@@ -153,6 +208,16 @@ class ApiController extends AbstractController
     private function createStreamedResponse(iterable $data): StreamedJsonResponse
     {
         $response = new StreamedJsonResponse($data);
+        $response->setPublic();
+        $response->setMaxAge(self::RESPONSES_MAX_AGE);
+        $response->setSharedMaxAge(self::RESPONSES_MAX_AGE);
+
+        return $response;
+    }
+
+    private function createStaticResponse(iterable $data): JsonResponse
+    {
+        $response = new JsonResponse($data);
         $response->setPublic();
         $response->setMaxAge(self::RESPONSES_MAX_AGE);
         $response->setSharedMaxAge(self::RESPONSES_MAX_AGE);
