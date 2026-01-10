@@ -1,15 +1,15 @@
-defmodule Platform.Accounts.User do
+defmodule Platform.Accounts.Ecto.Entities.User do
   use Ecto.Schema
   import Ecto.Changeset
-  import Platform.Utils.SlugUtils
+
+  alias Platform.Ecto.Types.{PrimaryKey, Slug}
 
   @username_regex ~r/^[ a-zA-Z0-9éÉèÈêÊëËäÄâÂàÀïÏöÖôÔüÜûÛçÇ\'’\-_\.&]+$/
   @email_regex ~r/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/
   @url_regex ~r/^https?:\/\/[\w\d\-._~:?#\[\]@!$&'()*+,;=%\/]+$/
-  @slug_regex ~r/^[a-z0-9]+(?:-[a-z0-9]+)*$/
 
-  @primary_key {:id, Platform.EctoTypes.UUIDv7, autogenerate: true}
-  @foreign_key_type Platform.EctoTypes.UUIDv7
+  @primary_key {:id, PrimaryKey, autogenerate: true}
+  @foreign_key_type PrimaryKey
 
   schema "users" do
     field :username, :string
@@ -17,7 +17,7 @@ defmodule Platform.Accounts.User do
     field :password, :string, redact: true  # Hides password in logs
 
     field :profile_picture, :string
-    field :slug, :string
+    field :slug, Slug
     field :platform_theme, Ecto.Enum, values: [:dark, :light]
     field :is_enabled, :boolean, default: true
     field :is_removed, :boolean, default: false
@@ -28,7 +28,7 @@ defmodule Platform.Accounts.User do
   end
 
   @doc false
-  def changeset(user, attrs) do
+  def create_changeset(user, attrs) do
     user
     |> cast(attrs, [:username, :email, :profile_picture, :password, :slug, :platform_theme, :is_enabled])
     |> validate_required([:username, :email, :password])
@@ -37,8 +37,6 @@ defmodule Platform.Accounts.User do
     |> update_change(:username, &String.trim/1)
     |> validate_length(:username, min: 1, max: 30)
     |> validate_format(:username, @username_regex)
-    |> generate_unique_slug(__MODULE__, :username)
-    |> validate_format(:slug, @slug_regex)
 
     |> update_change(:email, &String.trim/1)
     |> update_change(:email, &String.downcase/1)
@@ -49,6 +47,9 @@ defmodule Platform.Accounts.User do
 
     |> validate_length(:profile_picture, min: 1, max: 500)
     |> validate_format(:profile_picture, @url_regex)
+
+    |> PrimaryKey.ensure_generation()
+    |> Slug.generate()
 
     |> validate_length(:password, min: 8, max: 72)
     |> hash_password()

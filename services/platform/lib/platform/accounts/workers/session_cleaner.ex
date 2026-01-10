@@ -1,4 +1,4 @@
-defmodule Platform.Accounts.SessionCleaner do
+defmodule Platform.Accounts.Workers.SessionCleaner do
   @moduledoc """
   GenServer that periodically cleans up expired sessions from the database.
   """

@@ -58,8 +58,8 @@ CREATE TABLE "kingdoms" (
   "name" varchar(63) UNIQUE NOT NULL,
   "slug" varchar(127) UNIQUE NOT NULL,
   "fame" numeric(12,3) NOT NULL DEFAULT (30000.0),
-  "defense_troup" integer[] NOT NULL DEFAULT '{0, 0, 0, 0, 0, 0, 0, 0}',
-  "attack_troup" integer[] NOT NULL DEFAULT '{0, 0, 0, 0, 0, 0, 0, 0}',
+  "defense_troop" integer[] NOT NULL DEFAULT '{0, 0, 0, 0, 0, 0, 0, 0}',
+  "attack_troop" integer[] NOT NULL DEFAULT '{0, 0, 0, 0, 0, 0, 0, 0}',
   "is_active" bool NOT NULL DEFAULT (false),
   "is_removed" bool NOT NULL DEFAULT (false),
   "inserted_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
@@ -67,35 +67,36 @@ CREATE TABLE "kingdoms" (
   CONSTRAINT "chk_kingdoms_name_format" CHECK (name ~ '^[ a-zA-Z0-9éÉèÈêÊëËäÄâÂàÀïÏöÖôÔüÜûÛçÇ''’\-]+$'),
   CONSTRAINT "chk_kingdoms_fame_positive" CHECK (fame >= 0.0),
   CONSTRAINT "chk_kingdoms_slug_format" CHECK (slug ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'),
-  CONSTRAINT "chk_kingdoms_attack_troup_structure" CHECK (array_ndims(attack_troup) = 1 AND array_length(attack_troup, 1) = 8),
-  CONSTRAINT "chk_kingdoms_attack_troup_positive_integers" CHECK (0 <= ALL(attack_troup)),
-  CONSTRAINT "chk_kingdoms_defense_troup_structure" CHECK (array_ndims(defense_troup) = 1 AND array_length(defense_troup, 1) = 8),
-  CONSTRAINT "chk_kingdoms_defense_troup_positive_integers" CHECK (0 <= ALL(defense_troup))
+  CONSTRAINT "chk_kingdoms_attack_troop_structure" CHECK (array_ndims(attack_troop) = 1 AND array_length(attack_troop, 1) = 8),
+  CONSTRAINT "chk_kingdoms_attack_troop_positive_integers" CHECK (0 <= ALL(attack_troop)),
+  CONSTRAINT "chk_kingdoms_defense_troop_structure" CHECK (array_ndims(defense_troop) = 1 AND array_length(defense_troop, 1) = 8),
+  CONSTRAINT "chk_kingdoms_defense_troop_positive_integers" CHECK (0 <= ALL(defense_troop))
 );
 
 CREATE TABLE "battles" (
   "id" uuid PRIMARY KEY,
-  "attacker_id" uuid,
-  "defender_id" uuid,
-  "attacker_initial_troup" integer[] NOT NULL,
-  "defender_initial_troup" integer[] NOT NULL,
+  "attacker_kingdom_id" uuid,
+  "defender_kingdom_id" uuid,
+  "attacker_initial_troop" integer[] NOT NULL,
+  "defender_initial_troop" integer[] NOT NULL,
   "log" jsonb NOT NULL,
-  "attacker_final_troup" integer[] NOT NULL,
-  "defender_final_troup" integer[] NOT NULL,
+  "attacker_final_troop" integer[] NOT NULL,
+  "defender_final_troop" integer[] NOT NULL,
   "attacker_wins" bool NOT NULL,
+  "attacker_fame_modifier" numeric(12,3) NOT NULL,
+  "defender_fame_modifier" numeric(12,3) NOT NULL,
   "inserted_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
-  CONSTRAINT "chk_battles_attacker_is_not_defender" CHECK (attacker_id <> defender_id),
-  CONSTRAINT "chk_battles_attacker_initial_troup_structure" CHECK (array_ndims(attacker_initial_troup) = 1 AND array_length(attacker_initial_troup, 1) = 8),
-  CONSTRAINT "chk_battles_defender_initial_troup_structure" CHECK (array_ndims(defender_initial_troup) = 1 AND array_length(defender_initial_troup, 1) = 8),
-  CONSTRAINT "chk_battles_attacker_final_troup_structure" CHECK (array_ndims(attacker_final_troup) = 1 AND array_length(attacker_final_troup, 1) = 8),
-  CONSTRAINT "chk_battles_defender_final_troup_structure" CHECK (array_ndims(defender_final_troup) = 1 AND array_length(defender_final_troup, 1) = 8),
-  CONSTRAINT "chk_battles_attacker_initial_troup_positive_integers" CHECK (0 <= ALL(attacker_initial_troup)),
-  CONSTRAINT "chk_battles_defender_initial_troup_positive_integers" CHECK (0 <= ALL(defender_initial_troup)),
-  CONSTRAINT "chk_battles_attacker_final_troup_positive_integers" CHECK (0 <= ALL(attacker_final_troup)),
-  CONSTRAINT "chk_battles_defender_final_troup_positive_integers" CHECK (0 <= ALL(defender_final_troup)),
+  CONSTRAINT "chk_battles_attacker_is_not_defender" CHECK (attacker_kingdom_id <> defender_kingdom_id),
+  CONSTRAINT "chk_battles_attacker_initial_troop_structure" CHECK (array_ndims(attacker_initial_troop) = 1 AND array_length(attacker_initial_troop, 1) = 8),
+  CONSTRAINT "chk_battles_defender_initial_troop_structure" CHECK (array_ndims(defender_initial_troop) = 1 AND array_length(defender_initial_troop, 1) = 8),
+  CONSTRAINT "chk_battles_attacker_final_troop_structure" CHECK (array_ndims(attacker_final_troop) = 1 AND array_length(attacker_final_troop, 1) = 8),
+  CONSTRAINT "chk_battles_defender_final_troop_structure" CHECK (array_ndims(defender_final_troop) = 1 AND array_length(defender_final_troop, 1) = 8),
+  CONSTRAINT "chk_battles_attacker_initial_troop_positive_integers" CHECK (0 <= ALL(attacker_initial_troop)),
+  CONSTRAINT "chk_battles_defender_initial_troop_positive_integers" CHECK (0 <= ALL(defender_initial_troop)),
+  CONSTRAINT "chk_battles_attacker_final_troop_positive_integers" CHECK (0 <= ALL(attacker_final_troop)),
+  CONSTRAINT "chk_battles_defender_final_troop_positive_integers" CHECK (0 <= ALL(defender_final_troop)),
   CONSTRAINT "chk_log_integrity" CHECK (is_valid_battle_log(log))
 );
-
 
 CREATE TABLE "protagonists" (
   "id" uuid PRIMARY KEY,
@@ -216,9 +217,9 @@ CREATE INDEX "idx_kingdoms_user_id" ON "kingdoms" ("user_id");
 
 CREATE INDEX "idx_kingdoms_leader_id" ON "kingdoms" ("leader_id");
 
-CREATE INDEX "idx_battles_attacker_id" ON "battles" ("attacker_id");
+CREATE INDEX "idx_battles_attacker_kingdom_id" ON "battles" ("attacker_kingdom_id");
 
-CREATE INDEX "idx_battles_defender_id" ON "battles" ("defender_id");
+CREATE INDEX "idx_battles_defender_kingdom_id" ON "battles" ("defender_kingdom_id");
 
 CREATE UNIQUE INDEX "idx_protagonists_id_user_id" ON "protagonists" ("id", "user_id");
 
@@ -258,9 +259,9 @@ ALTER TABLE "kingdoms" ADD FOREIGN KEY ("leader_id") REFERENCES "protagonists" (
 
 ALTER TABLE "kingdoms" ADD FOREIGN KEY ("leader_id", "user_id") REFERENCES "protagonists" ("id", "user_id");
 
-ALTER TABLE "battles" ADD FOREIGN KEY ("attacker_id") REFERENCES "kingdoms" ("id");
+ALTER TABLE "battles" ADD FOREIGN KEY ("attacker_kingdom_id") REFERENCES "kingdoms" ("id");
 
-ALTER TABLE "battles" ADD FOREIGN KEY ("defender_id") REFERENCES "kingdoms" ("id");
+ALTER TABLE "battles" ADD FOREIGN KEY ("defender_kingdom_id") REFERENCES "kingdoms" ("id");
 
 ALTER TABLE "protagonists" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 
@@ -305,8 +306,8 @@ CREATE OR REPLACE VIEW battle_log_notation_view AS
 WITH raw_data AS (
   SELECT 
     id AS battle_id,
-    attacker_id,
-    defender_id,
+    attacker_kingdom_id,
+    defender_kingdom_id,
     split_part(log::text, '\n', 1) as line_initial,
     split_part(log::text, '\n', 2) as line_log,
     split_part(log::text, '\n', 3) as line_final,

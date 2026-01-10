@@ -13,7 +13,7 @@ defmodule Platform.Application do
       {DNSCluster, query: Application.get_env(:platform, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Platform.PubSub},
       # Background workers
-      Platform.Accounts.SessionCleaner,
+      Platform.Accounts.Workers.SessionCleaner,
       # Start to serve requests, typically the last entry
       PlatformWeb.Endpoint
     ]

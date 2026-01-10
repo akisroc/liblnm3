@@ -189,7 +189,9 @@ defmodule Battle do
       |> Stream.reject(&(&1) |> same_side?(striking_unit))
       |> Stream.reject(&(&1.count === 0))
       |> Stream.reject(&(&1.stricken?))
-      |> Enum.reject(fn unit -> !striking_unit.distance? && unit.distance? end)
+      |> Enum.reject(fn unit ->
+        !striking_unit.archetype.distance? && unit.archetype.distance?
+      end)
       |> pick_random_or_nil()
   end
   defp pick_random_or_nil([]), do: nil
