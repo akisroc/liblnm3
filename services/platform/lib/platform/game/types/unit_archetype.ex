@@ -11,9 +11,20 @@ defmodule Platform.Game.UnitArchetype do
 
   `4.0 / 7.0 = 0.5714285714285714`, so let’s make it `0.57`.
 
+  ### Fame drain rate
+
+  **Fame drain rate** is based upon old LNM data, repurposing the former
+  plunder rates. This value is a foundation for fame extraction mathematics
+  when a kingdom defeats another one in battle.
+
+  **Example (B1):**
+
+  B1 archetype was renowned for being a pretty weak unit in fight but
+  with a very high plunder rate. Its value was `6.0`, so let’s keep it.
+
   ### Fame cost
 
-  **Fame cost** is derived from old LNM data. Soldiers were recruited in
+  **Fame cost** is also derived from old LNM data. Soldiers were recruited in
   barracks. Each barrack of a certain archetype occupied a certain number
   of hectares, and allowed to recruit a certain number of soldiers. In this
   new version, barracks are removed, so soldiers are directly recruited. But
@@ -33,6 +44,7 @@ defmodule Platform.Game.UnitArchetype do
     :defense,
     :speed,
     :kill_rate,
+    :fame_drain_rate,
     :distance?,
     :fame_cost
   ]
@@ -43,6 +55,7 @@ defmodule Platform.Game.UnitArchetype do
     defense: float(),
     speed: float(),
     kill_rate: float(),
+    fame_drain_rate: float(),
     distance?: boolean(),
     fame_cost: float()
   }
@@ -82,90 +95,7 @@ defmodule Platform.Game.UnitArchetype do
       defense: 7.0,
       speed: 85.0,
       kill_rate: 0.57,
-      distance?: false,
-      fame_cost: 2.86
-    }
-  end
-
-  defp b1 do
-    %__MODULE__{
-      label: :b1,
-      power: 4.0,
-      defense: 7.0,
-      speed: 85.0,
-      kill_rate: 0.57,
-      distance?: false,
-      fame_cost: 2.86
-    }
-  end
-
-  defp b1 do
-    %__MODULE__{
-      label: :b1,
-      power: 4.0,
-      defense: 7.0,
-      speed: 85.0,
-      kill_rate: 0.57,
-      distance?: false,
-      fame_cost: 2.86
-    }
-  end
-
-  defp b1 do
-    %__MODULE__{
-      label: :b1,
-      power: 4.0,
-      defense: 7.0,
-      speed: 85.0,
-      kill_rate: 0.57,
-      distance?: false,
-      fame_cost: 2.86
-    }
-  end
-
-  defp b1 do
-    %__MODULE__{
-      label: :b1,
-      power: 4.0,
-      defense: 7.0,
-      speed: 85.0,
-      kill_rate: 0.57,
-      distance?: false,
-      fame_cost: 2.86
-    }
-  end
-
-  defp b1 do
-    %__MODULE__{
-      label: :b1,
-      power: 4.0,
-      defense: 7.0,
-      speed: 85.0,
-      kill_rate: 0.57,
-      distance?: false,
-      fame_cost: 2.86
-    }
-  end
-
-  defp b1 do
-    %__MODULE__{
-      label: :b1,
-      power: 4.0,
-      defense: 7.0,
-      speed: 85.0,
-      kill_rate: 0.57,
-      distance?: false,
-      fame_cost: 2.86
-    }
-  end
-
-  defp b1 do
-    %__MODULE__{
-      label: :b1,
-      power: 4.0,
-      defense: 7.0,
-      speed: 85.0,
-      kill_rate: 0.57,
+      fame_drain_rate: 6.0,
       distance?: false,
       fame_cost: 2.86
     }
