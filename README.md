@@ -16,9 +16,9 @@ forum archives.
 
 ## Project technical overview
 
-### Structure
+### Project structure
 
-```
+```directory
 lnm3/
 ├── .env.example                # Example environment variables
 ├── docker-compose.yml          # Local development orchestration
@@ -83,6 +83,106 @@ Maybe check your `/etc/hosts` if something doesn’t work as expected.
 > This is not to be deployed in production.
 
 ---
+
+### Database structure
+
+```mermaid
+erDiagram
+    USERS ||--o{ KINGDOMS : "owns"
+    USERS ||--o{ PROTAGONISTS : "plays"
+    USERS ||--o{ CHRONICLES : "masters"
+    USERS ||--o{ BOARDS : "creates"
+    USERS ||--o{ THREADS : "starts"
+    USERS ||--o{ POSTS : "writes"
+    USERS ||--o{ SESSIONS : "has"
+    USERS ||--o{ CHAPTERS_VIEWS : "reads"
+
+    KINGDOMS ||--o{ BATTLES : "attacks/defends"
+    KINGDOMS ||--o{ MISSIVES : "sends/receives"
+    KINGDOMS |o--o| PROTAGONISTS : "led_by"
+
+    PROTAGONISTS ||--o{ PROTAGONISTS_CHRONICLES : "participates"
+    PROTAGONISTS ||--o{ CHAPTERS : "writes"
+    CHRONICLES ||--o{ PROTAGONISTS_CHRONICLES : "includes"
+    CHRONICLES ||--o{ CHAPTERS : "contains"
+    
+    BOARDS ||--o{ THREADS : "contains"
+    THREADS ||--o{ POSTS : "contains"
+    CHAPTERS ||--o{ CHAPTERS_VIEWS : "viewed_by"
+
+    USERS {
+        uuid id PK
+        varchar username
+        varchar email
+        varchar slug
+        platform_theme_enum platform_theme
+        bool is_enabled
+    }
+
+    KINGDOMS {
+        uuid id PK
+        uuid user_id FK
+        uuid leader_id FK
+        varchar name
+        numeric fame
+        integer_array defense_troup
+        integer_array attack_troup
+        bool is_active
+    }
+
+    BATTLES {
+        uuid id PK
+        uuid attacker_id FK
+        uuid defender_id FK
+        integer_array attacker_initial_troup
+        jsonb log
+        bool attacker_wins
+    }
+
+    PROTAGONISTS {
+        uuid id PK
+        uuid user_id FK
+        uuid kingdom_id FK
+        varchar name
+        numeric fame
+        bool anonymous
+    }
+
+    MISSIVES {
+        uuid id PK
+        uuid sender_id FK
+        uuid receiver_id FK
+        text content
+        bool is_read
+    }
+
+    CHRONICLES {
+        uuid id PK
+        uuid gm_id FK
+        uuid user_id FK
+        varchar title
+        varchar slug
+    }
+
+    CHAPTERS {
+        uuid id PK
+        uuid chronicle_id FK
+        uuid protagonist_id FK
+        text content
+    }
+
+    SESSIONS {
+        uuid id PK
+        uuid user_id FK
+        bytea token
+        inet ip_address
+        timestamp expires_at
+    }
+```
+
+Some points:
+- Keys are UUIDv7 generated in code.
+- Passwords use Argon2id hash.
 
 ## Development
 
