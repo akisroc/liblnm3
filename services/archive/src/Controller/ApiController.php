@@ -5,15 +5,16 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\StreamedJsonResponse;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Attribute\Route;
+use Psr\Log\LoggerInterface;
 use App\Service\Database;
 use App\Schema\Topic;
 use App\Schema\Post;
@@ -35,16 +36,28 @@ class ApiController extends AbstractController
         private readonly Database $db
     ) {}
 
-    #[Route('/', name: 'health', methods: ['GET'])]
-    public function health(RouterInterface $router): JsonResponse
+    #[Route('/ping', name: 'ping', methods: ['GET'])]
+    public function ping(): Response
     {
-        return new JsonResponse([
-            'message' => 'LNM3 Archive API is running and healthy.',
-            'routes' => array_map(
-                fn($route) => $route->getPath(),
-                array_values($router->getRouteCollection()->all())
-            )
-        ]);
+        return new Response('', 204);
+    }
+
+    #[Route('/health', name: 'health', methods: ['GET'])]
+    public function health(LoggerInterface $logger): JsonResponse
+    {
+        try {
+            $this->db->pdo->exec('SELECT 1');
+            return new JsonResponse([
+                'status' => 'ok',
+                'database' => 'connected'
+            ], 200);
+        } catch(\Exception $e) {
+            $logger->error($e->getMessage());
+            return new JsonResponse([
+                'status' => 'error',
+                'database' => 'unreachable'
+            ], 503);
+        }
     }
 
     #[Route('/topics', name: 'topics.list', methods: ['GET'])]
@@ -80,6 +93,12 @@ class ApiController extends AbstractController
         $stmt->setFetchMode(\PDO::FETCH_CLASS, Topic::class);
         $topic = $stmt->fetch();
 
+        if ($topic === false) {
+            return new JsonResponse([
+                'message' => "No topic found for id “{$id}”"
+            ], 404);
+        }
+
         $generator = function () use ($id) {
             $stmt = $this->db->pdo->prepare(
                 'SELECT id, topic_id AS topicId, position, author, content, created_at AS createdAt
@@ -92,12 +111,6 @@ class ApiController extends AbstractController
 
             yield from $stmt;
         };
-
-        if ($topic === false) {
-            return new JsonResponse([
-                'message' => "No topic found for id “{$id}”"
-            ], 404);
-        }
 
         return $this->createStreamedResponse([
             'id' => $topic->id,

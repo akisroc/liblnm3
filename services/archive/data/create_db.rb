@@ -24,7 +24,7 @@ begin
       position INTEGER,
       author TEXT,
       content TEXT,
-      created_at INTEGER
+      created_at TEXT
     );
   SQL
 
