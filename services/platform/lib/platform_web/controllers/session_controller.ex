@@ -1,10 +1,12 @@
 defmodule PlatformWeb.SessionController do
   use PlatformWeb, :controller
 
+  alias PlatformInfra.Database.Accounts
+
   def login(conn, %{"email" => email, "password" => password}) do
-    case Platform.Accounts.authenticate_user(email, password) do
+    case Accounts.authenticate_user(email, password) do
       {:ok, user} ->
-        token = Platform.Accounts.Session.generate_session_token(
+        token = Accounts.generate_session_token(
           user,
           conn.remote_ip |> :inet.ntoa() |> to_string(),
           conn |> get_req_header("user-agent") |> List.first()
@@ -18,7 +20,7 @@ defmodule PlatformWeb.SessionController do
           same_site: "Lax",
           domain: ".localhost",
           path: "/",
-          max_age: Platform.Accounts.Session.session_validity_in_seconds()
+          max_age: Accounts.session_validity_in_seconds()
         )
         |> put_status(:ok)
         |> json(%{

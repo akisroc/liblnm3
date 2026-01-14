@@ -1,7 +1,9 @@
-defmodule Platform.Accounts.Workers.SessionCleaner do
+defmodule PlatformInfra.Database.Workers.SessionCleaner do
   @moduledoc """
   GenServer that periodically cleans up expired sessions from the database.
   """
+  alias PlatformInfra.Entities.Session
+
   use GenServer
   require Logger
 
@@ -30,7 +32,7 @@ defmodule Platform.Accounts.Workers.SessionCleaner do
   end
 
   defp clean_expired_sessions do
-    case Platform.Accounts.Session.delete_expired_sessions() do
+    case Session.delete_expired_sessions() do
       {:ok, count} when count > 0 ->
         Logger.info("[#{__MODULE__}] Cleaned up #{count} expired session(s)")
 

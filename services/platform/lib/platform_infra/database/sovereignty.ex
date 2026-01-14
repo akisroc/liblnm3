@@ -1,11 +1,11 @@
-defmodule Platform.Sovereignty.Ecto.Repo do
+defmodule PlatformInfra.Database.Sovereignty do
   alias Ecto.{Changeset, Multi}
 
-  alias Platform.Repo
-  alias Platform.Ecto.Types.PrimaryKey
-  alias Platform.Sovereignty.Ecto.Entities.Kingdom
+  alias PlatformInfra.Database.Repo
+  alias PlatformInfra.Database.Types.PrimaryKey
+  alias PlatformInfra.Database.Entities.Kingdom
 
-  alias Platform.Sovereignty.Ecto.Entities.Battle
+  alias PlatformInfra.Database.Entities.Battle
   alias Platform.Sovereignty.War.Types.{BattleOutcome, BattleLogEntry}
 
   @spec get_kingdom(PrimaryKey.t()) :: {:ok, Kingdom.t()} | {:error, :not_found}

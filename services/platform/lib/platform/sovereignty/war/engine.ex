@@ -1,4 +1,4 @@
-defmodule Platform.Sovereignty.War do
+defmodule Platform.Sovereignty.War.Engine do
   alias Platform.Sovereignty.War.Types.{
     Troop, BattleState, Unit, UnitArchetype, BattleLogEntry, BattleOutcome
   }
@@ -40,6 +40,7 @@ defmodule Platform.Sovereignty.War do
   # PUBLIC API
   # ============================================================================
 
+  @doc false
   @spec attack([non_neg_integer()] | Troop.t(), [non_neg_integer()] | Troop.t(), float(), float()) :: {:ok, BattleOutcome.t()} | {:error, any()}
   def attack([_,_,_,_,_,_,_,_] = atk_raw_troop, [_,_,_,_,_,_,_,_] = def_raw_troop, atk_fame, def_fame) do
     with {:ok, atk_troop} <- Troop.from_raw(atk_raw_troop, true),

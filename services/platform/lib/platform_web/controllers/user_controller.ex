@@ -1,12 +1,14 @@
 defmodule PlatformWeb.UserController do
   use PlatformWeb, :controller
 
+  alias PlatformInfra.Database.Accounts
+
   def me(conn, _params) do
     # Extract token from cookie
     token = conn.cookies["_platform_user_token"]
 
     if token do
-      case Platform.Accounts.Session.get_user_by_session_token(token) do
+      case Accounts.get_user_by_session_token(token) do
         {:ok, user} ->
           conn
           |> put_status(:ok)
@@ -31,7 +33,7 @@ defmodule PlatformWeb.UserController do
   end
 
   def create(conn, %{"user" => user_params}) do
-    case Platform.Accounts.register_user(user_params) do
+    case Accounts.register_user(user_params) do
       {:ok, user} ->
       conn
       |> put_status(:created)

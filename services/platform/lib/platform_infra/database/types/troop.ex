@@ -1,4 +1,4 @@
-defmodule Platform.Sovereignty.Ecto.Types.Troop do
+defmodule PlatformInfra.Database.Types.Troop do
   use Ecto.Type
 
   def type, do: {:array, :integer}

@@ -1,10 +1,10 @@
-defmodule Platform.Sovereignty.Ecto.Entities.Battle do
+defmodule PlatformInfra.Database.Entities.Battle do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias Platform.Sovereignty.Ecto.Types.Troop
-  alias Platform.Sovereignty.Ecto.Entities.Kingdom
-  alias Platform.Ecto.Types.PrimaryKey
+  alias PlatformInfra.Database.Types.Troop
+  alias PlatformInfra.Database.Entities.Kingdom
+  alias PlatformInfra.Database.Types.PrimaryKey
 
   @type t :: %__MODULE__{
     id: PrimaryKey.t() | nil,

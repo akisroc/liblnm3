@@ -1,8 +1,9 @@
-defmodule Platform.Accounts.Ecto.Entities.User do
+defmodule PlatformInfra.Database.Entities.User do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias Platform.Ecto.Types.{PrimaryKey, Slug}
+  alias PlatformInfra.Database.Entities.Session
+  alias PlatformInfra.Database.Types.{PrimaryKey, Slug}
 
   @username_regex ~r/^[ a-zA-Z0-9éÉèÈêÊëËäÄâÂàÀïÏöÖôÔüÜûÛçÇ\'’\-_\.&]+$/
   @email_regex ~r/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/
@@ -22,7 +23,7 @@ defmodule Platform.Accounts.Ecto.Entities.User do
     field :is_enabled, :boolean, default: true
     field :is_removed, :boolean, default: false
 
-    has_many :sessions, Platform.Accounts.Session
+    has_many :sessions, Session
 
     timestamps(type: :utc_datetime)
   end
@@ -78,7 +79,7 @@ defmodule Platform.Accounts.Ecto.Entities.User do
       [
         t_cost: 4,
         m_cost: 18,  # 2^18 KiB => 256MiB
-        parallelism: System.schedulers_online(),
+        parallelism: 2,
         argon2_type: 2  # Argon2id
       ]
     end

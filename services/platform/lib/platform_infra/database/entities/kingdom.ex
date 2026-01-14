@@ -1,10 +1,10 @@
-defmodule Platform.Sovereignty.Entities.Kingdom do
+defmodule PlatformInfra.Database.Entities.Kingdom do
   use Ecto.Schema
   import Ecto.Changeset
-  import Platform.Utils.SlugUtils
 
-  alias Platform.Sovereignty.Ecto.Types.Troop
-  alias Platform.Ecto.Types.{PrimaryKey, Slug}
+  alias PlatformInfra.Database.Entities.User
+  alias PlatformInfra.Database.Types.Troop
+  alias PlatformInfra.DatabaseTypes.{PrimaryKey, Slug}
 
   @type t :: %__MODULE__{
     id: PrimaryKey.t() | nil,
@@ -18,7 +18,7 @@ defmodule Platform.Sovereignty.Entities.Kingdom do
     is_removed: boolean() | nil,
     inserted_at: DateTime.t() | nil,
     updated_at: DateTiime.t() | nil,
-    user: Ecto.Association.NotLoaded.t() | Platform.Accounts.User.t()
+    user: Ecto.Association.NotLoaded.t() | User.t()
   }
 
   @type loaded :: %__MODULE__{
@@ -33,7 +33,7 @@ defmodule Platform.Sovereignty.Entities.Kingdom do
     is_removed: boolean(),
     inserted_at: DateTime.t(),
     updated_at: DateTime.t(),
-    user: Ecto.Association.NotLoaded.t() | Platform.Accounts.User.t()
+    user: Ecto.Association.NotLoaded.t() | User.t()
   }
 
   @name_regex ~r/^[ a-zA-Z0-9éÉèÈêÊëËäÄâÂàÀïÏöÖôÔüÜûÛçÇ''’\-]+$/
@@ -50,7 +50,7 @@ defmodule Platform.Sovereignty.Entities.Kingdom do
     field :is_active, :boolean, default: false
     field :is_removed, :boolean, default: false
 
-    belongs_to :user, Platform.Accounts.User
+    belongs_to :user, User
 
     timestamps()
   end

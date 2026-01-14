@@ -1,9 +1,9 @@
 defmodule PlatformWeb.BattleController do
   use PlatformWeb, :controller
 
-  alias Platform.Sovereignty.Ecto.Entities.Kingdom
-  alias Platform.Accounts.Ecto.Entities.User
-  alias Platform.Sovereignty.Ecto.Repo, as: SovereigntyRepo
+  alias PlatformInfra.Database.Entities.Kingdom
+  alias PlatformInfra.Database.Entities.User
+  alias PlatformInfra.Database.Sovereignty, as: SovereigntyRepo
   alias Platform.Sovereignty.War
 
   def attack(conn, %{"atk_kingdom_id" => atk_kingdom_id, "def_kingdom_id" => def_kingdom_id}) do

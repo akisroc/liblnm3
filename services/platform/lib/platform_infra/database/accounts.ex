@@ -1,44 +1,37 @@
-defmodule Platform.Accounts.Ecto.Entities.Session do
-  use Ecto.Schema
-  import Ecto.Changeset
-  import Ecto.Query
+defmodule PlatformInfra.Database.Accounts do
+  alias PlatformInfra.Database.Entities.{User, Session}
+  alias PlatformInfra.Repo
 
-  alias Platform.Ecto.Types.PrimaryKey
+  def authenticate_user(email, password) do
+    user = Repo.get_by(User, email: email)
 
-  @session_validity_in_days 120
-  @session_validity_in_seconds 60 * 60 * 24 * @session_validity_in_days
+    cond do
+      user && Argon2.verify_pass(password, user.password) && user.is_enabled && !user.is_removed ->
+        {:ok, user}
 
-  @primary_key {:id, PrimaryKey, autogenerate: true}
-  @foreign_key_type PrimaryKey
+      user && user.is_removed -> {:error, :removed}
 
-  schema "sessions" do
-    field :token, :binary
-    field :context, :string, default: "session"
-    field :ip_address, EctoNetwork.INET
-    field :user_agent, :string
-    field :expires_at, :utc_datetime
+      user && !user.is_enabled -> {:error, :disabled}
 
-    belongs_to :user, Platform.Accounts.User
-
-    timestamps(updated_at: false, type: :utc_datetime)
+      true ->
+        Argon2.no_user_verify()
+        {:error, :unauthorized}
+    end
   end
 
-  @doc false
-  def create_changeset(session, attrs) do
-    session
-    |> cast(attrs, [:token, :context, :ip_address, :user_id, :user_agent, :expires_at])
-    |> validate_required([:token, :context, :ip_address, :user_id, :expires_at])
-    |> unique_constraint(:token)
+  def register_user(attrs \\ %{}) do
+    %User{}
+    |> User.changeset(attrs)
+    |> Repo.insert()
   end
 
-  @doc false
   def generate_session_token(user, ip_address, user_agent) do
     token_bytes = :crypto.strong_rand_bytes(32)
     token_hashed = :crypto.hash(:sha256, token_bytes)
 
     {:ok, inet_addr} = :inet.parse_address(to_charlist(ip_address))
 
-    Platform.Repo.insert!(%Platform.Accounts.Session{
+    Repo.insert!(%Session{
       user_id: user.id,
       token: token_hashed,
       context: "session",
@@ -50,17 +43,16 @@ defmodule Platform.Accounts.Ecto.Entities.Session do
     token_bytes
   end
 
-  @doc false
   def get_user_by_session_token(token) do
     with {:ok, token_bin} <- Base.url_decode64(token, padding: false) do
       token_hashed = :crypto.hash(:sha256, token_bin)
 
-      query = from s in Platform.Accounts.Session,
+      query = from s in Session,
         where: s.token == ^token_hashed,
         where: s.expires_at > fragment("now()"),
         preload: [:user]
 
-      case Platform.Repo.one(query) do
+      case Repo.one(query) do
         nil -> {:error, :not_found}
         session -> {:ok, session.user}
       end
@@ -71,16 +63,16 @@ defmodule Platform.Accounts.Ecto.Entities.Session do
   end
 
   def delete_session_token(token) do
-    Platform.Repo.delete_all(
-      from s in Platform.Accounts.Session, where: s.token == ^token
+    Repo.delete_all(
+      from s in Session, where: s.token == ^token
     )
 
     :ok
   end
 
   def delete_expired_sessions do
-    {count, _} = Platform.Repo.delete_all(
-      from s in Platform.Accounts.Session, where: s.expires_at < fragment("now()")
+    {count, _} = Repo.delete_all(
+      from s in Session, where: s.expires_at < fragment("now()")
     )
 
     {:ok, count}

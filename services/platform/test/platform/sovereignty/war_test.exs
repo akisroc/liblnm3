@@ -5,6 +5,8 @@ defmodule Platform.Sovereignty.WarTest do
   alias Platform.Sovereignty.War.Types.{Troop, Unit, UnitArchetype, BattleOutcome}
 
   setup do
+    :rand.seed(:exsss, {1, 2, 3})
+
     b1 = UnitArchetype.get!(:b1)
     b2 = UnitArchetype.get!(:b2)
     b3 = UnitArchetype.get!(:b3)
@@ -19,20 +21,20 @@ defmodule Platform.Sovereignty.WarTest do
 
   describe "attack/4 – Clauses and validations" do
     test "accepts troops as raw lists of integers, %", %{b1: b1} do
-      atk_raw = [2500, 0, 0, 0, 0, 0, 0, 0]
-      def_raw = [1, 0, 0, 0, 0, 0, 0, 0]
+      atk_troop = [2500, 0, 0, 0, 0, 0, 0, 0]
+      def_troop = [1, 0, 0, 0, 0, 0, 0, 0]
 
-      assert {:ok, %BattleOutcome{} = outcome} = War.attack(atk_raw, def_raw, 1000.0, 1000.0)
+      assert {:ok, %BattleOutcome{} = outcome} = War.attack(atk_troop, def_troop, 1000.0, 1000.0)
       asert outcome.attacker_wins? === true
     end
 
     test "returns error on invalid raw list length" do
-      invalid_raw = [1000, 0]
-      valid_raw = [1000, 0, 0, 0, 0, 0, 0, 0]
+      invalid_troop = [1000, 0]
+      valid_troop = [1000, 0, 0, 0, 0, 0, 0, 0]
 
-      assert {:error, :invalid_raw_troop_format} = War.attack(invalid_raw, invalid_raw, 1000.0, 1000.0)
-      assert {:error, :invalid_raw_troop_format} = War.attack(invalid_raw, valid_raw, 1000.0, 1000.0)
-      assert {:error, :invalid_raw_troop_format} = War.attack(valid_raw, invalid_raw, 1000.0, 1000.0)
+      assert {:error, :invalid_troop_format} = War.attack(invalid_troop, invalid_troop, 1000.0, 1000.0)
+      assert {:error, :invalid_troop_format} = War.attack(invalid_troop, valid_troop, 1000.0, 1000.0)
+      assert {:error, :invalid_troop_format} = War.attack(valid_troop, invalid_troop, 1000.0, 1000.0)
     end
   end
 end

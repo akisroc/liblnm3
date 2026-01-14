@@ -9,11 +9,11 @@ defmodule Platform.Application do
   def start(_type, _args) do
     children = [
       PlatformWeb.Telemetry,
-      Platform.Repo,
+      PlatformInfra.Repo,
       {DNSCluster, query: Application.get_env(:platform, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Platform.PubSub},
       # Background workers
-      Platform.Accounts.Workers.SessionCleaner,
+      PlatformInfra.Database.Workers.SessionCleaner,
       # Start to serve requests, typically the last entry
       PlatformWeb.Endpoint
     ]

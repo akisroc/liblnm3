@@ -1,4 +1,4 @@
-defmodule Platform.Ecto.Types.Slug do
+defmodule PlatformInfra.Database.Types.Slug do
   use Ecto.Type
 
   alias Ecto.Changeset

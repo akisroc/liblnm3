@@ -1,4 +1,4 @@
-defmodule Platform.Ecto.Types.PrimaryKey do
+defmodule PlatformInfra.Database.Types.PrimaryKey do
   use Ecto.Type
 
   alias Ecto.Changeset
