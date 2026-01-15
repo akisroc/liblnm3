@@ -59,7 +59,7 @@ defmodule PlatformInfra.Database.Entities.Kingdom do
     kingdom
     |> cast(attrs, [:user_id, :name, :slug, :fame, :defense_troop, :attack_troop, :is_active, :is_removed])
     |> validate_required([:user_id, :name])
-    |> unique_constraint(:name, name: "kingdoms_name_key")
+    |> unique_constraint(:name, name: :idx_kingdoms_name_not_removed)
     |> unique_constraint(:slug, name: "kingdoms_slug_key")
     |> validate_length(:name, min: 1, max: 63)
     |> validate_length(:slug, min: 1, max: 127)

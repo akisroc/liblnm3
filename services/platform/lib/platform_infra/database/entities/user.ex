@@ -32,9 +32,9 @@ defmodule PlatformInfra.Database.Entities.User do
     user
     |> cast(attrs, [:username, :email, :profile_picture, :password, :slug, :platform_theme, :is_enabled])
     |> validate_required([:username, :email, :password])
-    |> unique_constraint(:username, name: "users_username_key")
-    |> unique_constraint(:email, name: "users_email_key")
-    |> unique_constraint(:slug, name: "users_slug_key")
+    |> unique_constraint(:username, name: :idx_users_username_not_removed)
+    |> unique_constraint(:email, name: :idx_users_email_not_removed)
+    |> unique_constraint(:slug, name: :users_slug_key)
 
     |> update_change(:username, &String.trim/1)
     |> validate_length(:username, min: 1, max: 30)
