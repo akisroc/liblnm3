@@ -135,6 +135,7 @@ CREATE TABLE "protagonists" (
   "is_removed" bool NOT NULL DEFAULT (false),
   "inserted_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
   "updated_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+  CONSTRAINT "chk_protagonists_name_format" CHECK (name ~ '^[ a-zA-Z0-9éÉèÈêÊëËäÄâÂàÀïÏöÖôÔüÜûÛçÇ''’\-]+$'),
   CONSTRAINT "chk_protagonists_biography_length" CHECK (char_length(biography) <= 500000),
   CONSTRAINT "chk_protagonists_fame_positive" CHECK (fame >= 0.0),
   CONSTRAINT "chk_protagonists_slug_format" CHECK (slug ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$')
