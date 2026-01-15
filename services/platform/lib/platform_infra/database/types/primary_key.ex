@@ -22,7 +22,9 @@ defmodule PlatformInfra.Database.Types.PrimaryKey do
   """
   @spec ensure_generation(Changeset.t()) :: Changeset.t()
   def ensure_generation(changeset) do
-    if Changeset.fetch_field(changeset, :id) do
+    id = Changeset.get_field(changeset, :id)
+
+    if is_binary(id) do
       changeset
     else
       Changeset.put_change(changeset, :id, UUIDv7.generate())

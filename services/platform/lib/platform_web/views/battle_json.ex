@@ -1,5 +1,5 @@
 defmodule PlatformWeb.Views.BattleJSON do
-  alias Platform.Sovereignty.Ecto.Entities.Battle
+  alias PlatformInfra.Database.Entities.Battle
 
   @public_fields [
     :id,
@@ -16,7 +16,7 @@ defmodule PlatformWeb.Views.BattleJSON do
     :inserted_at
   ]
 
-  @spec show(Battle.loaded())
+  @spec show(Battle.loaded()) :: map()
   def show(battle) do
     battle
     |> Map.take(@public_fields)

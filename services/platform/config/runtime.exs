@@ -26,7 +26,7 @@ end
 if config_env() == :dev do
   # Allow overriding database config with environment variables in dev
   if database_url = System.get_env("DATABASE_URL") do
-    config :platform, Platform.Repo, url: database_url
+    config :platform, PlatformInfra.Repo, url: database_url
   end
 end
 
@@ -40,7 +40,7 @@ if config_env() == :prod do
 
   maybe_ipv6 = if System.get_env("ECTO_IPV6") in ~w(true 1), do: [:inet6], else: []
 
-  config :platform, Platform.Repo,
+  config :platform, PlatformInfra.Repo,
     # ssl: true,
     url: database_url,
     pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),

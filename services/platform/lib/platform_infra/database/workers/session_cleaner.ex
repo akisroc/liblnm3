@@ -2,7 +2,7 @@ defmodule PlatformInfra.Database.Workers.SessionCleaner do
   @moduledoc """
   GenServer that periodically cleans up expired sessions from the database.
   """
-  alias PlatformInfra.Entities.Session
+  alias PlatformInfra.Database.Accounts
 
   use GenServer
   require Logger
@@ -32,15 +32,12 @@ defmodule PlatformInfra.Database.Workers.SessionCleaner do
   end
 
   defp clean_expired_sessions do
-    case Session.delete_expired_sessions() do
-      {:ok, count} when count > 0 ->
-        Logger.info("[#{__MODULE__}] Cleaned up #{count} expired session(s)")
-
+    case Accounts.delete_expired_sessions() do
       {:ok, 0} ->
         Logger.debug("[#{__MODULE__}] No expired sessions to clean up")
 
-      {:error, reason} ->
-        Logger.error("[#{__MODULE__}] Cleanup failed: #{inspect(reason)}")
+      {:ok, count} ->
+        Logger.info("[#{__MODULE__}] Cleaned up #{count} expired session(s)")
     end
   end
 end

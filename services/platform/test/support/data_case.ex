@@ -1,4 +1,4 @@
-defmodule Platform.DataCase do
+defmodule PlatformInfra.DataCase do
   @moduledoc """
   This module defines the setup for tests requiring
   access to the application's data layer.
@@ -10,7 +10,7 @@ defmodule Platform.DataCase do
   we enable the SQL sandbox, so changes done to the database
   are reverted at the end of every test. If you are using
   PostgreSQL, you can even run database tests asynchronously
-  by setting `use Platform.DataCase, async: true`, although
+  by setting `use PlatformInfra.DataCase, async: true`, although
   this option is not recommended for other databases.
   """
 
@@ -18,17 +18,17 @@ defmodule Platform.DataCase do
 
   using do
     quote do
-      alias Platform.Repo
+      alias PlatformInfra.Repo
 
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
-      import Platform.DataCase
+      import PlatformInfra.DataCase
     end
   end
 
   setup tags do
-    Platform.DataCase.setup_sandbox(tags)
+    PlatformInfra.DataCase.setup_sandbox(tags)
     :ok
   end
 
@@ -36,7 +36,7 @@ defmodule Platform.DataCase do
   Sets up the sandbox based on the test tags.
   """
   def setup_sandbox(tags) do
-    pid = Ecto.Adapters.SQL.Sandbox.start_owner!(Platform.Repo, shared: not tags[:async])
+    pid = Ecto.Adapters.SQL.Sandbox.start_owner!(PlatformInfra.Repo, shared: not tags[:async])
     on_exit(fn -> Ecto.Adapters.SQL.Sandbox.stop_owner(pid) end)
   end
 

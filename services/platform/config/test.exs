@@ -5,10 +5,10 @@ import Config
 # The MIX_TEST_PARTITION environment variable can be used
 # to provide built-in test partitioning in CI environment.
 # Run `mix help test` for more information.
-config :platform, Platform.Repo,
-  username: "user",
-  password: "pass",
-  hostname: "localhost",
+config :platform, PlatformInfra.Repo,
+  username: System.get_env("POSTGRES_USER") || "user",
+  password: System.get_env("POSTGRES_PASSWORD") || "pass",
+  hostname: System.get_env("DB_HOST") || "database",
   database: "lnm3_platform_test#{System.get_env("MIX_TEST_PARTITION")}",
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: System.schedulers_online() * 2
@@ -21,7 +21,7 @@ config :platform, PlatformWeb.Endpoint,
   server: false
 
 # In test we don't send emails
-config :platform, Platform.Mailer, adapter: Swoosh.Adapters.Test
+config :platform, PlatformInfra.Mailer, adapter: Swoosh.Adapters.Test
 
 # Disable swoosh api client as it is only required for production adapters
 config :swoosh, :api_client, false

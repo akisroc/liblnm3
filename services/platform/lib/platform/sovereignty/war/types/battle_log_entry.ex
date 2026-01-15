@@ -14,7 +14,7 @@ defmodule Platform.Sovereignty.War.Types.BattleLogEntry do
   }
 
   @spec to_raw(__MODULE__.t()) :: map()
-  def to_raw(__MODULE__{} = log_entry) do
+  def to_raw(%__MODULE__{} = log_entry) do
     %{
       attacking_unit:
         log_entry.attacking_unit.archetype.label

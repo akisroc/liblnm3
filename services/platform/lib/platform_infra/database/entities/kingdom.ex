@@ -4,7 +4,7 @@ defmodule PlatformInfra.Database.Entities.Kingdom do
 
   alias PlatformInfra.Database.Entities.User
   alias PlatformInfra.Database.Types.Troop
-  alias PlatformInfra.DatabaseTypes.{PrimaryKey, Slug}
+  alias PlatformInfra.Database.Types.{PrimaryKey, Slug}
 
   @type t :: %__MODULE__{
     id: PrimaryKey.t() | nil,
@@ -59,15 +59,15 @@ defmodule PlatformInfra.Database.Entities.Kingdom do
     kingdom
     |> cast(attrs, [:user_id, :name, :slug, :fame, :defense_troop, :attack_troop, :is_active, :is_removed])
     |> validate_required([:user_id, :name])
-    |> unique_constraint([:name, :slug])
-    |> generate_unique_slug(__MODULE__, :name)
+    |> unique_constraint(:name, name: "kingdoms_name_key")
+    |> unique_constraint(:slug, name: "kingdoms_slug_key")
     |> validate_length(:name, min: 1, max: 63)
     |> validate_length(:slug, min: 1, max: 127)
     |> validate_fame()
     |> validate_format(:name, @name_regex)
 
     |> PrimaryKey.ensure_generation()
-    |> Slug.generate()
+    |> Slug.generate(:name)
 
     |> update_change(:name, &String.trim/1)
   end

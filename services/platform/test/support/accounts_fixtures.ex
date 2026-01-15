@@ -1,4 +1,6 @@
-defmodule Platform.Fixtures do
+defmodule PlatformInfra.AccountsFixtures do
+  alias PlatformInfra.Database.Accounts
+
   @moduledoc """
   Test fixtures for creating test data.
   """
@@ -14,7 +16,7 @@ defmodule Platform.Fixtures do
         email: "user#{System.unique_integer([:positive])}@example.com",
         password: "password123456"
       })
-      |> Platform.Accounts.register_user()
+      |> Accounts.register_user()
 
     user
   end

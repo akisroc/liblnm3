@@ -9,8 +9,8 @@ defmodule PlatformWeb.BattleController do
   def attack(conn, %{"atk_kingdom_id" => atk_kingdom_id, "def_kingdom_id" => def_kingdom_id}) do
     user = conn.assigns.current_account
 
-    with {:ok, atk_kingdom} <- SovereigntyRepo.fetch_kingdom(atk_kingdom_id),
-         {:ok, def_kingdom} <- SovereigntyRepo.fetch_kingdom(def_kingdom_id),
+    with {:ok, atk_kingdom} <- SovereigntyRepo.get_kingdom(atk_kingdom_id),
+         {:ok, def_kingdom} <- SovereigntyRepo.get_kingdom(def_kingdom_id),
          :ok <- check_ownership(atk_kingdom, user),
          :ok <- check_active_status(atk_kingdom, def_kingdom),
          {:ok, battle_outcome} <- War.attack(

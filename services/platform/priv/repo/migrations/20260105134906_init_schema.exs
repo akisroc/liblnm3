@@ -1,4 +1,4 @@
-defmodule Platform.Repo.Migrations.InitSchema do
+defmodule PlatformInfra.Repo.Migrations.InitSchema do
   use Ecto.Migration
 
   def up do

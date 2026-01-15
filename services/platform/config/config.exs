@@ -8,10 +8,10 @@
 import Config
 
 config :platform,
-  ecto_repos: [Platform.Repo],
+  ecto_repos: [PlatformInfra.Repo],
   generators: [timestamp_type: :utc_datetime]
 
-config :platform, Platform.Repo,
+config :platform, PlatformInfra.Repo,
   migration_primary_key: [name: :id, type: :binary_id],
   migration_foreign_key: [type: :binary_id]
 

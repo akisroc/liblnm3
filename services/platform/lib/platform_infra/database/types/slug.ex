@@ -3,7 +3,10 @@ defmodule PlatformInfra.Database.Types.Slug do
 
   alias Ecto.Changeset
 
-  @slug_regex ~r/^[a-z0-9]+(?:-[a-z0-9]+)*$/
+  # Allow:
+  # Normal prefixed slug (see generate/2 function)
+  # Full uuidv7 in edge cases
+  @slug_regex ~r/^(?:[a-z0-9]+(?:-[a-z0-9]+)*|[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12})$/
 
   def type, do: :string
 
@@ -25,25 +28,37 @@ defmodule PlatformInfra.Database.Types.Slug do
 
   @doc """
   Slug is prefixed with the last characters of UUIDv7 to
-  ensure unicity.
+  ensure unicity. We use 8 characters to prevent birthday
+  paradox: ~4,29 billion combinations, so we would need
+  65’536 resources with same given field’s value for
+  the risk of collision to become statically significative.
 
   `id` field must be hydrated at this stage, or the function
   will do nothing and return Changeset without generating
   slug.
-  """
-  @spec generate(Changeset.t(), atom()) :: Changeset.t()
-  def generate(changeset, field) do
-    id = Changeset.fetch_field(changeset, :id)
-    value = Changeset.fetch_field(changeset, field)
 
-    if id && value do
-      Changeset.put_change(
-        changeset,
-        :slug,
-        "#{String.slice(id, -6, 6)}-#{value}"
-      )
+  If for some reason the field’s value is not sluggable
+  and becomes "", we fallback to the full primary key.
+  This is extreme case, shouldn’t happen much.
+  """
+  @spec generate(Changeset.t() | binary(), atom() | binary()) :: Changeset.t()
+  def generate(%Changeset{} = changeset, field) do
+    id = Changeset.get_field(changeset, :id)
+    value = Changeset.get_field(changeset, field)
+
+    if is_binary(id) && is_binary(value) do
+      changeset |> Changeset.put_change(:slug, generate(id, value))
     else
       changeset
+    end
+  end
+  def generate(id, value) when is_binary(id) and is_binary(value) do
+    suffix = Slugger.slugify_downcase(value)
+
+    if suffix == "" do
+      id
+    else
+      "#{String.slice(id, -8, 8)}-#{suffix}"
     end
   end
 end

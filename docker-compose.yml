@@ -38,6 +38,8 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
     volumes:
       - db-data:/var/lib/postgresql/data:rw
     networks:
@@ -63,7 +65,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.platform.rule=Host(`platform.localhost`)"
       - "traefik.http.services.platform.loadbalancer.server.port=4000"
-      - "traefik.docker.network=front_network"
+      - "traefik.docker.network=${PROJECT_NAME}_front_network"
     networks:
       - front_network
       - database_network
@@ -86,6 +88,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.archive.rule=Host(`archive.localhost`)"
       - "traefik.http.services.archive.loadbalancer.server.port=9000"
+      - "traefik.docker.network=${PROJECT_NAME}_front_network"
     networks:
       - front_network
 
@@ -107,6 +110,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.frontend.rule=Host(`localhost`)"
       - "traefik.http.services.frontend.loadbalancer.server.port=3000"
+      - "traefik.docker.network=${PROJECT_NAME}_front_network"
     networks:
       - front_network
     depends_on:

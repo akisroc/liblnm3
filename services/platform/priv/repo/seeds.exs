@@ -12,22 +12,29 @@
 
 import Ecto.Query
 
+alias PlatformInfra.Repo
+alias PlatformInfra.Database.Entities.{User, Session, Kingdom}
+alias PlatformInfra.Database.Accounts
+
+@nb_of_users = 50
+@nb_of_kingdoms = 40
+
 # INITIAL ADMIN
 admin_params = %{
   username: System.get_env("ADMIN_USERNAME") || "Admin",
   email: System.get_env("ADMIN_EMAIL") || "admin@akisroc.org",
   password: System.get_env("ADMIN_PASSWORD") || "devdevdev"
 }
-Platform.Repo.transaction(fn ->
-  case Platform.Repo.get_by(Platform.Accounts.User, email: admin_params.email) do
+Repo.transaction(fn ->
+  case Repo.get_by(User, email: admin_params.email) do
     nil ->
-      case Platform.Accounts.register_user(admin_params) do
+      case Accounts.register_user(admin_params) do
         {:ok, _user} ->
           IO.puts("✅ Admin created")
         {:error, changeset} ->
           IO.puts("❌ Critical error on admin creation")
           IO.inspect(changeset.errors)
-          Platform.Repo.rollback(:registration_failed)
+          Repo.rollback(:registration_failed)
       end
 
     _user -> IO.puts("Admin already exists. Seed ignored.")
@@ -39,46 +46,50 @@ env = Application.get_env(:platform, :env, :prod)
 if env in [:test, :dev] do
 
   # --- USERS ---
-  Platform.Repo.transaction(fn ->
-    for _ <- 1..50 do
-      user = %Platform.Accounts.User{}
-      |> Platform.Accounts.User.changeset(%{
-        username: Faker.Internet.user_name(),
-        email: Faker.Internet.safe_email(),
+  Repo.transaction(fn ->
+    usernames = Faker.Util.sample_uniq(@nb_of_users, &Faker.Internet.user_name/0)
+    emails = Faker.Util.sample_uniq(@nb_of_users, &Faker.Internet.safe_email/0)
+
+    for i <- 1..@nb_of_users do
+      user = %User{}
+      |> User.create_changeset(%{
+        username: Enum.at(usernames, i - 1),
+        email: Enum.at(emails, i - 1),
         password: Faker.String.base64(16)
       })
-      |> Platform.Repo.insert!()
+      |> Repo.insert!()
 
-      %Platform.Accounts.Session{}
-      |> Platform.Accounts.Session.changeset(%{
+      %Session{}
+      |> Session.create_changeset(%{
         user_id: user.id,
         token: :crypto.hash(:sha256, :crypto.strong_rand_bytes(32)),
         ip_address: Faker.Internet.ip_v4_address(),
         user_agent: Faker.Internet.UserAgent.desktop_user_agent(),
-        expires_at: Platform.Accounts.Session.expires_at(user)
+        expires_at: Accounts.session_expires_at(user)
       })
-      |> Platform.Repo.insert!()
+      |> Repo.insert!()
     end
 
-    IO.puts "✅ Created 50 fake users"
+    IO.puts "✅ Created #{@nb_of_users} fake users"
   end)
 
   # --- KINGDOMS ---
-  Platform.Repo.transaction(fn ->
-    user_ids = Platform.Repo.all(from u in Platform.Accounts.User, select: u.id)
+  Repo.transaction(fn ->
+    user_ids = Repo.all(from u in User, select: u.id)
+    names = Faker.Util.sample_uniq(@nb_of_users, &Faker.Address.city/0)
 
-    for i <- 0..39 do
-      %Platform.Game.Kingdom{}
-      |> Platform.Game.Kingdom.changeset(%{
-        name: Faker.Address.city(),
+    for i <- 1..@nb_of_kingdoms do
+      %Kingdom{}
+      |> Kingdom.create_changeset(%{
+        name: Enum.at(names, i - 1),
         fame: (:rand.uniform() * 100_000.0) |> Float.round(3),
-        defense_troup: Enum.map(1..8, fn _ -> Enum.random(0..2000) end),
-        attack_troup:  Enum.map(1..8, fn _ -> Enum.random(0..2000) end),
+        defense_troop: Enum.map(1..8, fn _ -> Enum.random(0..2000) end),
+        attack_troop:  Enum.map(1..8, fn _ -> Enum.random(0..2000) end),
         is_active: false,
-        user_id: Enum.at(user_ids, i)
+        user_id: Enum.at(user_ids, i - 1)
       })
-      |> Platform.Repo.insert!()
+      |> Repo.insert!()
     end
-    IO.puts "✅ Created 40 fake kingdoms"
+    IO.puts "✅ Created #{@nb_of_kingdoms} fake kingdoms"
   end)
 end

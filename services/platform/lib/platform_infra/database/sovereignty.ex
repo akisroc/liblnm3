@@ -1,12 +1,12 @@
 defmodule PlatformInfra.Database.Sovereignty do
   alias Ecto.{Changeset, Multi}
 
-  alias PlatformInfra.Database.Repo
+  alias PlatformInfra.Repo
   alias PlatformInfra.Database.Types.PrimaryKey
   alias PlatformInfra.Database.Entities.Kingdom
 
   alias PlatformInfra.Database.Entities.Battle
-  alias Platform.Sovereignty.War.Types.{BattleOutcome, BattleLogEntry}
+  alias Platform.Sovereignty.War.Types.{BattleOutcome, BattleLogEntry, Troop}
 
   @spec get_kingdom(PrimaryKey.t()) :: {:ok, Kingdom.t()} | {:error, :not_found}
   def get_kingdom(id) do
@@ -31,11 +31,11 @@ defmodule PlatformInfra.Database.Sovereignty do
     Multi.new()
     |> Multi.update(:update_attacker, Changeset.change(atk_kingdom, %{
       attack_troop: atk_final_troop,
-      fame: atk_kingdom + battle_outcome.attacker_fame_modifier
+      fame: atk_kingdom.fame + battle_outcome.attacker_fame_modifier
     }))
     |> Multi.update(:update_defender, Changeset.change(def_kingdom, %{
       attack_troop: def_final_troop,
-      fame: def_kingdom + battle_outcome.defender_fame_modifier
+      fame: def_kingdom.fame + battle_outcome.defender_fame_modifier
     }))
     |> Multi.insert(:insert_battle, %Battle{
       attacker_kingdom_id: atk_kingdom.id,
@@ -47,13 +47,13 @@ defmodule PlatformInfra.Database.Sovereignty do
       attacker_final_troop: atk_final_troop,
       attacker_wins?: battle_outcome.attacker_wins?,
       attacker_fame_modifier: battle_outcome.attacker_fame_modifier,
-      defender_fame_modifier: battle_outcome.defender.fame_modifier
+      defender_fame_modifier: battle_outcome.defender_fame_modifier
     })
     |> Repo.transaction()
     |> handle_transaction_result()
   end
 
-  @spec handle_transaction_reasult({:ok | Battle.loaded()} | {:error, any(), any(), any()}) :: {:ok, Battle.loaded()} | {:error, any()}
+  @spec handle_transaction_result({:ok | Battle.loaded()} | {:error, any(), any(), any()}) :: {:ok, Battle.loaded()} | {:error, any()}
   defp handle_transaction_result({:ok, %{insert_battle: battle}}) do
     {:ok, battle}
   end

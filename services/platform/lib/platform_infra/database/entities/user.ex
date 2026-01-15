@@ -3,11 +3,10 @@ defmodule PlatformInfra.Database.Entities.User do
   import Ecto.Changeset
 
   alias PlatformInfra.Database.Entities.Session
-  alias PlatformInfra.Database.Types.{PrimaryKey, Slug}
+  alias PlatformInfra.Database.Types.{PrimaryKey, Slug, Url}
 
   @username_regex ~r/^[ a-zA-Z0-9éÉèÈêÊëËäÄâÂàÀïÏöÖôÔüÜûÛçÇ\'’\-_\.&]+$/
   @email_regex ~r/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/
-  @url_regex ~r/^https?:\/\/[\w\d\-._~:?#\[\]@!$&'()*+,;=%\/]+$/
 
   @primary_key {:id, PrimaryKey, autogenerate: true}
   @foreign_key_type PrimaryKey
@@ -17,7 +16,7 @@ defmodule PlatformInfra.Database.Entities.User do
     field :email, :string
     field :password, :string, redact: true  # Hides password in logs
 
-    field :profile_picture, :string
+    field :profile_picture, Url
     field :slug, Slug
     field :platform_theme, Ecto.Enum, values: [:dark, :light]
     field :is_enabled, :boolean, default: true
@@ -33,7 +32,9 @@ defmodule PlatformInfra.Database.Entities.User do
     user
     |> cast(attrs, [:username, :email, :profile_picture, :password, :slug, :platform_theme, :is_enabled])
     |> validate_required([:username, :email, :password])
-    |> unique_constraint([:username, :email, :slug])
+    |> unique_constraint(:username, name: "users_username_key")
+    |> unique_constraint(:email, name: "users_email_key")
+    |> unique_constraint(:slug, name: "users_slug_key")
 
     |> update_change(:username, &String.trim/1)
     |> validate_length(:username, min: 1, max: 30)
@@ -46,11 +47,8 @@ defmodule PlatformInfra.Database.Entities.User do
 
     |> validate_inclusion(:platform_theme, [:dark, :light])
 
-    |> validate_length(:profile_picture, min: 1, max: 500)
-    |> validate_format(:profile_picture, @url_regex)
-
     |> PrimaryKey.ensure_generation()
-    |> Slug.generate()
+    |> Slug.generate(:username)
 
     |> validate_length(:password, min: 8, max: 72)
     |> hash_password()
@@ -64,19 +62,24 @@ defmodule PlatformInfra.Database.Entities.User do
     end
   end
 
-  # Todo: Could (should?) be in global configs
+  # Todo: Could (should) be in global configs
   defp argon2_config() do
     env = Application.get_env(:platform, :env, :prod)
 
-    if env in [:test, :dev] do
-      [
+    case env do
+      :test -> [
         t_cost: 1,
-        m_cost: 8,
+        m_cost: 6,
+        parallelism: 1,
+        argon2_type: 2
+      ]
+      :dev -> [
+        t_cost: 2,
+        m_cost: 12,
         parallelism: System.schedulers_online(),
         argon2_type: 2
       ]
-    else
-      [
+      :prod -> [
         t_cost: 4,
         m_cost: 18,  # 2^18 KiB => 256MiB
         parallelism: 2,

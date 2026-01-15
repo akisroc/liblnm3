@@ -13,7 +13,7 @@ defmodule PlatformWeb.Router do
   scope "/", PlatformWeb do
     pipe_through :api
 
-    get "/", HealthController, :health
+    get "/ping", HealthController, :healthcheck
     post "/login", SessionController, :login
     post "/register", UserController, :create
   end

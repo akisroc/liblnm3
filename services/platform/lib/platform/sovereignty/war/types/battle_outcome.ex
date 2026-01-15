@@ -1,7 +1,5 @@
 defmodule Platform.Sovereignty.War.Types.BattleOutcome do
-  alias Platform.Sovereignty.War
-  alias Platform.Sovereignty.War.Types.{Troop, Unit, BattleLogEntry}
-  alias Platform.Sovereignty.Ecto.Entities.Kingdom
+  alias Platform.Sovereignty.War.Types.{Troop, BattleLogEntry}
 
   defstruct [
     :attacker_initial_troop,

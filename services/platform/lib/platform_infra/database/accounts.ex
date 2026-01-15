@@ -1,6 +1,11 @@
 defmodule PlatformInfra.Database.Accounts do
+  import Ecto.Query
+
   alias PlatformInfra.Database.Entities.{User, Session}
   alias PlatformInfra.Repo
+
+  @session_validity_in_days 120
+  @session_validity_in_seconds 60 * 60 * 24 * @session_validity_in_days
 
   def authenticate_user(email, password) do
     user = Repo.get_by(User, email: email)
@@ -21,7 +26,7 @@ defmodule PlatformInfra.Database.Accounts do
 
   def register_user(attrs \\ %{}) do
     %User{}
-    |> User.changeset(attrs)
+    |> User.create_changeset(attrs)
     |> Repo.insert()
   end
 
@@ -37,7 +42,7 @@ defmodule PlatformInfra.Database.Accounts do
       context: "session",
       ip_address: %Postgrex.INET{address: inet_addr},
       user_agent: user_agent,
-      expires_at: expires_at(user)
+      expires_at: session_expires_at(user)
     })
 
     token_bytes
@@ -70,6 +75,7 @@ defmodule PlatformInfra.Database.Accounts do
     :ok
   end
 
+  @spec delete_expired_sessions :: {:ok, non_neg_integer()}
   def delete_expired_sessions do
     {count, _} = Repo.delete_all(
       from s in Session, where: s.expires_at < fragment("now()")
@@ -78,8 +84,7 @@ defmodule PlatformInfra.Database.Accounts do
     {:ok, count}
   end
 
-  # Todo: Shorter session for admins and GMs
-  def expires_at(_user) do
+  def session_expires_at(_user) do
     DateTime.utc_now()
       |> DateTime.add(@session_validity_in_seconds, :second)
       |> DateTime.truncate(:second)

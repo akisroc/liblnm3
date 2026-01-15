@@ -1,7 +1,5 @@
 defmodule Platform.Sovereignty.War.Engine do
-  alias Platform.Sovereignty.War.Types.{
-    Troop, BattleState, Unit, UnitArchetype, BattleLogEntry, BattleOutcome
-  }
+  alias Platform.Sovereignty.War.Types.{Troop, BattleState, Unit, BattleOutcome}
 
   # ============================================================================
   # CONSTANTS & BALANCING
@@ -42,18 +40,12 @@ defmodule Platform.Sovereignty.War.Engine do
 
   @doc false
   @spec attack([non_neg_integer()] | Troop.t(), [non_neg_integer()] | Troop.t(), float(), float()) :: {:ok, BattleOutcome.t()} | {:error, any()}
-  def attack([_,_,_,_,_,_,_,_] = atk_raw_troop, [_,_,_,_,_,_,_,_] = def_raw_troop, atk_fame, def_fame) do
-    with {:ok, atk_troop} <- Troop.from_raw(atk_raw_troop, true),
-         {:ok, def_troop} <- Troop.from_raw(def_raw_troop, false) do
-      attack(atk_troop, def_troop, atk_fame, def_fame)
-    end
-  end
-  def attack(%Troop{} = atk_initial_troop, %Troop{} = atk_def_troop, atk_fame, def_fame) do
-    flat_units = format_troops_for_fight(atk_initial_troop, atk_def_troop)
+  def attack(%Troop{} = atk_initial_troop, %Troop{} = def_initial_troop, atk_fame, def_fame) do
+    flat_units = Troop.format_for_fight(atk_initial_troop, def_initial_troop)
 
     initial_state = %BattleState{
       units: flat_units,
-      log: :queue.new()
+      log_queue: :queue.new()
     }
 
     # Battle phases
@@ -61,7 +53,7 @@ defmodule Platform.Sovereignty.War.Engine do
     |> Enum.reduce_while(initial_state, fn unit, acc_state ->
 
       # Fetching unit current state
-      atk_unit = Enum.find(acc_state.units, &same_unit?(&1, unit))
+      atk_unit = Enum.find(acc_state.units, &Unit.same_unit?(&1, unit))
 
       # If unit already wiped or initially empty, we pass…
       if atk_unit.count === 0 do
@@ -80,37 +72,37 @@ defmodule Platform.Sovereignty.War.Engine do
 
             {
               :cont,
-              %{ acc_state |
-                units:
-                  acc_state.units |> Enum.map(fn unit ->
-                    cond do
-                      same_unit?(unit, atk_unit) -> %{unit | stroke?: true}
-                      same_unit?(unit, def_unit) ->
-                        %{unit | stricken?: true, count: max(0, unit.count - kill_count)}
-                      true -> unit
-                    end
-                  end),
-                log:
-                  acc_state
-                  |> update_log(atk_unit, def_unit, kill_steps)
-            }}
+              acc_state
+              |> BattleState.update_salvo_units(atk_unit, def_unit, kill_count)
+              |> BattleState.add_salvo_log_entry(atk_unit, def_unit, kill_steps)
+            }
         end
       end
 
     end)
 
-    %BattleOutcome{
-      attacker_initial_troop: atk_initial_troop,
-      defender_initial_troop: def_initial_troop,
-      attacker_final_troop: final_state.units |> Enum.filter(&(&1.attacker?)),
-      defender_final_troop: final_state.units |> Enum.reject(&(&1.attacker?)),
-      log: :queue.to_list(final_state.log_queue),
-      attacker_initial_fame: atk_fame,
-      defender_initial_fame: def_fame,
+    {
+      :ok,
+      %BattleOutcome{
+        attacker_initial_troop: atk_initial_troop,
+        defender_initial_troop: def_initial_troop,
+        attacker_final_troop: final_state.units |> Enum.filter(&(&1.attacker?)),
+        defender_final_troop: final_state.units |> Enum.reject(&(&1.attacker?)),
+        log: :queue.to_list(final_state.log_queue),
+        attacker_initial_fame: atk_fame,
+        defender_initial_fame: def_fame,
+      }
+      |> apply_winner()
+      |> apply_fame_drain()
     }
-    |> apply_winner()
-    |> apply_fame_drain()
 
+  end
+
+  def attack(atk_raw_troop, def_raw_troop, atk_fame, def_fame) do
+    with {:ok, atk_troop} <- Troop.from_raw(atk_raw_troop, true),
+         {:ok, def_troop} <- Troop.from_raw(def_raw_troop, false) do
+      attack(atk_troop, def_troop, atk_fame, def_fame)
+    end
   end
 
   # ============================================================================
@@ -147,14 +139,14 @@ defmodule Platform.Sovereignty.War.Engine do
           real_tick_dmg = min(base_dmg * friction, remaining_u2_count)
           {acc_kill_count + real_tick_dmg, [trunc(real_tick_dmg) | acc_kill_steps]}
         else
-          {acc_kill_count, [0 | steps]}
+          {acc_kill_count, [0 | acc_kill_steps]}
         end
       end)
 
     {trunc(kill_count), Enum.reverse(steps)}
   end
 
-  @spec attacker_wins(Troop.t(), Troop.t()) :: boolean()
+  @spec attacker_wins?(Troop.t(), Troop.t()) :: boolean()
   defp attacker_wins?(attacker_final_troop, defender_final_troop) do
     attacker_final_strength = Troop.military_strength(attacker_final_troop)
     defender_final_strength = Troop.military_strength(defender_final_troop)
@@ -176,7 +168,7 @@ defmodule Platform.Sovereignty.War.Engine do
     end
 
     # BASE
-    base_bounty = winner_initial_troop |> Enum.reduce(0, fn unit, acc ->
+    base_bounty = winner_initial_troop.units |> Enum.reduce(0, fn unit, acc ->
       acc + (unit.count * unit.archetype.fame_drain_rate * @fame_drain_dampener)
     end)
 
@@ -200,17 +192,16 @@ defmodule Platform.Sovereignty.War.Engine do
   defp choose_target!(striking_unit, stricken_troop) do
     stricken_troop
     |> Enum.reject(fn candidate_unit ->
-      same_side?(candidate_unit, striking_unit) or
+      Unit.same_side?(candidate_unit, striking_unit) or
       candidate_unit.count === 0 or
       candidate_unit.stricken? or
-      !can_reach?(striking_unit, candidate_unit)
+      !Unit.can_reach?(striking_unit, candidate_unit)
     end)
     |> case do
       [] -> nil
       list -> Enum.random(list)
     end
   end
-
   @spec choose_target(Unit.t(), [Unit.t()]) :: Unit.t() | nil
   defp choose_target(striking_unit, stricken_troop) do
     choose_target!(striking_unit, stricken_troop)
@@ -259,40 +250,4 @@ defmodule Platform.Sovereignty.War.Engine do
     }
   end
 
-  # Merge two raw lists of units into one flat list, having them shuffled
-  # then sorted by speed.
-  #
-  # Shuffling before sorting allows to naturally randomize striking order
-  # for opposite units with same speed. Otherwise, attacking b2, for example,
-  # would always strike before defending b2.
-  @spec format_troops_for_fight(Troop.t(), Troop.t()) :: [Unit.t()]
-  defp format_troops_for_fight(attacking_troop, defending_troop) do
-    [attacking_troop, defending_troop]
-    |> List.flatten()
-    # Naturally randomize striking order if speed equality
-    |> Enum.shuffle()
-    |> Enum.sort_by(& &1.archetype.speed, :desc)
-  end
-
-  # Distance units can reach all units.
-  # Melee units cannot reach distance units.
-  @spec can_reach?(Unit.t(), Unit.t()) :: boolean()
-  defp can_reach?(%Unit{archetype: %{distance?: true}}, _), do: true
-  defp can_reach?(_, %Unit{archetype: %{distance?: false}}), do: true
-  defp can_reach?(_, _), do: false
-
-  @spec same_unit?(Unit.t(), Unit.t()) :: boolean()
-  defp same_unit?(u1, u2) do
-    same_archetype?(u1, u2) && same_side?(u1, u2)
-  end
-
-  @spec same_archetype?(Unit.t(), Unit.t()) :: boolean()
-  defp same_archetype?(u1, u2) do
-    u1.archetype.key === u2.archetype.key
-  end
-
-  @spec same_side?(Unit.t(), Unit.t()) :: boolean()
-  defp same_side?(u1, u2) do
-    u1.attacker? === u2.attacker?
-  end
 end

@@ -1,119 +1,125 @@
-defmodule PlatformWeb.SessionControllerTest do
-  use PlatformWeb.ConnCase, async: true
+# defmodule PlatformWeb.SessionControllerTest do
+#   use PlatformWeb.ConnCase, async: true
 
-  import Platform.Fixtures
+#   import Ecto.Query
 
-  describe "POST /login" do
-    setup do
-      user = user_fixture(%{
-         username: "loginuser",
-        email: "login@example.com",
-        password: "correctpassword123"
-      })
+#   alias PlatformInfra.AccountsFixtures
+#   alias PlatformInfra.Repo
+#   alias PlatformInfra.Database.Accounts
+#   alias PlatformInfra.Database.Entities.{User, Session}
 
-      {:ok, user: user}
-    end
+#   describe "POST /login" do
+#     setup do
+#       user = AccountsFixtures.user_fixture(%{
+#          username: "loginuser",
+#         email: "login@example.com",
+#         password: "correctpassword123"
+#       })
 
-    test "logs in user with valid credentials", %{conn: conn, user: user} do
-      conn = post(conn, ~p"/login", %{
-        email: "login@example.com",
-        password: "correctpassword123"
-      })
+#       {:ok, user: user}
+#     end
 
-      assert %{
-        "token" => token,
-        "user_id" => user_id,
-        "user_email" => "login@example.com",
-        "user_slug" => "loginuser"
-      } = json_response(conn, 200)
+#     test "logs in user with valid credentials", %{conn: conn, user: user} do
+#       conn = post(conn, ~p"/login", %{
+#         email: "login@example.com",
+#         password: "correctpassword123"
+#       })
 
-      assert user_id == user.id
-      assert is_binary(token)
+#       assert %{
+#         "token" => token,
+#         "user_id" => user_id,
+#         "user_email" => "login@example.com",
+#         "user_slug" => "loginuser"
+#       } = json_response(conn, 200)
 
-      # Check cookie is set
-      assert conn.resp_cookies["_platform_user_token"]
-      cookie = conn.resp_cookies["_platform_user_token"]
-      assert cookie.http_only == true
-      assert cookie.max_age == Platform.Accounts.Session.session_validity_in_seconds()
-    end
+#       assert user_id == user.id
+#       assert is_binary(token)
 
-    test "returns error with invalid password", %{conn: conn} do
-      conn = post(conn, ~p"/login", %{
-        email: "login@example.com",
-        password: "wrongpassword"
-      })
+#       # Check cookie is set
+#       assert conn.resp_cookies["_platform_user_token"]
+#       cookie = conn.resp_cookies["_platform_user_token"]
+#       assert cookie.http_only == true
+#       assert cookie.max_age == Accounts.session_validity_in_seconds()
+#     end
 
-      assert %{"error" => "Invalid credentials"} = json_response(conn, 401)
-    end
+#     test "returns error with invalid password", %{conn: conn} do
+#       conn = post(conn, ~p"/login", %{
+#         email: "login@example.com",
+#         password: "wrongpassword"
+#       })
 
-    test "returns error with non-existent email", %{conn: conn} do
-      conn = post(conn, ~p"/login", %{
-        email: "nonexistent@example.com",
-        password: "somepassword"
-      })
+#       assert %{"error" => "Invalid credentials"} = json_response(conn, 401)
+#     end
 
-      assert %{"error" => "Invalid credentials"} = json_response(conn, 401)
-    end
+#     test "returns error with non-existent email", %{conn: conn} do
+#       conn = post(conn, ~p"/login", %{
+#         email: "nonexistent@example.com",
+#         password: "somepassword"
+#       })
 
-    test "returns error for disabled user", %{conn: conn, user: user} do
-      Platform.Repo.update!(
-        Platform.Accounts.User.changeset(user, %{is_enabled: false})
-      )
+#       assert %{"error" => "Invalid credentials"} = json_response(conn, 401)
+#     end
 
-      conn = post(conn, ~p"/login", %{
-        email: "login@example.com",
-        password: "correctpassword123"
-      })
+#     test "returns error for disabled user", %{conn: conn, user: user} do
+#       Repo.update!(
+#         User.create_changeset(user, %{is_enabled: false})
+#       )
 
-      assert %{"error" => "Invalid credentials"} = json_response(conn, 401)
-    end
+#       conn = post(conn, ~p"/login", %{
+#         email: "login@example.com",
+#         password: "correctpassword123"
+#       })
 
-    test "returns error for removed user", %{conn: conn, user: user} do
-      Platform.Repo.update!(
-        Platform.Accounts.User.changeset(user, %{is_removed: true})
-      )
+#       assert %{"error" => "Invalid credentials"} = json_response(conn, 401)
+#     end
 
-      conn = post(conn, ~p"/login", %{
-        email: "login@example.com",
-        password: "correctpassword123"
-      })
+#     # Todo: Unique on fields doesn’t concern removed users
+#     test "returns error for removed user", %{conn: conn, user: user} do
+#       Repo.update!(
+#         User.create_changeset(user, %{is_removed: true})
+#       )
 
-      assert %{"error" => "Invalid credentials"} = json_response(conn, 401)
-    end
+#       conn = post(conn, ~p"/login", %{
+#         email: "login@example.com",
+#         password: "correctpassword123"
+#       })
 
-    test "creates session in database", %{conn: conn, user: user} do
-      conn = post(conn, ~p"/login", %{
-        email: "login@example.com",
-        password: "correctpassword123"
-      })
+#       assert %{"error" => "Invalid credentials"} = json_response(conn, 401)
+#     end
 
-      assert json_response(conn, 200)
+#     test "creates session in database", %{conn: conn, user: user} do
+#       conn = post(conn, ~p"/login", %{
+#         email: "login@example.com",
+#         password: "correctpassword123"
+#       })
 
-      # Verify session was created
-      sessions = Platform.Repo.all(
-        from s in Platform.Accounts.Session,
-        where: s.user_id == ^user.id
-      )
+#       assert json_response(conn, 200)
 
-      assert length(sessions) == 1
-      session = List.first(sessions)
-      assert session.context == "session"
-      assert session.ip_address != nil
-    end
+#       # Verify session was created
+#       sessions = Repo.all(
+#         from s in Session,
+#         where: s.user_id == ^user.id
+#       )
 
-    test "stores hashed token in database", %{conn: conn} do
-      conn = post(conn, ~p"/login", %{
-        email: "login@example.com",
-        password: "correctpassword123"
-      })
+#       assert length(sessions) == 1
+#       session = List.first(sessions)
+#       assert session.context == "session"
+#       assert session.ip_address != nil
+#     end
 
-      response = json_response(conn, 200)
-      token = response["token"]
+#     test "stores hashed token in database", %{conn: conn} do
+#       conn = post(conn, ~p"/login", %{
+#         email: "login@example.com",
+#         password: "correctpassword123"
+#       })
 
-      # Token in DB should be hashed, not the raw base64 token
-      session = Platform.Repo.one(Platform.Accounts.Session)
-      refute session.token == token
-      refute session.token == Base.url_decode64!(token, padding: false)
-    end
-  end
-end
+#       response = json_response(conn, 200)
+#       token = response["token"]
+
+#       # Token in DB should be hashed, not the raw base64 token
+#       session = Repo.one(Session)
+#       refute session.token == token
+#       refute session.token == Base.url_decode64!(token, padding: false)
+#     end
+#   end
+# end

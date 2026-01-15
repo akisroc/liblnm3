@@ -56,5 +56,5 @@ shell-nuxt: ## Enter in Nuxt container
 	$(EXEC_NUXT) sh
 
 test: ## Launch tests on all services
-	$(EXEC_PHX) mix test
-	#$(EXEC_SF) bin/phpunit
+	docker compose run --rm -e MIX_ENV=test -e PHIX_SERVER=false platform mix test
+# 	#$(EXEC_SF) bin/phpunit
