@@ -82,11 +82,24 @@ CREATE TABLE "shouts" (
   CONSTRAINT "chk_shouts_content_length" CHECK (char_length(content) <= 500)
 );
 
+-- WHISPERS
+CREATE TABLE "whispers" (
+  "id" uuid PRIMARY KEY,
+  "content" text,
+  "sender_id" uuid NOT NULL,
+  "receiver_id" uuid NOT NULL,
+  "is_read" bool NOT NULL DEFAULT (false),
+  "inserted_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+  "updated_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+  CONSTRAINT "chk_whispers_content_length" CHECK(char_length(content) <= 10000),
+  CONSTRAINT "chk_whispers_sender_is_not_receiver" CHECK (sender_id <> receiver_id)
+);
+
 -- KINGDOMS
 CREATE TABLE "kingdoms" (
   "id" uuid PRIMARY KEY,
   "user_id" uuid NOT NULL,
-  "leader_id" uuid,
+  "leader_id" uuid NOT NULL,
   "name" varchar(63) NOT NULL,
   "slug" varchar(127) UNIQUE NOT NULL,
   "fame" numeric(12,3) NOT NULL DEFAULT (30000.0),
@@ -238,6 +251,8 @@ CREATE TABLE "posts" (
   "user_id" uuid NOT NULL,
   "thread_id" uuid NOT NULL,
   "content" text NOT NULL,
+  "inserted_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+  "updated_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
   CONSTRAINT "chk_posts_content_length" CHECK (char_length(content) <= 10000)
 );
 
@@ -261,6 +276,13 @@ CREATE TABLE "sessions" (
 -- USERS
 CREATE UNIQUE INDEX "idx_users_nickname_not_removed" ON "users" ("nickname") WHERE "is_removed" = false;
 CREATE UNIQUE INDEX "idx_users_email_not_removed" ON "users" ("email") WHERE "is_removed" = false;
+
+-- SHOUTS
+CREATE INDEX "idx_shouts_user_id" ON "shouts" ("user_id");
+
+-- WHISPERS
+CREATE INDEX "idx_whispers_sender_id" ON "whispers" ("sender_id");
+CREATE INDEX "idx_whispers_receiver_id" ON "whispers" ("receiver_id");
 
 -- KINGDOMS
 CREATE UNIQUE INDEX "idx_kingdoms_name_not_removed" ON "kingdoms" ("name") WHERE "is_removed" = false;
@@ -314,6 +336,10 @@ CREATE INDEX "sessions_user_id" ON "sessions" ("user_id");
 -- SHOUTS
 ALTER TABLE "shouts" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 
+-- WHISPERS
+ALTER TABLE "whispers" ADD FOREIGN KEY ("sender_id") REFERENCES "users" ("id");
+ALTER TABLE "whispers" ADD FOREIGN KEY ("receiver_id") REFERENCES "users" ("id");
+
 -- KINGDOMS
 ALTER TABLE "kingdoms" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 ALTER TABLE "kingdoms" ADD FOREIGN KEY ("leader_id") REFERENCES "protagonists" ("id");
@@ -360,6 +386,30 @@ ALTER TABLE "posts" ADD FOREIGN KEY ("thread_id") REFERENCES "threads" ("id");
 
 -- SESSIONS
 ALTER TABLE "sessions" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
+
+
+-- ------------
+-- COMMENTS
+-- ------------
+
+-- SHOUTS
+COMMENT ON TABLE "shouts" IS 'Chat messages (only one general channel)';
+
+-- WHISPERS
+COMMENT ON TABLE "whispers" IS 'Private messages between two users';
+COMMENT ON COLUMN "whispers"."sender_id" IS 'User sending the whisper';
+COMMENT ON COLUMN "whispers"."receiver_id" IS 'User receiving the whisper';
+
+-- KINGDOMS
+COMMENT ON COLUMN "kingdoms"."leader_id" IS 'Protagonist leading the kingdom';
+COMMENT ON COLUMN "kingdoms"."is_active" IS 'One active kingdom per user a time';
+
+-- MISSIVES
+COMMENT ON COLUMN "missives"."sender_id" IS 'Kingdom sending the missive';
+COMMENT ON COLUMN "missives"."receiver_id" IS 'Kingdom receiving the missive';
+
+-- CHRONICLES
+COMMENT ON COLUMN "chronicles"."gm_id" IS 'User mastering the chronicle';
 
 
 -- ------------
