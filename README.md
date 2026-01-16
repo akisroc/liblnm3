@@ -149,8 +149,11 @@ erDiagram
     KINGDOMS ||--o{ MISSIVES : "sends/receives"
     KINGDOMS |o--o| PROTAGONISTS : "led_by"
 
+    PROTAGONISTS ||--o{ SHOUTS : "shouts"
+    PROTAGONISTS ||--o{ WHISPERS : "sends/receives"
     PROTAGONISTS ||--o{ PROTAGONISTS_CHRONICLES : "participates"
     PROTAGONISTS ||--o{ CHAPTERS : "writes"
+    
     CHRONICLES ||--o{ PROTAGONISTS_CHRONICLES : "includes"
     CHRONICLES ||--o{ CHAPTERS : "contains"
     
@@ -165,26 +168,8 @@ erDiagram
         varchar slug
         platform_theme_enum platform_theme
         bool is_enabled
-    }
-
-    KINGDOMS {
-        uuid id PK
-        uuid user_id FK
-        uuid leader_id FK
-        varchar name
-        numeric fame
-        integer_array defense_troup
-        integer_array attack_troup
-        bool is_active
-    }
-
-    BATTLES {
-        uuid id PK
-        uuid attacker_id FK
-        uuid defender_id FK
-        integer_array attacker_initial_troup
-        jsonb log
-        bool attacker_wins
+        bool is_removed
+        timestamp inserted_at
     }
 
     PROTAGONISTS {
@@ -193,7 +178,36 @@ erDiagram
         uuid kingdom_id FK
         varchar name
         numeric fame
-        bool anonymous
+        bool is_anonymous
+        bool is_removed
+    }
+
+    KINGDOMS {
+        uuid id PK
+        uuid user_id FK
+        uuid leader_id FK
+        varchar name
+        numeric fame
+        integer_array defense_troop
+        integer_array attack_troop
+        bool is_active
+        bool is_removed
+    }
+
+    SHOUTS {
+        uuid id PK
+        uuid protagonist_id FK
+        text content
+        timestamp inserted_at
+    }
+
+    WHISPERS {
+        uuid id PK
+        uuid sender_id FK
+        uuid receiver_id FK
+        text content
+        bool is_read
+        timestamp inserted_at
     }
 
     MISSIVES {
@@ -202,6 +216,19 @@ erDiagram
         uuid receiver_id FK
         text content
         bool is_read
+        timestamp inserted_at
+    }
+
+    BATTLES {
+        uuid id PK
+        uuid attacker_kingdom_id FK
+        uuid defender_kingdom_id FK
+        integer_array attacker_initial_troop
+        integer_array defender_initial_troop
+        jsonb log
+        bool attacker_wins
+        numeric attacker_fame_modifier
+        numeric defender_fame_modifier
     }
 
     CHRONICLES {
@@ -210,6 +237,7 @@ erDiagram
         uuid user_id FK
         varchar title
         varchar slug
+        bool is_removed
     }
 
     CHAPTERS {
@@ -217,6 +245,24 @@ erDiagram
         uuid chronicle_id FK
         uuid protagonist_id FK
         text content
+        timestamp inserted_at
+    }
+
+    THREADS {
+        uuid id PK
+        uuid user_id FK
+        uuid board_id FK
+        varchar title
+        varchar slug
+        bool is_removed
+    }
+
+    POSTS {
+        uuid id PK
+        uuid user_id FK
+        uuid thread_id FK
+        text content
+        timestamp inserted_at
     }
 
     SESSIONS {
@@ -224,6 +270,7 @@ erDiagram
         uuid user_id FK
         bytea token
         inet ip_address
+        varchar user_agent
         timestamp expires_at
     }
 ```
