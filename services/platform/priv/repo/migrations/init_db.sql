@@ -72,6 +72,16 @@ CREATE TABLE "users" (
   CONSTRAINT "chk_users_slug_format" CHECK (slug ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$')
 );
 
+-- SHOUTS
+CREATE TABLE "shouts" (
+  "id" uuid PRIMARY KEY,
+  "user_id" uuid NOT NULL,
+  "content" text,
+  "inserted_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+  "updated_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+  CONSTRAINT "chk_shouts_content_length" CHECK (char_length(content) <= 500)
+);
+
 -- KINGDOMS
 CREATE TABLE "kingdoms" (
   "id" uuid PRIMARY KEY,
@@ -300,6 +310,9 @@ CREATE INDEX "sessions_user_id" ON "sessions" ("user_id");
 -- ------------
 -- FOREIGN KEYS
 -- ------------
+
+-- SHOUTS
+ALTER TABLE "shouts" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 
 -- KINGDOMS
 ALTER TABLE "kingdoms" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
