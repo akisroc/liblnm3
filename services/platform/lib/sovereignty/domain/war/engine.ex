@@ -1,5 +1,6 @@
-defmodule Platform.Sovereignty.War.Engine do
-  alias Platform.Sovereignty.War.Types.{Troop, BattleState, Unit, BattleOutcome}
+defmodule Platform.Sovereignty.Domain.War.Engine do
+  alias Platform.Sovereignty.Domain.Types.{Troop, BattleState, Unit}
+  alias Platform.Sovereignty.Domain.Entities.{Battle, Kingdom}
 
   # ============================================================================
   # CONSTANTS & BALANCING
@@ -35,11 +36,12 @@ defmodule Platform.Sovereignty.War.Engine do
   @fame_difference_slice 0.05
 
   # ============================================================================
-  # PUBLIC API
+  # API
   # ============================================================================
 
-  @doc false
-  @spec attack([non_neg_integer()] | Troop.t(), [non_neg_integer()] | Troop.t(), float(), float()) :: {:ok, BattleOutcome.t()} | {:error, any()}
+  @spec attack(Troop.t(), Troop.t(), float(), float()) :: {:ok, Battle.t()} | {:error, any()}
+  @spec attack([non_neg_integer()] | Troop.t(), [non_neg_integer()] | Troop.t(), float(), float()) :: {:ok, Battle.t()} | {:error, any()}
+
   def attack(%Troop{} = atk_initial_troop, %Troop{} = def_initial_troop, atk_fame, def_fame) do
     flat_units = Troop.format_for_fight(atk_initial_troop, def_initial_troop)
 
@@ -83,7 +85,7 @@ defmodule Platform.Sovereignty.War.Engine do
 
     {
       :ok,
-      %BattleOutcome{
+      %Battle{
         attacker_initial_troop: atk_initial_troop,
         defender_initial_troop: def_initial_troop,
         attacker_final_troop: final_state.units |> Enum.filter(&(&1.attacker?)),
@@ -209,26 +211,26 @@ defmodule Platform.Sovereignty.War.Engine do
     Enum.EmptyError -> nil
   end
 
-  @spec apply_winner(BattleOutcome.t()) :: BattleOutcome.t()
-  defp apply_winner(%BattleOutcome{} = outcome) do
-    %BattleOutcome{
-      outcome |
-      attacker_wins?: attacker_wins?(outcome.attacker_final_troop, outcome.defender_final_troop)
+  @spec apply_winner(Battle.t()) :: Battle.t()
+  defp apply_winner(%Battle{} = battle) do
+    %Battle{
+      battle |
+      attacker_wins?: attacker_wins?(battle.attacker_final_troop, battle.defender_final_troop)
     }
   end
 
-  @spec apply_fame_drain(BattleOutcome.t()) :: BattleOutcome.t()
-  defp apply_fame_drain(%BattleOutcome{} = outcome) do
+  @spec apply_fame_drain(Battle.t()) :: Battle.t()
+  defp apply_fame_drain(%Battle{} = battle) do
     {winner_initial_troop, loser_initial_troop, winner_fame, loser_fame} =
-      if outcome.attacker_wins? do
+      if battle.attacker_wins? do
         {
-          outcome.attacker_initial_troop, outcome.defender_initial_troop,
-          outcome.attacker_initial_fame, outcome.defender_initial_fame
+          battle.attacker_initial_troop, battle.defender_initial_troop,
+          battle.attacker_initial_fame, battle.defender_initial_fame
         }
       else
         {
-          outcome.defender_initial_troop, outcome.attacker_initial_troop,
-          outcome.defender_initial_fame, outcome.attacker_initial_fame
+          battle.defender_initial_troop, battle.attacker_initial_troop,
+          battle.defender_initial_fame, battle.attacker_initial_fame
         }
       end
 
@@ -237,14 +239,14 @@ defmodule Platform.Sovereignty.War.Engine do
     )
 
     {attacker_modifier, defender_modifier} =
-      if outcome.attacker_wins? do
+      if battle.attacker_wins? do
         {winner_modifier, loser_modifier}
       else
         {loser_modifier, winner_modifier}
       end
 
-    %BattleOutcome{
-      outcome |
+    %Battle{
+      battle |
       attacker_fame_modifier: attacker_modifier,
       defender_fame_modifier: defender_modifier
     }
