@@ -1,0 +1,83 @@
+defmodule Platform.Sovereignty.Infrastructure.Persistence.Schemas.Notable do
+  use Ecto.Schema
+  import Ecto.Changeset
+
+  alias Platform.Shared.Infrastructure.Persistence.Types.{UUID7, LoreName, Slug, Url}
+  alias Platform.Sovereignty.Infrastructure.Persistence.Schemas.{Player, Kingdom}
+
+  @primary_key {:id, UUID7, autogenerate: true}
+  @foreign_key_type UUID7
+
+  schema "protagonists" do
+    field :name, LoreName
+    field :fame, :decimal, default: Decimal.new("0.0")
+    field :slug, Slug
+    field :is_anonymous, :boolean, default: true
+    field :profile_picture, Url
+    field :biography, :string
+    field :is_removed, :boolean, default: false
+
+    timestamps()
+
+    belongs_to :player, Player,
+      foreign_key: :player_id,
+      references: :id
+
+    belongs_to :kingdom, Kingdom,
+      foreign_key: :kingdom_id,
+      references: :id
+  end
+
+  def register(notable, attrs) do
+    notable
+    |> cast(attrs, [:player_id, :kingdom_id, :name])
+    |> validate_required([:player_id, :name])
+
+    |> update_change(:name, &String.trim/1)
+    |> validate_length(:name, min: 1, max: 30)
+    |> unique_constraint(:name, name: :idx_protagonists_name_not_removed)
+
+    |> Slug.generate(:name)
+    |> validate_length(:slug, min: 1, max: 60)
+    |> unique_constraint(:slug, name: :protagonists_slug_key)
+
+    |> assoc_constraint(:player)
+    |> assoc_constraint(:kingdom)
+  end
+
+  def rename(notable, attrs) do
+    notable
+    |> cast(attrs, [:name])
+    |> validate_required(:name)
+
+    |> update_change(:name, &String.trim/1)
+    |> validate_length(:name, min: 1, max: 30)
+    |> unique_constraint(:name, name: :idx_protagonists_name_not_removed)
+  end
+
+  def relocate(notable, attrs) do
+    notable
+    |> cast(attrs, [:kingdom_id])
+    |> validate_required(:kingdom_id)
+
+    |> assoc_constraint(:kingdom)
+    |> foreign_key_constraint(
+      :kingdom_id,
+      name: :fk_kingdom_has_leader,
+      message: "cannot relocate a leader from its kingdom – must change leader first"
+    )
+  end
+
+  def adjust_fame(notable, attrs) do
+    notable
+    |> cast(attrs, [:fame])
+    |> validate_required(:fame)
+  end
+
+  def remove(notable, attrs) do
+    notable
+    |> cast(attrs, [:is_removed])
+    |> validate_required(:is_removed)
+    |> validate_inclusion(:is_removed, [true])
+  end
+end

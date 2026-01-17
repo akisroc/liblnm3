@@ -8,10 +8,10 @@
 import Config
 
 config :platform,
-  ecto_repos: [PlatformInfra.Repo],
+  ecto_repos: [Platform.Shared.Infrastructure.Persistence.Repo],
   generators: [timestamp_type: :utc_datetime]
 
-config :platform, PlatformInfra.Repo,
+config :platform, Platform.Shared.Infrastructure.Persistence.Repo,
   migration_primary_key: [name: :id, type: :binary_id],
   migration_foreign_key: [type: :binary_id]
 
@@ -42,6 +42,10 @@ config :logger, :default_formatter,
 
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
+
+# ADAPTERS
+config :platform, :kingdom_repository,
+  adapter: Platform.Sovereignty.Infrastructure.Persistence.Repositories.KingdomRepository
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
