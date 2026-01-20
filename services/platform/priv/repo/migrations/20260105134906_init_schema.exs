@@ -1,4 +1,17 @@
 defmodule PlatformInfra.Repo.Migrations.InitSchema do
+  @moduledoc """
+  First database schema initialization.
+
+  Incremental migrations won’t be used during initial
+  development phase. The files init_db.sql and deinit_db.sql
+  will be maintained instead, and the dev database locally
+  reset at each alteration if needed.
+
+  This method will no longer be used once the application is
+  in production. At this time, Ecto’s migration system is to
+  be used as intended.
+  """
+
   use Ecto.Migration
 
   def up do
