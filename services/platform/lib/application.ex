@@ -12,8 +12,12 @@ defmodule Platform.Application do
       PlatformInfra.Repo,
       {DNSCluster, query: Application.get_env(:platform, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Platform.PubSub},
+
       # Background workers
       PlatformInfra.Database.Workers.SessionCleaner,
+      Platform.Shared.Infrastructure.Persistence.Workers.OutboxCleaner,
+      Platform.Shared.Infrastructure.Persistence.Workers.OutboxRelay,
+
       # Start to serve requests, typically the last entry
       PlatformWeb.Endpoint
     ]

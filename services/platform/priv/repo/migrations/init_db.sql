@@ -75,6 +75,12 @@ CREATE TYPE "platform_theme_enum" AS ENUM (
     'light'
 );;
 
+CREATE TYPE "outbox_message_status" AS ENUM(
+    'pending',
+    'success',
+    'failed'
+);;
+
 
 -- ------------
 -- TABLES
@@ -289,6 +295,19 @@ CREATE TABLE "sessions" (
     "inserted_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP)
 );;
 
+-- OUTBOX (technical table)
+CREATE TABLE "outbox" (
+    "id" integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    "message_type" varchar(255) NOT NULL,
+    "payload" jsonb NOT NULL,
+    "metadata" jsonb DEFAULT '{}'::jsonb,
+    "consumed_by" varchar(255)[] DEFAULT '{}',
+    "failed_attempts" integer NOT NULL DEFAULT (0),
+    "last_error" varchar(1027),
+    "status" outbox_message_status NOT NULL DEFAULT 'pending',
+    "scheduled_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+    "closed_at" timestamp
+);;
 
 -- ------------
 -- INDEXES
@@ -348,6 +367,9 @@ CREATE INDEX "idx_posts_thread_id" ON "posts" ("thread_id");;
 
 -- SESSIONS
 CREATE INDEX "sessions_user_id" ON "sessions" ("user_id");;
+
+-- OUTBOX
+CREATE INDEX idx_outbox_active_messages ON outbox (id) WHERE closed_at IS NULL;;
 
 
 -- ------------
@@ -570,10 +592,17 @@ COMMENT ON CONSTRAINT "fk_protagonists_kingdom_id"
 IS 'Deferrable to allow registering a kingdom with its leader protagonist; ' ||
    'see register_kingdom_and_leader procedure';;
 
-
 -- MISSIVES
 COMMENT ON COLUMN "missives"."sender_id" IS 'Kingdom sending the missive';;
 COMMENT ON COLUMN "missives"."receiver_id" IS 'Kingdom receiving the missive';;
 
 -- CHRONICLES
 COMMENT ON COLUMN "chronicles"."gm_id" IS 'User mastering the chronicle';;
+
+-- OUTBOX
+COMMENT ON TABLE "outbox" IS "Technical table – asynchronous message bus";;
+COMMENT ON COLUMN "outbox"."message_type" IS "Message’s identifier – example: “UserRegistered”";;
+COMMENT ON COLUMN "outbox"."payload" IS "Message’s payload";;
+COMMENT ON COLUMN "outbox"."consumed_by" IS "List of the services which have already consumed the message";;
+COMMENT ON COLUMN "outbox"."scheduled_at" IS "Time of the dispatch start";;
+COMMENT ON COLUMN "outbox"."closed_at" IS "Time of the the last consumption, sealing the message";;
