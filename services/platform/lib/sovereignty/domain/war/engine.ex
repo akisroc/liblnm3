@@ -189,25 +189,19 @@ defmodule Platform.Sovereignty.Domain.War.Engine do
     {drain, -drain}
   end
 
-  @spec choose_target!(Unit.t(), [Unit.t()]) :: Unit.t() | nil
-  defp choose_target!(striking_unit, stricken_troop) do
-    stricken_troop
-    |> Enum.reject(fn candidate_unit ->
-      Unit.same_side?(candidate_unit, striking_unit) or
-      candidate_unit.count === 0 or
-      candidate_unit.stricken? or
-      !Unit.can_reach?(striking_unit, candidate_unit)
-    end)
-    |> case do
-      [] -> nil
-      list -> Enum.random(list)
-    end
-  end
   @spec choose_target(Unit.t(), [Unit.t()]) :: Unit.t() | nil
   defp choose_target(striking_unit, stricken_troop) do
-    choose_target!(striking_unit, stricken_troop)
-  rescue
-    Enum.EmptyError -> nil
+    stricken_troop
+    |> Enum.filter(fn candidate_unit ->
+      candidate_unit.count > 0 or
+      not candidate_unit.stricken? or
+      not Unit.same_side?(candidate_unit, striking_unit) or
+      Unit.can_reach?(striking_unit, candidate_unit)
+    end)
+    |> case do
+      []         -> nil
+      candidates -> Enum.random(candidates)
+    end
   end
 
   @spec apply_winner(BattleOutcome.t()) :: BattleOutcome.t()
