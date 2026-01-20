@@ -1,9 +1,10 @@
-defmodule Platform.Shared.Infrastructure.Persistence.Schemas.Battle do
+defmodule Platform.Sovereignty.Infrastructure.Persistence.Schemas.Battle do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias Platform.Shared.Infrastructure.Persistence.Types.{UUID7, Troop}
-  alias Platform.Shared.Infrastructure.Persistence.Schemas.Kingdom
+  alias Platform.Sovereignty.Infrastructure.Persistence.Types.Troop
+  alias Platform.Sovereignty.Infrastructure.Persistence.Schemas.Kingdom
+  alias Platform.Shared.Infrastructure.Persistence.Types.UUID7
 
   @type t :: %__MODULE__{
     id: String.t() | nil,
@@ -14,27 +15,10 @@ defmodule Platform.Shared.Infrastructure.Persistence.Schemas.Battle do
     log: map() | nil,
     attacker_final_troop: [non_neg_integer()] | nil,
     defender_final_troop: [non_neg_integer()] | nil,
-    attacker_wins?: boolean() | nil,
+    attacker_wins: boolean() | nil,
     attacker_fame_modifier: Decimal.t() | nil,
     defender_fame_modifier: Decimal.t() | nil,
     inserted_at: DateTime.t() | nil,
-    attacker_kingdom: Ecto.Association.NotLoaded.t() | Kingdom.t(),
-    defender_kingdom: Ecto.Association.NotLoaded.t() | Kingdom.t()
-  }
-
-  @type loaded :: %__MODULE__{
-    id: String.t(),
-    attacker_kingdom_id: String.t(),
-    defender_kingdom_id: String.t(),
-    attacker_initial_troop: [non_neg_integer()],
-    defender_initial_troop: [non_neg_integer()],
-    log: map(),
-    attacker_final_troop: [non_neg_integer()],
-    defender_final_troop: [non_neg_integer()],
-    attacker_wins?: boolean(),
-    attacker_fame_modifier: Decimal.t(),
-    defender_fame_modifier: Decimal.t(),
-    inserted_at: DateTime.t(),
     attacker_kingdom: Ecto.Association.NotLoaded.t() | Kingdom.t(),
     defender_kingdom: Ecto.Association.NotLoaded.t() | Kingdom.t()
   }
@@ -48,21 +32,17 @@ defmodule Platform.Shared.Infrastructure.Persistence.Schemas.Battle do
     field :log, :map
     field :attacker_final_troop, Troop
     field :defender_final_troop, Troop
-    field :attacker_wins?, :boolean, source: :attacker_wins
+    field :attacker_wins, :boolean
     field :attacker_fame_modifier, :decimal
     field :defender_fame_modifier, :decimal
 
-    timestamps(updated_at: false, type: :utc_datetime)
+    timestamps(updated_at: false)
 
-    belongs_to :attacker_kingdom, Kingdom, foreign_key: :attacker_kingdom_id
-    belongs_to :defender_kingdom, Kingdom, foreign_key: :defender_kingdom_id
+    belongs_to :attacker_kingdom, Kingdom
+    belongs_to :defender_kingdom, Kingdom
   end
 
-  @doc """
-  Battles are immutable.
-  Once inserted, they are history, they will never change.
-  """
-  def create_changeset(battle, attrs) do
+  def register(battle, attrs) do
     battle
     |> cast(attrs, [
       :attacker_kingdom_id,
@@ -91,5 +71,10 @@ defmodule Platform.Shared.Infrastructure.Persistence.Schemas.Battle do
     |> foreign_key_constraint(:attacker_kingdom_id)
     |> foreign_key_constraint(:defender_kingdom_id)
     |> check_constraint(:attacker_kingdom_id, name: :chk_battles_attacker_is_not_defender)
+    |> check_constraint(:attacker_initial_troop, name: :chk_battles_attacker_initial_troop_integrity)
+    |> check_constraint(:defender_initial_troop, name: :chk_battles_defender_initial_troop_integrity)
+    |> check_constraint(:attacker_final_troop, name: :chk_battles_attacker_final_troop_integrity)
+    |> check_constraint(:defender_final_troop, name: :chk_battles_defender_final_troop_integrity)
+    |> check_constraint(:log, name: :chk_log_integrity)
   end
 end

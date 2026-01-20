@@ -3,8 +3,12 @@ defmodule Platform.Sovereignty.Infrastructure.Persistence.Schemas.Kingdom do
   import Ecto.Changeset
 
   alias Platform.Sovereignty.Infrastructure.Persistence.Schemas.{Player, Notable}
-  alias Platform.Shared.Infrastructure.Persistence.Types.{UUID7, LoreName, Slug, Troop}
+  alias Platform.Sovereignty.Infrastructure.Persistence.Types.Troop
+  alias Platform.Shared.Infrastructure.Persistence.Types.{UUID7, LoreName, Slug}
   alias Platform.Shared.Infrastructure.Persistence.Types
+
+  @name_max_length 60
+  @slug_max_length 120
 
   @type t :: %__MODULE__{
     id: UUID7.t() | nil,
@@ -59,11 +63,11 @@ defmodule Platform.Sovereignty.Infrastructure.Persistence.Schemas.Kingdom do
     |> UUID7.ensure_generation()
 
     |> update_change(:name, &String.trim/1)
-    |> validate_length(:name, min: 1, max: 60)
+    |> validate_length(:name, min: 1, max: @name_max_length)
     |> unique_constraint(:name, name: :idx_kingdoms_name_not_removed)
 
     |> Slug.generate(:name)
-    |> validate_length(:slug, min: 1, max: 120)
+    |> validate_length(:slug, min: 1, max: @slug_max_length)
     |> unique_constraint(:slug, name: :kingdoms_slug_key)
 
     |> assoc_constraint(:player)
@@ -71,18 +75,26 @@ defmodule Platform.Sovereignty.Infrastructure.Persistence.Schemas.Kingdom do
     |> foreign_key_constraint(:leader_id, name: :fk_leader_player_ownership)
   end
 
-  def activate(kingdom, attrs) do
+  def rename(kingdom, attrs) do
     kingdom
-    |> cast(attrs, [:is_active])
-    |> validate_required(:is_active)
-    |> validate_inclusion(:is_active, [true])
+    |> cast(attrs, [:name])
+    |> validate_required(:name)
+
+    |> update_change(:name, &String.trim/1)
+    |> validate_length(:name, min: 1, max: @name_max_length)
+    |> unique_constraint(:name, name: :idx_protagonists_name_not_removed)
   end
 
-  def deactivate(kingdom, attrs) do
+  def activate(kingdom) do
     kingdom
-    |> cast(attrs, [:is_active])
-    |> validate_required(:is_active)
-    |> validate_inclusion(:is_active, [false])
+    |> change()
+    |> put_change(:is_active, true)
+  end
+
+  def deactivate(kingdom) do
+    kingdom
+    |> change()
+    |> put_change(:is_active, false)
   end
 
   def change_leader(kingdom, attrs) do
@@ -109,11 +121,10 @@ defmodule Platform.Sovereignty.Infrastructure.Persistence.Schemas.Kingdom do
     )
   end
 
-  def remove(kingdom, attrs) do
+  def soft_remove(kingdom) do
     kingdom
-    |> cast(attrs, [:is_removed])
-    |> validate_required(:is_removed)
-    |> validate_inclusion(:is_removed, [true])
+    |> change()
+    |> put_change(:is_removed, true)
   end
 
 end

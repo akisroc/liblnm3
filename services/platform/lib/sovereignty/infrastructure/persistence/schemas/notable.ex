@@ -5,6 +5,9 @@ defmodule Platform.Sovereignty.Infrastructure.Persistence.Schemas.Notable do
   alias Platform.Shared.Infrastructure.Persistence.Types.{UUID7, LoreName, Slug, Url}
   alias Platform.Sovereignty.Infrastructure.Persistence.Schemas.{Player, Kingdom}
 
+  @name_max_length 30
+  @slug_max_length 60
+
   @primary_key {:id, UUID7, autogenerate: true}
   @foreign_key_type UUID7
 
@@ -34,25 +37,15 @@ defmodule Platform.Sovereignty.Infrastructure.Persistence.Schemas.Notable do
     |> validate_required([:player_id, :name])
 
     |> update_change(:name, &String.trim/1)
-    |> validate_length(:name, min: 1, max: 30)
+    |> validate_length(:name, min: 1, max: @name_max_length)
     |> unique_constraint(:name, name: :idx_protagonists_name_not_removed)
 
     |> Slug.generate(:name)
-    |> validate_length(:slug, min: 1, max: 60)
+    |> validate_length(:slug, min: 1, max: @slug_max_length)
     |> unique_constraint(:slug, name: :protagonists_slug_key)
 
     |> assoc_constraint(:player)
     |> assoc_constraint(:kingdom)
-  end
-
-  def rename(notable, attrs) do
-    notable
-    |> cast(attrs, [:name])
-    |> validate_required(:name)
-
-    |> update_change(:name, &String.trim/1)
-    |> validate_length(:name, min: 1, max: 30)
-    |> unique_constraint(:name, name: :idx_protagonists_name_not_removed)
   end
 
   def relocate(notable, attrs) do
@@ -74,10 +67,9 @@ defmodule Platform.Sovereignty.Infrastructure.Persistence.Schemas.Notable do
     |> validate_required(:fame)
   end
 
-  def remove(notable, attrs) do
+  def soft_remove(notable) do
     notable
-    |> cast(attrs, [:is_removed])
-    |> validate_required(:is_removed)
-    |> validate_inclusion(:is_removed, [true])
+    |> change()
+    |> put_change(:is_removed, true)
   end
 end

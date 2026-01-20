@@ -1,22 +1,22 @@
-defmodule Platform.Shared.Infrastructure.Persistence.Types.Nickname do
+defmodule Platform.IAM.Infrastructure.Persistence.Types.Email do
   use Ecto.Type
   alias Ecto.Changeset
 
   @type t :: String.t()
 
-  @nickname_regex ~r/^[ a-zA-Z0-9éÉèÈêÊëËäÄâÂàÀïÏöÖôÔüÜûÛçÇ\'’\-_\.&]+$/
+  @email_regex ~r/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/
 
   def type, do: :string
 
   @spec cast(any()) :: {:ok, String.t() | nil} | {:error, Keyword.t()}
   def cast(nil), do: {:ok, nil}
   def cast(value) when is_binary(value) do
-    case Regex.match?(@nickname_regex, value) do
-      false -> {:error, [message: "Invalid nickname format"]}
+    case Regex.match?(@email_regex, value) do
+      false -> {:error, [message: "Invalid email format"]}
       true -> {:ok, value}
     end
   end
-  def cast(_), do: {:error, [message: "Nickname must be a string"]}
+  def cast(_), do: {:error, [message: "Email must be a string"]}
 
   def load(data) when is_binary(data), do: {:ok, data}
   def load(_), do: :error

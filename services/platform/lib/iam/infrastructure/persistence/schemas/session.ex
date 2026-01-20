@@ -1,8 +1,8 @@
-defmodule Platform.Shared.Infrastructure.Persistence.Schemas.Session do
+defmodule Platform.IAM.Infrastructure.Persistence.Schemas.Session do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias Platform.Shared.Infrastructure.Persistence.Schemas.User
+  alias Platform.IAM.Infrastructure.Persistence.Schemas.User
   alias Platform.Shared.Infrastructure.Persistence.Types.UUID7
 
   @primary_key {:id, UUID7, autogenerate: true}
@@ -17,11 +17,10 @@ defmodule Platform.Shared.Infrastructure.Persistence.Schemas.Session do
 
     belongs_to :user, User
 
-    timestamps(updated_at: false, type: :utc_datetime)
+    timestamps(updated_at: false)
   end
 
-  @doc false
-  def create_changeset(session, attrs) do
+  def create(session, attrs) do
     session
     |> cast(attrs, [:token, :context, :ip_address, :user_id, :user_agent, :expires_at])
     |> validate_required([:token, :context, :ip_address, :user_id, :expires_at])

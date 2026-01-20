@@ -1,7 +1,8 @@
 defmodule Platform.Sovereignty.Application.Commands.LaunchAttack do
 
   alias Platform.Sovereignty.Domain.War
-  alias Platform.Sovereignty.Domain.Types.BattleOutcome
+  # alias Platform.Sovereignty.Domain.Types.BattleOutcome
+  alias Platform.Shared.Domain.Types
 
   alias Platform.Sovereignty.Infrastructure.Persistence.Repo
 
@@ -11,8 +12,8 @@ defmodule Platform.Sovereignty.Application.Commands.LaunchAttack do
   ]
 
   @type t :: %__MODULE__{
-    atk_player_id: any(),
-    def_player_id: any()
+    atk_player_id: Types.id(),
+    def_player_id: Types.id()
   }
 
 
