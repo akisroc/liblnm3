@@ -32,7 +32,7 @@ services:
 
   database:
     build:
-      context: ./infrastructure/database
+      context: ./infrastructure/database/postgres
       target: dev
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
@@ -44,6 +44,16 @@ services:
       - db-data:/var/lib/postgresql/data:rw
     networks:
       - database_network
+
+  migrator:
+    build: ./infrastructure/database/migrator
+    environment:
+      - DATABASE_URL=${POSTGRES_URL}
+    networks:
+      - database_network
+    depends_on:
+      database:
+        condition: service_healthy
 
   platform:
     build:
