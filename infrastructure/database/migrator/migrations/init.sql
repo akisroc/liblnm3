@@ -65,6 +65,15 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- TECHNICAL FUNCTION: SEND SIGNAL ON NEW OUTBOX MESSAGE
+CREATE OR REPLACE FUNCTION notify_outbox_insertion() RETURNS TRIGGER AS $$
+    BEGIN
+        PERFORM pg_notify('new_outbox_message', '');
+        RETURN NEW;
+    END;
+end;
+$$ LANGUAGE plpgsql;
+
 
 -- ------------
 -- TYPES
@@ -527,6 +536,12 @@ CREATE TRIGGER check_topics_is_removed_definitive
     WHEN (OLD.is_removed IS TRUE AND NEW.is_removed IS FALSE)
     EXECUTE FUNCTION prevent_unremove();
 
+-- TECHNICAL
+--
+-- OUTBOX
+CREATE TRIGGER new_outbox_message_trigger
+    AFTER INSERT ON outbox FOR EACH ROW
+    EXECUTE FUNCTION notify_outbox_insertion();
 
 -- ------------
 -- VIEWS
