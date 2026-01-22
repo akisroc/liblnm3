@@ -2,7 +2,7 @@ defmodule Platform.Roleplay.Infrastructure.Persistence.Schemas.Protagonist do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias Platform.Roleplay.Infrastructure.Persistence.Schemas.{Player, Kingdom}
+  alias Platform.Roleplay.Infrastructure.Persistence.Schemas.{Player, Kingdom, Chapter, Whisper}
   alias Platform.Shared.Infrastructure.Persistence.Types.{UUID7, LoreName, Slug, Url}
 
   @biography_max_length 500000
@@ -40,6 +40,9 @@ defmodule Platform.Roleplay.Infrastructure.Persistence.Schemas.Protagonist do
 
     belongs_to :user, Player
     belongs_to :kingdom, Kingdom
+
+    has_many :chapters, Chapter
+    has_many :whispers, Whisper
   end
 
   def register(protagonist, attrs) do

@@ -199,7 +199,6 @@ CREATE TABLE "missives" (
     "content" text NOT NULL,
     "is_read" bool NOT NULL DEFAULT (false),
     "inserted_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
-    "updated_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
     CONSTRAINT "chk_missives_content_length" CHECK (char_length(content) <= 10000),
     CONSTRAINT "chk_missives_sender_is_not_receiver" CHECK (sender_id <> receiver_id)
 );;
@@ -207,7 +206,7 @@ CREATE TABLE "missives" (
 -- CHRONICLES
 CREATE TABLE "chronicles" (
     "id" uuid PRIMARY KEY,
-    "gm_id" uuid NOT NULL,
+    "narrator_id" uuid NOT NULL,
     "player_id" uuid NOT NULL,
     "title" varchar(63) NOT NULL,
     "slug" varchar(127) UNIQUE NOT NULL,
@@ -346,7 +345,7 @@ CREATE INDEX "idx_missives_receiver_id" ON "missives" ("receiver_id");
 
 -- CHRONICLES
 CREATE UNIQUE INDEX "idx_chronicles_title_not_removed" ON "chronicles" ("title") WHERE "is_removed" = false;;
-CREATE INDEX "idx_chronicles_gm_id" ON "chronicles" ("gm_id");;
+CREATE INDEX "idx_chronicles_narrator_id" ON "chronicles" ("narrator_id");;
 CREATE INDEX "idx_chronicles_player_id" ON "chronicles" ("player_id");;
 
 -- CHAPTERS
@@ -417,7 +416,7 @@ ALTER TABLE "missives" ADD FOREIGN KEY ("sender_id") REFERENCES "kingdoms" ("id"
 ALTER TABLE "missives" ADD FOREIGN KEY ("receiver_id") REFERENCES "kingdoms" ("id");;
 
 -- CHRONICLES
-ALTER TABLE "chronicles" ADD FOREIGN KEY ("gm_id") REFERENCES "users" ("id");;
+ALTER TABLE "chronicles" ADD FOREIGN KEY ("narrator_id") REFERENCES "users" ("id");;
 ALTER TABLE "chronicles" ADD FOREIGN KEY ("player_id") REFERENCES "users" ("id");;
 
 -- PROTAGONISTS & CHRONICLES
@@ -597,7 +596,7 @@ COMMENT ON COLUMN "missives"."sender_id" IS 'Kingdom sending the missive';;
 COMMENT ON COLUMN "missives"."receiver_id" IS 'Kingdom receiving the missive';;
 
 -- CHRONICLES
-COMMENT ON COLUMN "chronicles"."gm_id" IS 'User mastering the chronicle';;
+COMMENT ON COLUMN "chronicles"."narrator_id" IS 'User mastering the chronicle';;
 
 -- OUTBOX
 COMMENT ON TABLE "outbox" IS "Technical table – asynchronous message bus";;

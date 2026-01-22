@@ -49,9 +49,19 @@ $$ LANGUAGE plpgsql IMMUTABLE;
 CREATE OR REPLACE FUNCTION prevent_unremove() RETURNS TRIGGER AS $$
 BEGIN
     IF OLD.is_removed = true AND NEW.is_removed = false THEN
-        RAISE EXCEPTION 'Operation not allowed: is_removed is irreversible.';
-       END IF;
-       RETURN NEW;
+        RAISE EXCEPTION 'Operation not allowed: is_removed is irreversible';
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- PREVENT USERS FROM UPDATING WHISPER’S CONTENT AFTER IT HAS BEEN READ
+CREATE OR REPLACE FUNCTION prevent_read_whisper_content_update() RETURNS TRIGGER AS $$
+BEGIN
+    IF OLD.is_read = true AND NEW.content IS DISTINCT FROM OLD.content THEN
+        RAISE EXCEPTION "Cannot modify content from a whisper which has been read";
+    END IF;
+    RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -195,7 +205,6 @@ CREATE TABLE "missives" (
     "content" text NOT NULL,
     "is_read" bool NOT NULL DEFAULT (false),
     "inserted_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
-    "updated_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
     CONSTRAINT "chk_missives_content_length" CHECK (char_length(content) <= 10000),
     CONSTRAINT "chk_missives_sender_is_not_receiver" CHECK (sender_id <> receiver_id)
 );
@@ -203,11 +212,12 @@ CREATE TABLE "missives" (
 -- CHRONICLES
 CREATE TABLE "chronicles" (
     "id" uuid PRIMARY KEY,
-    "gm_id" uuid NOT NULL,
+    "narrator_id" uuid NOT NULL,
     "player_id" uuid NOT NULL,
     "title" varchar(63) NOT NULL,
     "slug" varchar(127) UNIQUE NOT NULL,
     "description" text,
+    "is_archived" bool NOT NULL DEFAULT (false),
     "is_removed" bool NOT NULL DEFAULT (false),
     "inserted_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
     "updated_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
@@ -249,30 +259,32 @@ CREATE TABLE "boards" (
     "title" varchar(63) NOT NULL,
     "description" varchar(511) NOT NULL,
     "slug" varchar(127) UNIQUE NOT NULL,
+    "is_archived" bool NOT NULL DEFAULT (false),
     "is_removed" bool NOT NULL DEFAULT (false),
     "inserted_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
     "updated_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
     CONSTRAINT "chk_boards_slug_format" CHECK (slug ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$')
 );
 
--- THREADS
-CREATE TABLE "threads" (
+-- TOPICS
+CREATE TABLE "topics" (
     "id" uuid PRIMARY KEY,
     "user_id" uuid NOT NULL,
     "board_id" uuid NOT NULL,
     "title" varchar(63) NOT NULL,
     "slug" varchar(127) UNIQUE NOT NULL,
     "is_removed" bool NOT NULL DEFAULT (false),
+    "is_archived" bool NOT NULL DEFAULT (false),
     "inserted_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
     "updated_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
-    CONSTRAINT "chk_threads_slug_format" CHECK (slug ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$')
+    CONSTRAINT "chk_topics_slug_format" CHECK (slug ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$')
 );
 
 -- POSTS
 CREATE TABLE "posts" (
     "id" uuid PRIMARY KEY,
     "user_id" uuid NOT NULL,
-    "thread_id" uuid NOT NULL,
+    "topic_id" uuid NOT NULL,
     "content" text NOT NULL,
     "inserted_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
     "updated_at" timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
@@ -342,7 +354,7 @@ CREATE INDEX "idx_missives_receiver_id" ON "missives" ("receiver_id");
 
 -- CHRONICLES
 CREATE UNIQUE INDEX "idx_chronicles_title_not_removed" ON "chronicles" ("title") WHERE "is_removed" = false;
-CREATE INDEX "idx_chronicles_gm_id" ON "chronicles" ("gm_id");
+CREATE INDEX "idx_chronicles_narrator_id" ON "chronicles" ("narrator_id");
 CREATE INDEX "idx_chronicles_player_id" ON "chronicles" ("player_id");
 
 -- CHAPTERS
@@ -353,13 +365,13 @@ CREATE INDEX "idx_chapters_protagonist_id" ON "chapters" ("protagonist_id");
 CREATE UNIQUE INDEX "idx_boards_title_not_removed" ON "boards" ("title") WHERE "is_removed" = false;
 CREATE INDEX "idx_boards_user_id" ON "boards" ("user_id");
 
--- THREADS
-CREATE INDEX "idx_threads_user_id" ON "threads" ("user_id");
-CREATE INDEX "idx_threads_board_id" ON "threads" ("board_id");
+-- TOPICS
+CREATE INDEX "idx_topics_user_id" ON "topics" ("user_id");
+CREATE INDEX "idx_topics_board_id" ON "topics" ("board_id");
 
 -- POSTS
 CREATE INDEX "idx_posts_user_id" ON "posts" ("user_id");
-CREATE INDEX "idx_posts_thread_id" ON "posts" ("thread_id");
+CREATE INDEX "idx_posts_topic_id" ON "posts" ("topic_id");
 
 -- SESSIONS
 CREATE INDEX "sessions_user_id" ON "sessions" ("user_id");
@@ -413,7 +425,7 @@ ALTER TABLE "missives" ADD FOREIGN KEY ("sender_id") REFERENCES "kingdoms" ("id"
 ALTER TABLE "missives" ADD FOREIGN KEY ("receiver_id") REFERENCES "kingdoms" ("id");
 
 -- CHRONICLES
-ALTER TABLE "chronicles" ADD FOREIGN KEY ("gm_id") REFERENCES "users" ("id");
+ALTER TABLE "chronicles" ADD FOREIGN KEY ("narrator_id") REFERENCES "users" ("id");
 ALTER TABLE "chronicles" ADD FOREIGN KEY ("player_id") REFERENCES "users" ("id");
 
 -- PROTAGONISTS & CHRONICLES
@@ -431,13 +443,13 @@ ALTER TABLE "chapters_views" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id
 -- BOARDS
 ALTER TABLE "boards" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 
--- THREADS
-ALTER TABLE "threads" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
-ALTER TABLE "threads" ADD FOREIGN KEY ("board_id") REFERENCES "boards" ("id");
+-- TOPICS
+ALTER TABLE "topics" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
+ALTER TABLE "topics" ADD FOREIGN KEY ("board_id") REFERENCES "boards" ("id");
 
 -- POSTS
 ALTER TABLE "posts" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
-ALTER TABLE "posts" ADD FOREIGN KEY ("thread_id") REFERENCES "threads" ("id");
+ALTER TABLE "posts" ADD FOREIGN KEY ("topic_id") REFERENCES "topics" ("id");
 
 -- SESSIONS
 ALTER TABLE "sessions" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
@@ -475,41 +487,43 @@ $$;
 -- TRIGGERS
 -- ------------
 
--- SOFT DELETES ARE DEFINITIVE
+-- GENERAL
+--
+-- WHISPERS
+CREATE TRIGGER check_whisper_read_content_immutable
+    BEFORE UPDATE ON whispers FOR EACH ROW
+    EXECUTE FUNCTION prevent_read_whisper_content_update();
 
+-- SOFT DELETES ARE DEFINITIVE
+--
 -- USERS
 CREATE TRIGGER check_users_is_removed_definitive
     BEFORE UPDATE ON users FOR EACH ROW
     WHEN (OLD.is_removed IS TRUE AND NEW.is_removed IS FALSE)
-    EXECUTE FUNCTION prevent_unremove();;
-
+    EXECUTE FUNCTION prevent_unremove();
 -- KINGDOMS
 CREATE TRIGGER check_kingdoms_is_removed_definitive
     BEFORE UPDATE ON kingdoms FOR EACH ROW
     WHEN (OLD.is_removed IS TRUE AND NEW.is_removed IS FALSE)
     EXECUTE FUNCTION prevent_unremove();
-
 -- PROTAGONISTS
 CREATE TRIGGER check_protagonists_is_removed_definitive
     BEFORE UPDATE ON protagonists FOR EACH ROW
     WHEN (OLD.is_removed IS TRUE AND NEW.is_removed IS FALSE)
     EXECUTE FUNCTION prevent_unremove();
-
 -- CHRONICLES
 CREATE TRIGGER check_chronicles_is_removed_definitive
     BEFORE UPDATE ON chronicles FOR EACH ROW
     WHEN (OLD.is_removed IS TRUE AND NEW.is_removed IS FALSE)
     EXECUTE FUNCTION prevent_unremove();
-
 -- BOARDS
 CREATE TRIGGER check_boards_is_removed_definitive
     BEFORE UPDATE ON boards FOR EACH ROW
     WHEN (OLD.is_removed IS TRUE AND NEW.is_removed IS FALSE)
     EXECUTE FUNCTION prevent_unremove();
-
--- THREADS
-CREATE TRIGGER check_threads_is_removed_definitive
-    BEFORE UPDATE ON threads FOR EACH ROW
+-- TOPICS
+CREATE TRIGGER check_topics_is_removed_definitive
+    BEFORE UPDATE ON topics FOR EACH ROW
     WHEN (OLD.is_removed IS TRUE AND NEW.is_removed IS FALSE)
     EXECUTE FUNCTION prevent_unremove();
 
@@ -558,8 +572,10 @@ WHERE ls.step_raw <> '';
 -- ------------
 
 -- FUNCTIONS
-COMMENT ON FUNCTION validate_troop(integer[])
-IS 'A troop must be a flat list of 8 postive integers';
+COMMENT ON FUNCTION validate_troop(integer[]) IS 'A troop must be a flat list of 8 postive integers';
+COMMENT ON FUNCTION prevent_unremove() IS 'Prevent definitive remove from being cancelled.'
+COMMENT ON FUNCTION prevent_read_whisper_content_update()
+IS 'Prevent users from updating whisper’s content after it has been read'
 
 -- PROCEDURES
 COMMENT ON PROCEDURE register_kingdom_and_leader(uuid, uuid, uuid, varchar, varchar, varchar)
@@ -593,7 +609,7 @@ COMMENT ON COLUMN "missives"."sender_id" IS 'Kingdom sending the missive';
 COMMENT ON COLUMN "missives"."receiver_id" IS 'Kingdom receiving the missive';
 
 -- CHRONICLES
-COMMENT ON COLUMN "chronicles"."gm_id" IS 'User mastering the chronicle';
+COMMENT ON COLUMN "chronicles"."narrator_id" IS 'User mastering the chronicle';
 
 -- OUTBOX
 COMMENT ON TABLE "outbox" IS "Technical table – asynchronous message bus";
