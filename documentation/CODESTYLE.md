@@ -24,6 +24,10 @@ repo  = "repository"
 infra = "infrastructure"
 app   = "application"
 nsfw  = "not safe for work"
+db    = "database"
+env   = "environment"
+dev   = "development"
+prod  = "production"
 ```
 
 These are OK, especially if they significantly improve code
@@ -60,7 +64,7 @@ makes things very clear, let’s say OK for these:
 In some specific contexts, like straightforward anonymous
 function or guards, you can allow yourself to use some
 arbitrary letters in cases where conciseness helps
-readability. Example:
+readability rather than the contrary. Example:
 
 ```elixir
 def can_see_nsfw?(%User{} = u) when u.age >= 18, do: true

@@ -1,8 +1,14 @@
 # --- BASE STAGE ---
 FROM postgres:18.1-alpine AS base
 
+WORKDIR /app
+
+COPY --chmod=755 init-scripts/init-db.sh /docker-entrypoint-initdb.d/10-init-db.sh
+COPY --chmod=755 initial-schema /
+
 HEALTHCHECK --interval=5s --timeout=5s --start-period=10s --retries=5 \
-  CMD pg_isready -U "${POSTGRES_USER}" -d "${POSTGRES_DB}" || exit 1
+  CMD pg_isready \
+  -U "${POSTGRES_USER}" -d "${POSTGRES_DB}" || exit 1
 
 EXPOSE 5432
 

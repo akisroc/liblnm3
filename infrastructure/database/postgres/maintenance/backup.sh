@@ -4,19 +4,19 @@ log_info() { echo "[$(date +'%Y-%m-%d %H:%M:%S')] INFO: $1"; }
 log_error() { echo "[$(date +'%Y-%m-%d %H:%M:%S')] ERROR: $1" >&2; }
 
 
-if [ -z "$POSTGRES_DB" ] || [ -z "$POSTGRES_USER" ] || [ -z "$POSTGRES_PASSWORD" ] || [ -z "$REMOTE_BACKUP_BUCKET" ]; then
-    log_error "Environment variables (POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD, REMOTE_BACKUP_BUCKET) are missing."
+if [ -z "$DB_NAME" ] || [ -z "$DB_ADMIN" ] || [ -z "$DB_ADMIN_PASSWORD" ] || [ -z "$DB_REMOTE_BACKUP_BUCKET" ]; then
+    log_error "Environment variables (DB_NAME, DB_ADMIN, DB_ADMIN_PASSWORD, DB_REMOTE_BACKUP_BUCKET) are missing."
     exit 1
 fi
 
 db_container_name="lnm3_database"
-db_user="${POSTGRES_USER}"
-db_name="${POSTGRES_DB}"
-db_pass="${POSTGRES_PASSWORD}"
+db_user="${DB_ADMIN}"
+db_name="${DB_NAME}"
+db_pass="${DB_ADMIN_PASSWORD}"
 backup_path="/opt/lnm3/backups"
 timestamp=$(date +%Y-%m-%d_%H-%M-%S)
 filename="backup_${db_name}_${timestamp}.sql.gz"
-backup_bucket="${REMOTE_BACKUP_BUCKET}"
+backup_bucket="${DB_REMOTE_BACKUP_BUCKET}"
 
 mkdir -p $backup_path
 

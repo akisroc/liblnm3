@@ -43,12 +43,12 @@ config :logger, :default_formatter,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
-# AGGREGATES ADAPTERS
+# SECONDARY ADAPTERS
 config :platform, :identities_adapter,
-  adapter: Platform.IAM.Infrastructure.Persistence.Postgres.Repositories.Identities
+  Platform.IAM.Infra.Persistence.Postgres.Repositories.Identities
 
 config :platform, :kingships_adapter,
-  adapter: Platform.Sovereignty.Infrastructure.Persistence.Postgres.Repositories.Kingships
+  Platform.Sovereignty.Infra.Persistence.Postgres.Repositories.Kingships
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

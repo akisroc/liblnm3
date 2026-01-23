@@ -9,14 +9,19 @@ defmodule Platform.Application do
   def start(_type, _args) do
     children = [
       PlatformWeb.Telemetry,
-      PlatformInfra.Repo,
+      Platform.Shared.Outbox.Infra.Persistence.Postgres.Repo,
+      # Platform.IAM.Infra.Persistence.Postgres.Repo
+      Platform.IAM.Supervisor, # Todo: Do the same for other contexts
+      # Platform.Roleplay.Infra.Persistence.Postgres.Repo,
+      # Platform.Social.Infra.Persistence.Postgres.Repo,
+      Platform.Sovereignty.Infra.Persistence.Postgres.Repo,
       {DNSCluster, query: Application.get_env(:platform, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Platform.PubSub},
 
       # Background workers
-      PlatformInfra.Database.Workers.SessionCleaner,
-      Platform.Shared.Infrastructure.Persistence.Workers.OutboxCleaner,
-      Platform.Shared.Infrastructure.Persistence.Workers.OutboxRelay,
+      # PlatformInfra.Database.Workers.SessionCleaner,
+      # Platform.Shared.Outbox.Infra.Persistence.Postgres.Workers.OutboxCleaner,
+      # Platform.Shared.Outbox.Infra.Persistence.Postgres.Workers.OutboxRelay,
 
       # Start to serve requests, typically the last entry
       PlatformWeb.Endpoint

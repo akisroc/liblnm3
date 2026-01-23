@@ -8,16 +8,16 @@
 log_info() { echo "[$(date +'%Y-%m-%d %H:%M:%S')] INFO: $1"; }
 log_error() { echo "[$(date +'%Y-%m-%d %H:%M:%S')] ERROR: $1" >&2; }
 
-if [ -z "$POSTGRES_DB" ] || [ -z "$POSTGRES_USER" ] || [ -z "$POSTGRES_PASSWORD" ]; then
-    log_error "Environment variables (DB_NAME, USER, PASS) are missing."
+if [ -z "$DB_NAME" ] || [ -z "$DB_ADMIN" ] || [ -z "$DB_ADMIN_PASSWORD" ]; then
+    log_error "Environment variables (DB_NAME, DB_ADMIN, DB_ADMIN_PASSWORD) are missing."
     exit 1
 fi
 
 backup_file="$1"
 db_container_name="lnm3_database"
-db_user="${POSTGRES_USER}"
-db_name="${POSTGRES_DB}"
-db_pass="${POSTGRES_PASSWORD}"
+db_user="${DB_ADMIN}"
+db_name="${DB_NAME}"
+db_pass="${DB_ADMIN_PASSWORD}"
 
 if [ -z "$backup_file" ] || [ ! -f "$backup_file" ]; then
     log_error "Usage: $0 /path/to/backup.sql.gz"
@@ -37,8 +37,8 @@ sleep 10
 log_info "Let’s go. Killing connections and dropping database…"
 
 docker exec -e PGPASSWORD="$db_pass" $db_container_name psql -U "$db_user" -d postgres <<EOF
-DROP DATABASE IF EXISTS ${POSTGRES_DB} WITH (FORCE);
-CREATE DATABASE ${POSTGRES_DB} OWNER ${POSTGRES_USER};
+DROP DATABASE IF EXISTS ${DB_NAME} WITH (FORCE);
+CREATE DATABASE ${DB_NAME} OWNER ${DB_ADMIN};
 EOF
 
 if [ $? -eq 0 ]; then

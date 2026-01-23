@@ -6,7 +6,7 @@ EXEC_PHX=docker compose exec platform
 EXEC_SF=docker compose exec archive
 EXEC_NUXT=docker compose exec frontend
 
-.PHONY: help setup up down restart logs ps shell-phx shell-nuxt db-migrate test
+.PHONY: help setup up down restart logs ps db-new-migration shell-phx shell-nuxt db-migrate test
 
 help: ## Display this help message
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
@@ -36,6 +36,13 @@ logs: ## Display real-time logs
 
 ps: ## Display all containers and their states
 	docker compose ps
+
+db-new-migration:
+	@if [ -z "$(NAME)" ]; then \
+		echo "Missing NAME argument"; \
+		exit 1; \
+	fi
+	docker compose run --rm migrator dbmate new $(NAME)
 
 db-setup: ## Create, migrate and seed database
 	docker compose run --rm -e PHX_SERVER=false platform mix ecto.setup

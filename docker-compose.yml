@@ -35,9 +35,14 @@ services:
       context: ./infrastructure/database/postgres
       target: dev
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${DB_ADMIN}
+      POSTGRES_PASSWORD: ${DB_ADMIN_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+      DB_NAME: ${DB_NAME}
+      DB_ADMIN: ${DB_ADMIN}
+      DB_ADMIN_PASSWORD: ${DB_ADMIN_PASSWORD}
+      DB_USER: ${DB_USER}
+      DB_USER_PASSWORD: ${DB_USER_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
@@ -47,8 +52,12 @@ services:
 
   migrator:
     build: ./infrastructure/database/migrator
+    privileged: true
     environment:
-      - DATABASE_URL=${POSTGRES_URL}
+      - DATABASE_URL=postgres://${DB_ADMIN}:${DB_ADMIN_PASSWORD}@${DB_HOST}/${DB_NAME}?sslmode=disable
+      - DBMATE_MIGRATIONS_DIR=${MIGRATOR_MIGRATIONS_DIR}
+    volumes:
+      - ./infrastructure/database/migrator/migrations:/app/${MIGRATOR_MIGRATIONS_DIR}
     networks:
       - database_network
     depends_on:
@@ -61,14 +70,16 @@ services:
       target: dev
     restart: unless-stopped
     environment:
-      MIX_ENV: ${MIX_ENV}
-      SECRET_KEY_BASE: ${SECRET_KEY_BASE}
-      DATABASE_URL: ${DATABASE_URL}
-      PHX_SERVER: ${PHX_SERVER}
-      PHX_HOST: ${PHX_HOST}
-      PORT: ${PORT}
+      MIX_ENV: ${PLATFORM_ENV}
+      SECRET_KEY_BASE: ${PLATFORM_SECRET_KEY_BASE}
+      DATABASE_URL: ecto://${DB_USER}:${DB_USER_PASSWORD}@${DB_HOST}/${DB_NAME}
+      PHX_SERVER: ${PLATFORM_PHX_SERVER}
+      PHX_HOST: ${PLATFORM_PHX_HOST}
+      PORT: ${PLATFORM_PORT}
       DOCKER: ${DOCKER}
-      CORS_ORIGINS: ${CORS_ORIGINS}
+      CORS_ORIGINS: ${PLATFORM_CORS_ORIGINS}
+    ports:
+      - "4000:4000"
     volumes:
       - ./services/platform:/app:rw,cached,z
     labels:
@@ -89,8 +100,8 @@ services:
       target: dev
     restart: unless-stopped
     environment:
-      APP_ENV: ${APP_ENV}
-      APP_SECRET: ${APP_SECRET}
+      APP_ENV: ${ARCHIVE_ENV}
+      APP_SECRET: ${ARCHIVE_SECRET}
     volumes:
       - ./services/archive:/app:rw,cached,z
       - /app/var
@@ -108,11 +119,11 @@ services:
       target: dev
     restart: unless-stopped
     environment:
-      NODE_ENV: ${NODE_ENV}
-      NUXT_PUBLIC_PLATFORM_URL: ${NUXT_PUBLIC_PLATFORM_URL}
-      NUXT_PUBLIC_ARCHIVE_URL: ${NUXT_PUBLIC_ARCHIVE_URL}
-      NUXT_PLATFORM_URL_INTERNAL: ${NUXT_PLATFORM_URL_INTERNAL}
-      NUXT_ARCHIVE_URL_INTERNAL: ${NUXT_ARCHIVE_URL_INTERNAL}
+      NODE_ENV: ${FRONTEND_ENV}
+      NUXT_PUBLIC_PLATFORM_URL: ${FRONTEND_PUBLIC_PLATFORM_URL}
+      NUXT_PUBLIC_ARCHIVE_URL: ${FRONTEND_PUBLIC_ARCHIVE_URL}
+      NUXT_PLATFORM_URL_INTERNAL: ${FRONTEND_PLATFORM_URL_INTERNAL}
+      NUXT_ARCHIVE_URL_INTERNAL: ${FRONTEND_ARCHIVE_URL_INTERNAL}
     volumes:
       - ./services/frontend:/app:rw,cached,z
       - /app/node_modules
