@@ -44,35 +44,37 @@ if config_env() == :prod do
 
   maybe_ipv6 = if System.get_env("ECTO_IPV6") in ~w(true 1), do: [:inet6], else: []
 
+  # Check `SHOW max_connections;` to adjust
+
   config :platform, Platform.Shared.Outbox.Infra.Persistence.Postgres.Repo,
     ssl: true,
     url: database_url,
-    pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
+    pool_size: String.to_integer(System.get_env("POOL_SIZE_OUTBOX") || "2"),
     # For machines with several cores, consider starting multiple pools of `pool_size`
     # pool_count: 4,
     socket_options: maybe_ipv6
   config :platform, Platform.IAM.Infra.Persistence.Postgres.Repo,
     ssl: true,
     url: database_url,
-    pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
+    pool_size: String.to_integer(System.get_env("POOL_SIZE_IAM") || "15"),
     # pool_count: 4,
     socket_options: maybe_ipv6
   config :platform, Platform.Roleplay.Infra.Persistence.Postgres.Repo,
     ssl: true,
     url: database_url,
-    pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
+    pool_size: String.to_integer(System.get_env("POOL_SIZE_ROLEPLAY") || "8"),
     # pool_count: 4,
     socket_options: maybe_ipv6
   config :platform, Platform.Social.Infra.Persistence.Postgres.Repo,
     ssl: true,
     url: database_url,
-    pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
+    pool_size: String.to_integer(System.get_env("POOL_SIZE_SOCIAL") || "12"),
     # pool_count: 4,
     socket_options: maybe_ipv6
   config :platform, Platform.Sovereignty.Infra.Persistence.Postgres.Repo,
     ssl: true,
     url: database_url,
-    pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
+    pool_size: String.to_integer(System.get_env("POOL_SIZE_SOVEREIGNTY") || "8"),
     # pool_count: 4,
     socket_options: maybe_ipv6
 
