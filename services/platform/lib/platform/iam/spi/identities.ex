@@ -11,11 +11,11 @@ defmodule Platform.IAM.SPI.Identities do
   @callback get_user(user :: %{email: String.t()}) :: {:ok, map()} | {:error, any()}
   @callback get_user(user :: %{nickname: String.t()}) :: {:ok, map()} | {:error, any()}
 
-  @callback register_user(
-              nickname :: String.t(),
-              email :: String.t(),
-              password :: String.t()
-            ) ::
+  @callback register_user(%{
+              nickname: String.t(),
+              email: String.t(),
+              password: String.t()
+            }) ::
               {:ok, %{id: Types.id()}} | {:error, any()}
 
   @callback get_session(%{token: String.t()}) :: {:ok, map()}

@@ -562,7 +562,7 @@ CREATE SCHEMA technical;
 -- ------------
 
 -- IAM
-CREATE VIEW iam.session AS
+CREATE VIEW iam.sessions AS
     SELECT *
     FROM public.sessions;
 CREATE VIEW iam.users AS

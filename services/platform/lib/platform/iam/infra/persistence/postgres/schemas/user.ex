@@ -14,8 +14,11 @@ defmodule Platform.IAM.Infra.Persistence.Postgres.Schemas.User do
   @theme_light :light
   @themes [@theme_dark, @theme_light]
 
+  @nickname_min_length 1
   @nickname_max_length 30
+  @email_min_length 1
   @email_max_length 500
+  @password_min_length 8
   @password_max_length 250
   @slug_max_length 60
 
@@ -33,19 +36,18 @@ defmodule Platform.IAM.Infra.Persistence.Postgres.Schemas.User do
     field :platform_theme, Ecto.Enum, values: @themes
     field :is_enabled, :boolean, default: true
     field :is_removed, :boolean, default: false
+
+    timestamps()
   end
 
-  def register(user, attrs) do
+  def create(user, attrs) do
     user
     |> cast(attrs, [:nickname, :email, :password])
     |> validate_required([:nickname, :email, :password])
 
-    |> update_change(:nickname, &String.trim/1)
-    |> validate_length(:nickname, min: 1, max: @nickname_max_length)
+    |> validate_length(:nickname, min: @nickname_min_length, max: @nickname_max_length)
 
-    |> update_change(:email, &String.trim/1)
-    |> update_change(:email, &String.downcase/1)
-    |> validate_length(:email, min: 1, max: @email_max_length)
+    |> validate_length(:email, min: @email_min_length, max: @email_max_length)
 
     |> UUID7.ensure_generation()
     |> Slug.generate(:nickname)
@@ -55,7 +57,7 @@ defmodule Platform.IAM.Infra.Persistence.Postgres.Schemas.User do
     |> validate_subset(:roles, @roles)
     |> validate_inclusion(:platform_theme, @themes)
 
-    |> validate_length(:password, min: 8, max: @password_max_length)
+    |> validate_length(:password, min: @password_min_length, max: @password_max_length)
     |> hash_password()
 
     |> unique_constraint(:nickname, name: :idx_users_nickname_not_removed)
@@ -119,6 +121,13 @@ defmodule Platform.IAM.Infra.Persistence.Postgres.Schemas.User do
     |> change()
     |> put_change(:is_removed, true)
   end
+
+  def nickname_min_length, do: @nickname_min_length
+  def nickname_max_length, do: @nickname_max_length
+  def email_min_length, do: @email_min_length
+  def email_max_length, do: @email_max_length
+  def password_min_length, do: @password_min_length
+  def password_max_length, do: @password_max_length
 
   defp hash_password(changeset) do
     if password = get_change(changeset, :password) do

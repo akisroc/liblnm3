@@ -9,13 +9,13 @@ defmodule PlatformWeb.Router do
     # Todo
   end
 
-  # --- Public routes ---
-  scope "/", PlatformWeb do
-    # pipe_through :api
+  # ---
+  # --- Public routes
+  # ---
 
-    # get "/ping", HealthController, :healthcheck
-    # post "/login", SessionController, :login
-    # post "/register", UserController, :create
+  # --- IAM
+  scope "/", Platform.IAM.Infra.Web do
+    post "/register_user", IdentitiesController, :register_user
   end
 
   # Todo: Other scope for private?

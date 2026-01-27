@@ -1,14 +1,14 @@
 defmodule Platform.IAM.API.Commands.RegisterUser do
   defstruct [
-    :email,
     :nickname,
+    :email,
     :password,
     :metadata
   ]
 
   @type t :: %__MODULE__{
-    email: String.t(),
     nickname: String.t(),
+    email: String.t(),
     password: String.t(),
     metadata: %{
       remote_ip: String.t(),
@@ -23,8 +23,12 @@ defimpl Platform.Shared.Protocols.Command, for: Platform.IAM.API.Commands.Regist
   alias Platform.IAM.API.Commands.LoginUser
   alias Platform.Shared.Protocols.Command
 
-  def execute(%{email: email, nickname: nickname, password: password, metadata: metadata}) do
-    with {:ok, _user} <- @identities_adapter.register_user(email, nickname, password) do
+  def execute(%{nickname: nickname, email: email, password: password, metadata: metadata}) do
+    with {:ok, _user} <- @identities_adapter.register_user(%{
+      nickname: nickname,
+      email: email,
+      password: password
+    }) do
       Command.execute(%LoginUser{
         email: email,
         password: password,

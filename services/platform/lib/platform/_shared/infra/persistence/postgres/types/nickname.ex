@@ -10,9 +10,11 @@ defmodule Platform.Shared.Infra.Persistence.Postgres.Types.Nickname do
   @spec cast(any()) :: {:ok, String.t() | nil} | {:error, Keyword.t()}
   def cast(nil), do: {:ok, nil}
   def cast(value) when is_binary(value) do
-    case Regex.match?(@nickname_regex, value) do
+    cleaned_value = String.trim(value)
+
+    case Regex.match?(@nickname_regex, cleaned_value) do
       false -> {:error, [message: "Invalid nickname format"]}
-      true -> {:ok, value}
+      true -> {:ok, cleaned_value}
     end
   end
   def cast(_), do: {:error, [message: "Nickname must be a string"]}

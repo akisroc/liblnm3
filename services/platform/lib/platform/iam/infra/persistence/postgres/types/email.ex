@@ -10,9 +10,11 @@ defmodule Platform.IAM.Infra.Persistence.Postgres.Types.Email do
   @spec cast(any()) :: {:ok, String.t() | nil} | {:error, Keyword.t()}
   def cast(nil), do: {:ok, nil}
   def cast(value) when is_binary(value) do
-    case Regex.match?(@email_regex, value) do
+    cleaned_value = value |> String.trim() |> String.downcase()
+
+    case Regex.match?(@email_regex, cleaned_value) do
       false -> {:error, [message: "Invalid email format"]}
-      true -> {:ok, value}
+      true -> {:ok, cleaned_value}
     end
   end
   def cast(_), do: {:error, [message: "Email must be a string"]}

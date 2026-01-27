@@ -27,7 +27,7 @@ defimpl Platform.Shared.Protocols.Command, for: Platform.IAM.API.Commands.LoginU
     password: password,
     metadata: %{remote_ip: remote_ip, user_agent: user_agent}
   }) do
-    with {:ok, user_data} <- @identities_adapter.get_user(%{email: email}),
+    with %{id: _, email: _} = user_data <- @identities_adapter.get_user(%{email: email}),
          true <- Argon2.verify_pass(password, user_data.password) do
            user = User.from_data(user_data)
            with {:ok, inet_addr} <- :inet.parse_address(to_charlist(remote_ip)),
