@@ -2,7 +2,7 @@
 	import { page } from '$app/state';
 	import { locales, localizeHref } from '$lib/paraglide/runtime';
 	import favicon from '$lib/assets/favicon.svg';
-  import styles from '$lib/assets/styles/global.css';
+  import styles from '$lib/assets/styles/app.scss';
 
 	let { children } = $props();
 </script>

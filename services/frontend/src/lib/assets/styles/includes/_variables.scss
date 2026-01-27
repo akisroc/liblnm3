@@ -1,0 +1,21 @@
+/* COLORS */
+$color-primary: #1D2D33;
+$color-secondary: #3B5152;
+$color-page: #FFF8D0;
+$color-text: #1F1F1F;
+
+$color-navigation-background: rgba($color-text, 0.8);
+$color-navigation-link: rgba($color-page, 0.8);
+$color-navigation-link-hover: rgba($color-page, 1);
+
+
+/* BREAKPOINTS */
+$breakpoint-mobile: 0px;
+$breakpoint-tablet-portrait: 600px;
+$breakpoint-tablet-landscape: 900px;
+$breakpoint-desktop: 1200px;
+$breakpoint-desktop-large: 1800px;
+
+
+/* LAYOUT */
+$content-margin-top: 24px;

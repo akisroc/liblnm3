@@ -1,0 +1,70 @@
+@use "includes/variables" as *;
+
+form {
+  legend, label {
+    font-variant: small-caps;
+  }
+
+  legend {
+    font-size: 3rem;
+  }
+
+  label {
+    color: $color-secondary;
+    font-size: 1.5rem;
+    transition: all 0.1s ease-in-out;
+    input:focus ~ & {
+      font-weight: bold;
+      padding-left: 12px;
+      color: $color-primary;
+    }
+    input:hover ~ & {
+      color: $color-primary;
+    }
+  }
+
+  input {
+    display: block;
+    width: 40%;
+    padding: 12px 4px 6px 4px;
+    border: 1px solid transparent;
+    border-radius: 2px;
+    border-bottom: 1px solid $color-secondary;
+    background-color: transparent;
+    color: $color-secondary;
+    font-size: 1.8rem;
+    font-weight: bold;
+    transition: all 0.08s ease-in-out;
+    &:hover {
+      border-bottom: 1px solid $color-primary;
+    }
+    &:focus {
+      padding: 12px 4px 6px 4px;
+      border-radius: 12px;
+      border-bottom: 1px solid $color-primary;
+      color: $color-primary;
+    }
+  }
+}
+
+form.register-user {
+  display: grid;
+  place-content: center;
+  height: 60dvh;
+  width: 96dvw;
+  margin-top: 20dvh;
+  margin-left: 2dvw;
+  border-radius: 12px;
+  border: 1px solid white;
+  background-color: rgba(black, 0.8);
+
+  input {
+    width: 100%;
+    padding: 12px;
+    font-size: 2.2rem;
+  }
+
+  fieldset {
+    width: 100%;
+  }
+}

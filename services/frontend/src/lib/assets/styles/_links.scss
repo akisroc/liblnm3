@@ -1,0 +1,10 @@
+@use "includes/variables" as *;
+
+a {
+  color: $color-primary;
+  font-weight: bold;
+  transition: color 0.2s ease-in-out;
+  &:hover {
+    color: $color-secondary;
+  }
+}
