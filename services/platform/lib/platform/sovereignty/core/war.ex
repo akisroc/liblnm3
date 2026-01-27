@@ -1,7 +1,7 @@
-defmodule Platform.Sovereignty.Domain.War do
-  alias Platform.Sovereignty.Domain.War.Engine
-  alias Platform.Sovereignty.Domain.Types.{Troop, BattleOutcome}
-  alias Platform.Sovereignty.Domain.Entities.Kingdom
+defmodule Platform.Sovereignty.Core.War do
+  alias Platform.Sovereignty.Core.War.Engine
+  alias Platform.Sovereignty.Core.Types.{Troop, BattleOutcome}
+  alias Platform.Sovereignty.Core.Entities.Kingdom
 
   # Todo: Fame shouldn’t be accessed like a simple float. It also
   # involves Kingdom’s Protagonists respective fames.
@@ -9,8 +9,8 @@ defmodule Platform.Sovereignty.Domain.War do
   @spec attack(Kingdom.t(), Kingdom.t()) :: {:ok, BattleOutcome.t()} | {:error, atom()}
   def attack(atk_kingdom, def_kingdom) do
     with :ok              <- check_attack_conditions(atk_kingdom, def_kingdom),
-         {:ok, atk_troop} <- Troop.from_raw(atk_kingdom.attack_troop),
-         {:ok, def_troop} <- Troop.from_raw(def_kingdom.defense_troop) do
+         {:ok, atk_troop} <- Troop.from_raw(atk_kingdom.attack_troop, true),
+         {:ok, def_troop} <- Troop.from_raw(def_kingdom.defense_troop, false) do
 
       Engine.attack(atk_troop, def_troop, atk_kingdom.fame, def_kingdom.fame)
     end

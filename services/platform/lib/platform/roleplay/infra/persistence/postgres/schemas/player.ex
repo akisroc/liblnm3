@@ -1,4 +1,4 @@
-defmodule Platform.Roleplay.Infra.Postgres.Persistence.Schemas.Player do
+defmodule Platform.Roleplay.Infra.Persistence.Postgres.Schemas.Player do
   use Ecto.Schema
 
   alias Platform.Shared.Infra.Persistence.Postgres.Types.{UUID7, Slug, Url, Nickname}
@@ -14,7 +14,7 @@ defmodule Platform.Roleplay.Infra.Postgres.Persistence.Schemas.Player do
     field :slug, Slug
 
     has_many :protagonists, Protagonist
-    has_many :chronicles, Chronicle
+    has_many :chronicles, Chronicle, foreign_key: :narrator_id
 
     timestamps()
   end

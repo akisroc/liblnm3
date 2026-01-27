@@ -1,4 +1,4 @@
-defmodule Platform.Sovereignty.Domain.Entities.Player do
+defmodule Platform.Sovereignty.Core.Entities.Player do
 
   alias Platform.Shared.Domain.Types, as: SharedTypes
 

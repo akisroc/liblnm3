@@ -1,4 +1,4 @@
-defmodule Platform.Roleplaye.Infra.Persistence.Postgres.Schemas.Whisper do
+defmodule Platform.Roleplay.Infra.Persistence.Postgres.Schemas.Whisper do
   use Ecto.Schema
   import Ecto.Changeset
 

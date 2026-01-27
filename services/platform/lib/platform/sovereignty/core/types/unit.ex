@@ -1,4 +1,4 @@
-defmodule Platform.Sovereignty.Domain.Types.Unit do
+defmodule Platform.Sovereignty.Core.Types.Unit do
   alias Platform.Sovereignty.War.UnitArchetype
 
   defstruct [

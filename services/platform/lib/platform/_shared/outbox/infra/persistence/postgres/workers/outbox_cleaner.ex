@@ -7,8 +7,8 @@ defmodule Platform.Shared.Outbox.Infra.Persistence.Postgres.Workers.OutboxCleane
   use GenServer
   require Logger
 
-  alias Platform.Shared.Outbox.Infrastructure.Persistence.Repo
-  alias Platform.Shared.Outbox.Infra.Persistence.Schemas.OutboxMessage
+  alias Platform.Shared.Outbox.Infra.Persistence.Postgres.Repo
+  alias Platform.Shared.Outbox.Infra.Persistence.Postgres.Schemas.OutboxMessage
 
   @retention_days 7
   @batch_size 2000

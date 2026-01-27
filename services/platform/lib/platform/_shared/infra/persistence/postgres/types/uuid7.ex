@@ -42,5 +42,5 @@ defmodule Platform.Shared.Infra.Persistence.Postgres.Types.UUID7 do
 
   def generate, do: UUIDv7.generate()
 
-  def autogenerate, do: UUID7.generate()
+  def autogenerate, do: generate()
 end

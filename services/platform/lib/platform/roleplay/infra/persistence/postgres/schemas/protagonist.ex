@@ -11,7 +11,7 @@ defmodule Platform.Roleplay.Infra.Persistence.Postgres.Schemas.Protagonist do
 
   @type t :: %__MODULE__{
     id: String.t() | nil,
-    user_id: String.t() | nil,
+    player_id: String.t() | nil,
     kingdom_id: String.t() | nil,
     name: String.t() | nil,
     fame: Decimal.t() | nil,
@@ -21,7 +21,7 @@ defmodule Platform.Roleplay.Infra.Persistence.Postgres.Schemas.Protagonist do
     is_removed: boolean() | nil,
     inserted_at: DateTime.t() | nil,
     updated_at: DateTime.t() | nil,
-    user: Ecto.Association.NotLoaded.t() | User.t(),
+    player: Ecto.Association.NotLoaded.t() | Player.t(),
     kingdom: Ecto.Association.NotLoaded.t() | Kingdom.t()
   }
 
@@ -33,18 +33,19 @@ defmodule Platform.Roleplay.Infra.Persistence.Postgres.Schemas.Protagonist do
     field :name, LoreName
     field :biography, :string
     field :fame, :decimal, default: Decimal.new("0.0")
-    field :profile_picture, :boolean, default: true
+    field :profile_picture, Url
     field :is_anonymous, :boolean, default: true
     field :slug, Slug
     field :is_removed, :boolean, default: false
 
     timestamps()
 
-    belongs_to :user, Player
+    belongs_to :player, Player
     belongs_to :kingdom, Kingdom
 
     has_many :chapters, Chapter
-    has_many :whispers, Whisper
+    has_many :sent_whispers, Whisper, foreign_key: :sender_id
+    has_many :received_whispers, Whisper, foreign_key: :receiver_id
   end
 
   def register(protagonist, attrs) do

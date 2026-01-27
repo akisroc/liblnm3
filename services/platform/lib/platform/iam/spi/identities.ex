@@ -14,8 +14,7 @@ defmodule Platform.IAM.SPI.Identities do
   @callback register_user(
               nickname :: String.t(),
               email :: String.t(),
-              password :: String.t(),
-              provisioning_data :: %{kingdom_name: String.t(), leader_name: String.t()}
+              password :: String.t()
             ) ::
               {:ok, %{id: Types.id()}} | {:error, any()}
 

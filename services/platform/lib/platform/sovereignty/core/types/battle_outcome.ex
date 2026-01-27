@@ -1,6 +1,6 @@
-defmodule Platform.Sovereignty.Domain.Types.BattleOutcome do
+defmodule Platform.Sovereignty.Core.Types.BattleOutcome do
 
-  alias Platform.Sovereignty.Domain.Types.{Troop, BattleLogEntry}
+  alias Platform.Sovereignty.Core.Types.{Troop, BattleLogEntry}
 
   defstruct [
     :atk_initial_troop,

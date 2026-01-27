@@ -1,6 +1,6 @@
-defmodule Platform.Sovereignty.Domain.Entities.Kingdom do
-  alias Platform.Sovereignty.Domain.Entities.Player
-  alias Platform.Sovereignty.Domain.Types.Troop
+defmodule Platform.Sovereignty.Core.Entities.Kingdom do
+  alias Platform.Sovereignty.Core.Entities.Player
+  alias Platform.Sovereignty.Core.Types.Troop
   alias Platform.Shared.Domain.Types, as: SharedTypes
 
   defstruct [

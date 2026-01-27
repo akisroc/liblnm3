@@ -1,5 +1,5 @@
-defmodule Platform.Sovereignty.Domain.Types.BattleState do
-  alias Platform.Sovereignty.Domain.Types.{Unit, BattleLogEntry}
+defmodule Platform.Sovereignty.Core.Types.BattleState do
+  alias Platform.Sovereignty.Core.Types.{Unit, BattleLogEntry}
 
   defstruct [
     :units,

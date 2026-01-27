@@ -1,4 +1,4 @@
-defmodule Platform.Sovereignty.War.UnitArchetype do
+defmodule Platform.Sovereignty.Core.War.UnitArchetype do
 
   @moduledoc """
   Defines the static attributes for unit archetypes.

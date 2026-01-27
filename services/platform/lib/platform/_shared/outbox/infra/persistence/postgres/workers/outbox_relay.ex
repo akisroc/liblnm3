@@ -106,7 +106,7 @@ defmodule Platform.Shared.Outbox.Infra.Persistence.Postgres.Workers.OutboxRelay 
   @spec handle_success(OutboxMessage.t(), [String.t()]) :: any()
   defp handle_success(msg, consumers) do
     msg
-    |> OutboxMessage.update_consumers(consumers)
+    |> OutboxMessage.add_consumers(consumers)
     |> OutboxMessage.mark_as_success()
     |> OutboxMessage.close()
     |> Repo.update!()

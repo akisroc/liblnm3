@@ -26,11 +26,11 @@ defmodule Platform.IAM.Infra.Persistence.Postgres.Repositories.Identities do
   def get_user(%{nickname: nickname}), do: Repo.get_by(User, nickname: nickname)
 
   @impl true
-  def register_user(nickname, email, password, provisioning_data \\ %{}) do
+  def register_user(nickname, email, password) do
     Multi.new()
     |> Multi.insert(
       :user,
-      User.register(%User{
+      User.register(%User{}, %{
         nickname: nickname,
         email: email,
         password: password

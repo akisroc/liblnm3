@@ -1,5 +1,5 @@
-defmodule Platform.Sovereignty.Domain.War.Engine do
-  alias Platform.Sovereignty.Domain.Types.{Troop, BattleState, BattleOutcome, Unit}
+defmodule Platform.Sovereignty.Core.War.Engine do
+  alias Platform.Sovereignty.Core.Types.{Troop, BattleState, BattleOutcome, Unit}
 
   # ============================================================================
   # CONSTANTS & BALANCING

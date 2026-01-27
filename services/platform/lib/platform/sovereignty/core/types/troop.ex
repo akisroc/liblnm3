@@ -1,5 +1,6 @@
-defmodule Platform.Sovereignty.Domain.Types.Troop do
-  alias Platform.Sovereignty.Domain.Types.{Unit, UnitArchetype}
+defmodule Platform.Sovereignty.Core.Types.Troop do
+  alias Platform.Sovereignty.Core.Types.Unit
+  alias Platform.Sovereignty.Core.War.UnitArchetype
 
   defstruct [
     :attacker?,
@@ -26,7 +27,7 @@ defmodule Platform.Sovereignty.Domain.Types.Troop do
           |> Stream.with_index(1)
           |> Enum.map(fn {unit_count, identifier} ->
             %Unit{
-              archetype: UnitArchetype.get!(identifier),
+              archetype: UnitArchetype.get(identifier),
               count: unit_count,
               attacker?: attacker?,
               stroke?: false,
