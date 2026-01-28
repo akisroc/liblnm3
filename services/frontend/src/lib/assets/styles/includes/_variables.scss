@@ -1,12 +1,37 @@
-/* COLORS */
-$color-primary: #1D2D33;
-$color-secondary: #3B5152;
-$color-page: #FFF8D0;
-$color-text: #1F1F1F;
+/*
+---
+--- COLORS
+---
+*/
 
-$color-navigation-background: rgba($color-text, 0.8);
-$color-navigation-link: rgba($color-page, 0.8);
-$color-navigation-link-hover: rgba($color-page, 1);
+/* GRAPHIC CHARTER */
+$color-primary: oklch(65% 0.22 275);
+$color-primary-dim: oklch(65% 0.22 275 / 0.15);
+$color-secondary: oklch(78% 0.14 190);
+
+/* EVENTS */
+$color-accent: oklch(70% 0.2 20);
+$color-error: oklch(65% 0.2 25);
+$color-success: oklch(75% 0.18 150);
+$color-warning: oklch(85% 0.15 85);
+
+/* BACKGROUNDS */
+//$color-app-background: oklch(12% 0.03 275);
+$color-app-background: linear-gradient(315deg, black 0%, white 100%);
+
+/* TYPOGRAPHY */
+$color-text: oklch(98 0.01 275);
+$color-text-muted: oklch(75% 0.02 275);
+
+$color-page: #FFF8D0;
+//$color-primary: #1D2D33;
+//$color-secondary: #3B5152;
+//$color-page: #FFF8D0;
+//$color-text: #1F1F1F;
+//
+//$color-navigation-background: rgba($color-text, 0.8);
+//$color-navigation-link: rgba($color-page, 0.8);
+//$color-navigation-link-hover: rgba($color-page, 1);
 
 
 /* BREAKPOINTS */

@@ -1,0 +1,56 @@
+/* GRAPHIC CHARTER */
+$primary: hsl(0, 0%, 99%);
+$secondary: hsl(60, 100%, 50%);
+$secondary-dim: hsl(60, 100%, 35%);
+$black: hsl(0, 0%, 4%);
+$white: hsl(0, 0%, 98%);
+
+/* EVENTS */
+$accent: hsl(356, 100%, 68%);
+$error: hsl(0, 85%, 62%);
+$success: hsl(139, 58%, 53%);
+$warning: hsl(42, 95%, 63%);
+
+/* BACKGROUNDS */
+$app-background:
+  /* First layer: Texture */
+  url("app-background-noise.svg"),
+  /* Second layer: Radial light */
+  radial-gradient(
+    circle at 50% 0%,
+    hsla(60, 50%, 80%, 0.15) 0%,
+    hsla(60, 50%, 40%, 0.05) 40%,
+    transparent 80%
+  ),
+  /* Third layer: dark base */
+  hsl(60, 2%, 11%)
+;
+$page-background:
+  /* First layer: Texture */
+  url("page-background-noise.svg"),
+  /* Second layer: Left warm light */
+  radial-gradient(
+    circle at 15% 25%,
+    hsla(40, 20%, 98%, 1) 0%,
+    hsla(40, 20%, 98%, 0) 50%
+  ),
+  /* Third layer: Shadow right */
+  radial-gradient(
+    circle at 85% 75%,
+    hsla(40, 15%, 85%, 0.15) 0%,
+    transparent 60%
+  ),
+  /* Fourth layer: page base */
+  hsl(45, 35%, 90%)
+;
+
+/* TYPOGRAPHY */
+$text: oklch(98 0.01 275);
+$text-muted: oklch(75% 0.02 275);
+
+/* GLASS */
+//$glass-surface: oklch(30% 0.05 275 / 0.4);
+$glass-surface: hsl(0 0% 0% / 0.08);
+$glass-border: oklch(100% 0 0 / 0.1);
+$glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+$glass-blur: blur(20px);

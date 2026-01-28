@@ -1,12 +1,12 @@
-<form class="register-user" method="POST" action="#">
+<form class="onboarding-form" method="POST" action="#">
   <fieldset>
     <legend>Inscription</legend>
-    <label for="nickname">Nom d'utilisateur</label>
     <input type="text" id="nickname" name="nickname" required>
+    <label for="nickname">Nom d'utilisateur</label>
+    <input class="error" type="email" id="email" name="email" required>
     <label for="email">Adresse e-mail</label>
-    <input type="email" id="email" name="email" required>
+    <input class="success" type="password" id="password" name="password" required>
     <label for="password">Mot de passe</label>
-    <input type="password" id="password" name="password" required>
-    <button type="submit">Inscription</button>
   </fieldset>
+  <button type="submit">C’est parti</button>
 </form>
