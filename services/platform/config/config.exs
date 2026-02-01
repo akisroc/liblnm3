@@ -50,6 +50,9 @@ config :platform, :identities_adapter,
 config :platform, :kingships_adapter,
   Platform.Sovereignty.Infra.Persistence.Postgres.Repositories.Kingships
 
+config :platform, :lore_repository_adapter,
+  Platform.Roleplay.Infra.Persistence.Postgres.LoreRepository
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"
