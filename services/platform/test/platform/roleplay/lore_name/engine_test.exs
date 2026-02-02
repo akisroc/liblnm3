@@ -8,8 +8,13 @@ defmodule Platform.Roleplay.Core.LoreName.EngineTest do
   end
 
   describe "generate/2" do
-    test "generates names" do
-      assert is_binary(Engine.generate(3, 12))
+    test "checks integrity for 10000 random generations" do
+      for _ <- 1..10000 do
+        name = Engine.generate(5, 10)
+        len = String.length(name)
+        assert is_binary(name)
+        assert len >= 3 and len <= 12
+      end
     end
   end
 end

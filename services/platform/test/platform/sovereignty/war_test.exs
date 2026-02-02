@@ -32,10 +32,15 @@ defmodule Platform.Sovereignty.WarTest do
   describe "attack/2 – Clauses and validations" do
 
     test "obvious winner wins", %{kingdom1: k1, kingdom2: k2} do
-      assert {:ok, %BattleOutcome{atk_wins?: false}} = War.attack(
+      {:ok, %BattleOutcome{} = outcome} = War.attack(
         %{k1 | atk_troop: [10, 10, 10, 10, 10, 10, 10, 10]},
         %{k2 | def_troop: [1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000]}
       )
+
+      assert outcome.atk_wins? == false
+
+      assert outcome.atk_fame_modifier < 0.0
+      assert outcome.def_fame_modifier > 0.0
     end
   end
 end
