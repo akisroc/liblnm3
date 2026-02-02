@@ -14,7 +14,7 @@ defmodule Platform.Sovereignty.Infra.Persistence.Postgres.Schemas.Notable do
 
   schema "protagonists" do
     field :name, LoreName
-    field :fame, :decimal, default: Decimal.new("0.0")
+    field :fame, :decimal, default: 0.0
     field :slug, Slug
     field :is_anonymous, :boolean, default: true
     field :profile_picture, Url

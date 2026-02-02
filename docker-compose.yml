@@ -50,6 +50,26 @@ services:
     networks:
       - database_network
 
+  test_database:
+    build:
+      context: ./infrastructure/database/postgres
+      target: dev
+    environment:
+      POSTGRES_USER: testdbadmin
+      POSTGRES_PASSWORD: testdbadmin
+      POSTGRES_DB: testdb
+      DB_NAME: testdb
+      DB_ADMIN: testdbadmin
+      DB_ADMIN_PASSWORD: testdbadmin
+      DB_USER: testdbuser
+      DB_USER_PASSWORD: testdbuser
+    ports:
+      - "5433:5433"
+    volumes:
+      - db-data:/var/lib/postgresql/data:rw
+    networks:
+      - database_network
+
   # migrator:
   #   build: ./infrastructure/database/migrator
   #   privileged: true

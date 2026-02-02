@@ -14,7 +14,7 @@ defmodule Platform.Roleplay.Infra.Persistence.Postgres.Schemas.Protagonist do
     player_id: String.t() | nil,
     kingdom_id: String.t() | nil,
     name: String.t() | nil,
-    fame: Decimal.t() | nil,
+    fame: float() | nil,
     slug: String.t() | nil,
     is_anonymous: boolean() | nil,
     biography: String.t() | nil,
@@ -32,10 +32,10 @@ defmodule Platform.Roleplay.Infra.Persistence.Postgres.Schemas.Protagonist do
   schema "protagonists" do
     field :name, LoreName
     field :biography, :string
-    field :fame, :decimal, default: Decimal.new("0.0")
+    field :fame, :decimal, default: 0.0
     field :profile_picture, Url
     field :is_anonymous, :boolean, default: true
-    field :slug, Slug
+    field :slug,Slug
     field :is_removed, :boolean, default: false
 
     timestamps()

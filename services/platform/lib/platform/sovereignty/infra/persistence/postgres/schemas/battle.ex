@@ -16,8 +16,8 @@ defmodule Platform.Sovereignty.Infra.Persistence.Postgres.Schemas.Battle do
     attacker_final_troop: [non_neg_integer()] | nil,
     defender_final_troop: [non_neg_integer()] | nil,
     attacker_wins: boolean() | nil,
-    attacker_fame_modifier: Decimal.t() | nil,
-    defender_fame_modifier: Decimal.t() | nil,
+    attacker_fame_modifier: float() | nil,
+    defender_fame_modifier: float() | nil,
     inserted_at: DateTime.t() | nil,
     attacker_kingdom: Ecto.Association.NotLoaded.t() | Kingdom.t(),
     defender_kingdom: Ecto.Association.NotLoaded.t() | Kingdom.t()

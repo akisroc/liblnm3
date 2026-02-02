@@ -1,4 +1,4 @@
-defmodule Platform.Roleplay.Api.GenerateLoreName.Response do
+defmodule Platform.Roleplay.API.GenerateLoreNameResponse do
   defstruct [
     :name
   ]

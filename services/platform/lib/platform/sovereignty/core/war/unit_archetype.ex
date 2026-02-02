@@ -81,51 +81,30 @@ defmodule Platform.Sovereignty.Core.War.UnitArchetype do
     fame_cost: float()
   }
 
-  @spec get(non_neg_integer() | atom()) :: {:ok, __MODULE__.t()} | {:error, String.t()}
-  def get(1), do: {:ok, b1()}
-  def get(:b1), do: {:ok, b1()}
-  def get(2), do: {:ok, b2()}
-  def get(:b2), do: {:ok, b2()}
-  def get(3), do: {:ok, b3()}
-  def get(:b3), do: {:ok, b3()}
-  def get(4), do: {:ok, b4()}
-  def get(:b4), do: {:ok, b4()}
-  def get(5), do: {:ok, b5()}
-  def get(:b5), do: {:ok, b5()}
-  def get(6), do: {:ok, b6()}
-  def get(:b6), do: {:ok, b6()}
-  def get(7), do: {:ok, b7()}
-  def get(:b7), do: {:ok, b7()}
-  def get(8), do: {:ok, b8()}
-  def get(:b8), do: {:ok, b8()}
+  @spec get(non_neg_integer() | atom()) :: __MODULE__.t() | {:error, String.t()}
+  def get(1), do: b1()
+  def get(:b1), do: b1()
+  def get(2), do: b2()
+  def get(:b2), do: b2()
+  def get(3), do: b3()
+  def get(:b3), do: b3()
+  def get(4), do: b4()
+  def get(:b4), do: b4()
+  def get(5), do: b5()
+  def get(:b5), do: b5()
+  def get(6), do: b6()
+  def get(:b6), do: b6()
+  def get(7), do: b7()
+  def get(:b7), do: b7()
+  def get(8), do: b8()
+  def get(:b8), do: b8()
   def get(wrong_id) do
     {:error, "Wrong identifier `#{wrong_id}` for unit archetype"}
   end
 
-  @spec get!(non_neg_integer() | atom()) :: __MODULE__.t()
-  def get!(1), do: b1()
-  def get!(:b1), do: b1()
-  def get!(2), do: b2()
-  def get!(:b2), do: b2()
-  def get!(3), do: b3()
-  def get!(:b3), do: b3()
-  def get!(4), do: b4()
-  def get!(:b4), do: b4()
-  def get!(5), do: b5()
-  def get!(:b5), do: b5()
-  def get!(6), do: b6()
-  def get!(:b6), do: b6()
-  def get!(7), do: b7()
-  def get!(:b7), do: b7()
-  def get!(8), do: b8()
-  def get!(:b8), do: b8()
-  def get!(wrong_id) do
-    raise ArgumentError, message: "Wrong identifier `#{wrong_id}` for unit archetype"
-  end
-
   @spec all :: [__MODULE__.t()]
   def all do
-    [get!(1), get!(2), get!(3), get!(4), get!(5), get!(6), get!(7), get!(8)]
+    [get(1), get(2), get(3), get(4), get(5), get(6), get(7), get(8)]
   end
 
   defp b1 do

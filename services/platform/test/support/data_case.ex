@@ -1,4 +1,4 @@
-defmodule PlatformInfra.DataCase do
+defmodule Platform.DataCase do
   @moduledoc """
   This module defines the setup for tests requiring
   access to the application's data layer.
@@ -10,25 +10,37 @@ defmodule PlatformInfra.DataCase do
   we enable the SQL sandbox, so changes done to the database
   are reverted at the end of every test. If you are using
   PostgreSQL, you can even run database tests asynchronously
-  by setting `use PlatformInfra.DataCase, async: true`, although
+  by setting `use Platform.DataCase, async: true`, although
   this option is not recommended for other databases.
   """
 
   use ExUnit.CaseTemplate
 
+  @repos [
+    Platform.Shared.Outbox.Infra.Persistence.Postgres.Repo,
+    Platform.IAM.Infra.Persistence.Postgres.Repo,
+    Platform.Roleplay.Infra.Persistence.Postgres.Repo,
+    Platform.Social.Infra.Persistence.Postgres.Repo,
+    Platform.Sovereignty.Infra.Persistence.Postgres.Repo
+  ]
+
   using do
     quote do
-      alias PlatformInfra.Repo
+      alias Platform.Shared.Outbox.Infra.Persistence.Postgres.Repo, as: OutboxRepo
+      alias Platform.IAM.Infra.Persistence.Postgres.Repo, as: IAMRepo
+      alias Platform.Roleplay.Infra.Persistence.Postgres.Repo, as: RoleplayRepo
+      alias Platform.Social.Infra.Persistence.Postgres.Repo, as: SocialRepo
+      alias Platform.Sovereignty.Infra.Persistence.Postgres.Repo, as: SovereigntyRepo
 
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
-      import PlatformInfra.DataCase
+      import Platform.DataCase
     end
   end
 
   setup tags do
-    PlatformInfra.DataCase.setup_sandbox(tags)
+    Platform.DataCase.setup_sandbox(tags)
     :ok
   end
 
@@ -36,8 +48,10 @@ defmodule PlatformInfra.DataCase do
   Sets up the sandbox based on the test tags.
   """
   def setup_sandbox(tags) do
-    pid = Ecto.Adapters.SQL.Sandbox.start_owner!(PlatformInfra.Repo, shared: not tags[:async])
-    on_exit(fn -> Ecto.Adapters.SQL.Sandbox.stop_owner(pid) end)
+    Enum.each(@repos, fn repo ->
+      pid = Ecto.Adapters.SQL.Sandbox.start_owner!(repo, shared: not tags[:async])
+      on_exit(fn -> Ecto.Adapters.SQL.Sandbox.stop_owner(pid) end)
+    end)
   end
 
   @doc """

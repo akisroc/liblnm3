@@ -32,7 +32,7 @@ defmodule PlatformWeb.ConnCase do
   end
 
   setup tags do
-    PlatformInfra.DataCase.setup_sandbox(tags)
+    Platform.DataCase.setup_sandbox(tags)
     {:ok, conn: Phoenix.ConnTest.build_conn()}
   end
 end

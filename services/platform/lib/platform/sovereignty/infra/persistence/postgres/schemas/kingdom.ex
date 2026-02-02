@@ -35,7 +35,7 @@ defmodule Platform.Sovereignty.Infra.Persistence.Postgres.Schemas.Kingdom do
   schema "kingdoms" do
     field :name, LoreName
     field :slug, Slug
-    field :fame, :decimal, default: Decimal.new("30000.0")
+    field :fame, :decimal, default: 30000.0
     field :total_fame, :decimal, virtual: true
     field :defense_troop, Troop, default: [0, 0, 0, 0, 0, 0, 0, 0]
     field :attack_troop, Troop, default: [0, 0, 0, 0, 0, 0, 0, 0]

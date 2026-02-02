@@ -1,43 +1,41 @@
 defmodule Platform.Sovereignty.WarTest do
   use ExUnit.Case, async: true
 
-  alias Platform.Sovereignty.War
-  alias Platform.Sovereignty.War.Types.BattleOutcome
+  alias Platform.Sovereignty.Core.War
+  alias Platform.Sovereignty.Core.Types.BattleOutcome
+  alias Platform.Sovereignty.Core.Entities.Kingdom
 
   setup do
     :rand.seed(:exsss, {1, 2, 3})
 
-    # b1 = UnitArchetype.get!(:b1)
-    # b2 = UnitArchetype.get!(:b2)
-    # b3 = UnitArchetype.get!(:b3)
-    # b4 = UnitArchetype.get!(:b4)
-    # b5 = UnitArchetype.get!(:b5)
-    # b6 = UnitArchetype.get!(:b6)
-    # b7 = UnitArchetype.get!(:b7)
-    # b8 = UnitArchetype.get!(:b8)
+    kingdom1 = %Kingdom{
+      id: "123",
+      def_troop: [2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500],
+      atk_troop: [2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500],
+      fame: 30000.0,
+      active?: true,
+      player: %{id: "abc"}
+    }
 
-    # {:ok, b1: b1, b2: b2, b3: b3, b4: b4, b5: b5, b6: b6, b7: b7, b8: b8}
+    kingdom2 = %Kingdom{
+      id: "456",
+      def_troop: [2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500],
+      atk_troop: [2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500],
+      fame: 30000.0,
+      active?: true,
+      player: %{id: "def"}
+    }
 
-    :ok
+    {:ok, kingdom1: kingdom1, kingdom2: kingdom2}
   end
 
-  describe "attack/4 – Clauses and validations" do
-    test "accepts troops as raw lists of integers, %" do
-      atk_troop = [2500, 0, 0, 0, 0, 0, 0, 0]
-      def_troop = [1, 0, 0, 0, 0, 0, 0, 0]
+  describe "attack/2 – Clauses and validations" do
 
-      assert {:ok, %BattleOutcome{attacker_wins?: true}} = War.attack(
-        atk_troop, def_troop, 1000.0, 1000.0
+    test "obvious winner wins", %{kingdom1: k1, kingdom2: k2} do
+      assert {:ok, %BattleOutcome{atk_wins?: false}} = War.attack(
+        %{k1 | atk_troop: [10, 10, 10, 10, 10, 10, 10, 10]},
+        %{k2 | def_troop: [1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000]}
       )
-    end
-
-    test "returns error on invalid raw list length" do
-      invalid_troop = [1000, 0]
-      valid_troop = [1000, 0, 0, 0, 0, 0, 0, 0]
-
-      assert {:error, :invalid_troop_format} == War.attack(invalid_troop, invalid_troop, 1000.0, 1000.0)
-      assert {:error, :invalid_troop_format} == War.attack(invalid_troop, valid_troop, 1000.0, 1000.0)
-      assert {:error, :invalid_troop_format} == War.attack(valid_troop, invalid_troop, 1000.0, 1000.0)
     end
   end
 end

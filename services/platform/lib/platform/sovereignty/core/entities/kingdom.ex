@@ -7,6 +7,7 @@ defmodule Platform.Sovereignty.Core.Entities.Kingdom do
     :id,
     :def_troop,
     :atk_troop,
+    :fame,
     :active?,
     :player
   ]
@@ -15,6 +16,7 @@ defmodule Platform.Sovereignty.Core.Entities.Kingdom do
     id: SharedTypes.id(),
     def_troop: Troop.t() | nil,
     atk_troop: Troop.t() | nil,
+    fame: float(),
     active?: boolean(),
     player: Player.t()
   }

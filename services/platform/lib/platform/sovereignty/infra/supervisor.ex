@@ -1,4 +1,4 @@
-defmodule Platform.IAM.Supervisor do
+defmodule Platform.Sovereignty.Infra.Supervisor do
   use Supervisor
 
   def start_link(init_arg) do
@@ -8,7 +8,7 @@ defmodule Platform.IAM.Supervisor do
   @impl true
   def init(_init_arg) do
     children = [
-      Platform.IAM.Infra.Persistence.Postgres.Repo
+      Platform.Sovereignty.Infra.Persistence.Postgres.Repo
     ]
 
     Supervisor.init(children, strategy: :one_for_one)

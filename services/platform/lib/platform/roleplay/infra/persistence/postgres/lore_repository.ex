@@ -1,7 +1,7 @@
 defmodule Platform.Roleplay.Infra.Persistence.Postgres.LoreRepository do
   @behaviour Platform.Roleplay.SPI.LoreRepository
 
-  use Ecto.Query
+  import Ecto.Query
 
   alias Platform.Roleplay.Infra.Persistence.Postgres.Repo
   alias Platform.Roleplay.Infra.Persistence.Postgres.Schemas.{Protagonist, Kingdom}

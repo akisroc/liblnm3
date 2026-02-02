@@ -10,11 +10,10 @@ defmodule Platform.Application do
     children = [
       PlatformWeb.Telemetry,
       Platform.Shared.Outbox.Infra.Persistence.Postgres.Repo,
-      # Platform.IAM.Infra.Persistence.Postgres.Repo
-      Platform.IAM.Supervisor, # Todo: Do the same for other contexts
-      # Platform.Roleplay.Infra.Persistence.Postgres.Repo,
-      # Platform.Social.Infra.Persistence.Postgres.Repo,
-      Platform.Sovereignty.Infra.Persistence.Postgres.Repo,
+      Platform.IAM.Infra.Supervisor,
+      Platform.Roleplay.Infra.Supervisor,
+      Platform.Social.Infra.Supervisor,
+      Platform.Sovereignty.Infra.Supervisor,
       {DNSCluster, query: Application.get_env(:platform, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Platform.PubSub},
 
