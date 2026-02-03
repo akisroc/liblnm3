@@ -3,7 +3,7 @@ defmodule Platform.Shared.Infra.Persistence.Postgres.Types.LoreName do
 
   @type t :: String.t()
 
-  @name_regex ~r/^[ a-zA-Z0-9éÉèÈêÊëËäÄâÂàÀïÏöÖôÔüÜûÛçÇ''’\-]+$/
+  @name_regex ~r/^[ a-zA-Z0-9éÉèÈêÊëËäÄâÂàÀïÏöÖôÔüÜûÛçÇæÆœŒ''’\-]+$/
 
   def type, do: :string
 
