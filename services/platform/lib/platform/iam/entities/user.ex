@@ -1,4 +1,4 @@
-defmodule Platform.IAM.Core.Entities.User do
+defmodule Platform.IAM.Entities.User do
   alias Platform.Shared.Domain.Types, as: SharedTypes
 
   defstruct [

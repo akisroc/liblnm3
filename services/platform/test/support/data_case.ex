@@ -18,7 +18,7 @@ defmodule Platform.DataCase do
 
   @repos [
     Platform.Shared.Outbox.Infra.Persistence.Postgres.Repo,
-    Platform.IAM.Infra.Persistence.Postgres.Repo,
+    Platform.IAM.Infra.Postgres.Repo,
     Platform.Roleplay.Infra.Postgres.Repo,
     Platform.Social.Infra.Persistence.Postgres.Repo,
     Platform.Sovereignty.Infra.Persistence.Postgres.Repo
@@ -27,7 +27,7 @@ defmodule Platform.DataCase do
   using do
     quote do
       alias Platform.Shared.Outbox.Infra.Persistence.Postgres.Repo, as: OutboxRepo
-      alias Platform.IAM.Infra.Persistence.Postgres.Repo, as: IAMRepo
+      alias Platform.IAM.Infra.Postgres.Repo, as: IAMRepo
       alias Platform.Roleplay.Infra.Postgres.Repo, as: RoleplayRepo
       alias Platform.Social.Infra.Persistence.Postgres.Repo, as: SocialRepo
       alias Platform.Sovereignty.Infra.Persistence.Postgres.Repo, as: SovereigntyRepo

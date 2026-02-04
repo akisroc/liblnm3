@@ -1,4 +1,4 @@
-defmodule Platform.IAM.Infra.Persistence.Postgres.Types.Email do
+defmodule Platform.IAM.Infra.Postgres.Types.Email do
   use Ecto.Type
 
   @type t :: String.t()

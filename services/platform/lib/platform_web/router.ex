@@ -15,7 +15,7 @@ defmodule PlatformWeb.Router do
 
   # --- IAM
   scope "/", Platform.IAM.Infra.Web do
-    post "/register-user", IdentitiesController, :register_user
+    # post "/register-user", IdentitiesController, :register_user
   end
 
   # Todo: Other scope for private?

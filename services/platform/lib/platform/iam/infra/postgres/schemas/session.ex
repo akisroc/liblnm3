@@ -1,8 +1,8 @@
-defmodule Platform.IAM.Infra.Persistence.Postgres.Schemas.Session do
+defmodule Platform.IAM.Infra.Postgres.Schemas.Session do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias Platform.IAM.Infra.Persistence.Postgres.Schemas.User
+  alias Platform.IAM.Infra.Postgres.Schemas.User
   alias Platform.Shared.Infra.Persistence.Postgres.Types.UUID7
 
   @schema_prefix "iam"

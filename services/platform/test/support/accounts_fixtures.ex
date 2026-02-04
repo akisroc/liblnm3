@@ -1,5 +1,5 @@
 # defmodule PlatformInfra.AccountsFixtures do
-#   alias Platform.IAM.Infra.Persistence.Postgres.Repositories.Identities
+#   alias Platform.IAM.Infra.Postgres.Repositories.IdentitiesRepository
 
 #   @moduledoc """
 #   Test fixtures for creating test data.

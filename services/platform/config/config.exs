@@ -10,7 +10,7 @@ import Config
 config :platform,
   ecto_repos: [
     Platform.Shared.Outbox.Infra.Persistence.Postgres.Repo,
-    Platform.IAM.Infra.Persistence.Postgres.Repo,
+    Platform.IAM.Infra.Postgres.Repo,
     Platform.Roleplay.Infra.Postgres.Repo,
     Platform.Social.Infra.Persistence.Postgres.Repo,
     Platform.Sovereignty.Infra.Persistence.Postgres.Repo
@@ -21,7 +21,7 @@ config :platform, Platform.Shared.Outbox.Infra.Persistence.Postgres.Repo,
   migration_primary_key: [name: :id, type: :binary_id],
   migration_foreign_key: [type: :binary_id]
 
-config :platform, Platform.IAM.Infra.Persistence.Postgres.Repo,
+config :platform, Platform.IAM.Infra.Postgres.Repo,
   migration_primary_key: [name: :id, type: :binary_id],
   migration_foreign_key: [type: :binary_id]
 
@@ -66,8 +66,8 @@ config :logger, :default_formatter,
 config :phoenix, :json_library, Jason
 
 # SECONDARY ADAPTERS
-config :platform, :identities_adapter,
-  Platform.IAM.Infra.Persistence.Postgres.Repositories.Identities
+config :platform, :identities_repository_adapter,
+Platform.IAM.Infra.Postgres.Repositories.IdentitiesRepository
 
 config :platform, :kingships_adapter,
   Platform.Sovereignty.Infra.Persistence.Postgres.Repositories.Kingships

@@ -1,4 +1,4 @@
-defmodule Platform.IAM.SPI.Identities do
+defmodule Platform.IAM.Ports.SPI.IdentitiesRepository do
   @moduledoc """
   Manages users and sessions
   """

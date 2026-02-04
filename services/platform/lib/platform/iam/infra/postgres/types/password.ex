@@ -1,4 +1,4 @@
-defmodule Platform.IAM.Infra.Persistence.Postgres.Types.Password do
+defmodule Platform.IAM.Infra.Postgres.Types.Password do
   use Ecto.Type
 
   @type t :: String.t()

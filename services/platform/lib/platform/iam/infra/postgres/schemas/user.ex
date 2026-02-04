@@ -1,9 +1,9 @@
-defmodule Platform.IAM.Infra.Persistence.Postgres.Schemas.User do
+defmodule Platform.IAM.Infra.Postgres.Schemas.User do
   use Ecto.Schema
   import Ecto.Changeset
 
   alias Platform.Shared.Infra.Persistence.Postgres.Types.{UUID7, Nickname, Slug, Url}
-  alias Platform.IAM.Infra.Persistence.Postgres.Types.{Email, Password}
+  alias Platform.IAM.Infra.Postgres.Types.{Email, Password}
 
   @role_user :user
   @role_curator :curator

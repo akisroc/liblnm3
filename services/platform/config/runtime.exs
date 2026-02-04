@@ -27,7 +27,7 @@ if config_env() == :dev do
   # Allow overriding database config with environment variables in dev
   if database_url = System.get_env("DATABASE_URL") do
     config :platform, Platform.Shared.Outbox.Infra.Persistence.Postgres.Repo, url: database_url
-    config :platform, Platform.IAM.Infra.Persistence.Postgres.Repo, url: database_url
+    config :platform, Platform.IAM.Infra.Postgres.Repo, url: database_url
     config :platform, Platform.Roleplay.Infra.Postgres.Repo, url: database_url
     config :platform, Platform.Social.Infra.Persistence.Postgres.Repo, url: database_url
     config :platform, Platform.Sovereignty.Infra.Persistence.Postgres.Repo, url: database_url
@@ -53,7 +53,7 @@ if config_env() == :prod do
     # For machines with several cores, consider starting multiple pools of `pool_size`
     # pool_count: 4,
     socket_options: maybe_ipv6
-  config :platform, Platform.IAM.Infra.Persistence.Postgres.Repo,
+  config :platform, Platform.IAM.Infra.Postgres.Repo,
     ssl: true,
     url: database_url,
     pool_size: String.to_integer(System.get_env("POOL_SIZE_IAM") || "15"),

@@ -1,8 +1,8 @@
-defmodule Platform.IAM.Infra.Persistence.Postgres.Repositories.Identities do
-  @behaviour Platform.IAM.SPI.Identities
+defmodule Platform.IAM.Infra.Postgres.Repositories.IdentitiesRepository do
+  @behaviour Platform.IAM.Ports.SPI.IdentitiesRepository
 
-  alias Platform.IAM.Infra.Persistence.Postgres.Schemas.{User, Session}
-  alias Platform.IAM.Infra.Persistence.Postgres.Repo
+  alias Platform.IAM.Infra.Postgres.Schemas.{User, Session}
+  alias Platform.IAM.Infra.Postgres.Repo
 
   @impl true
   def get_user(token) when is_binary(token) do

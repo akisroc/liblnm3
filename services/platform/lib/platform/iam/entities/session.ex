@@ -1,4 +1,4 @@
-defmodule Platform.IAM.Core.Entities.Session do
+defmodule Platform.IAM.Entities.Session do
   alias Platform.Shared.Domain.Types, as: SharedTypes
 
   @admin_duration 1

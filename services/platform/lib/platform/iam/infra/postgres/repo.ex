@@ -1,4 +1,4 @@
-defmodule Platform.IAM.Infra.Persistence.Postgres.Repo do
+defmodule Platform.IAM.Infra.Postgres.Repo do
   use Ecto.Repo,
     otp_app: :platform,
     adapter: Ecto.Adapters.Postgres

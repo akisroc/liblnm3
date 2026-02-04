@@ -13,7 +13,7 @@ config :platform, Platform.Shared.Outbox.Infra.Persistence.Postgres.Repo,
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: System.schedulers_online() * 2
 
-config :platform, Platform.IAM.Infra.Persistence.Postgres.Repo,
+config :platform, Platform.IAM.Infra.Postgres.Repo,
   username: "testdbadmin",
   password: "testdbadmin",
   hostname: "test_database",
