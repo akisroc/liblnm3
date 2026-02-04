@@ -11,7 +11,7 @@ config :platform,
   ecto_repos: [
     Platform.Shared.Outbox.Infra.Persistence.Postgres.Repo,
     Platform.IAM.Infra.Persistence.Postgres.Repo,
-    Platform.Roleplay.Infra.Persistence.Postgres.Repo,
+    Platform.Roleplay.Infra.Postgres.Repo,
     Platform.Social.Infra.Persistence.Postgres.Repo,
     Platform.Sovereignty.Infra.Persistence.Postgres.Repo
   ],
@@ -25,7 +25,7 @@ config :platform, Platform.IAM.Infra.Persistence.Postgres.Repo,
   migration_primary_key: [name: :id, type: :binary_id],
   migration_foreign_key: [type: :binary_id]
 
-config :platform, Platform.Roleplay.Infra.Persistence.Postgres.Repo,
+config :platform, Platform.Roleplay.Infra.Postgres.Repo,
   migration_primary_key: [name: :id, type: :binary_id],
   migration_foreign_key: [type: :binary_id]
 
@@ -73,7 +73,7 @@ config :platform, :kingships_adapter,
   Platform.Sovereignty.Infra.Persistence.Postgres.Repositories.Kingships
 
 config :platform, :lore_repository_adapter,
-  Platform.Roleplay.Infra.Persistence.Postgres.LoreRepository
+  Platform.Roleplay.Infra.Postgres.LoreRepository
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

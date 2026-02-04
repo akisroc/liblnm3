@@ -1,10 +1,10 @@
-defmodule Platform.Roleplay.Infra.Persistence.Postgres.LoreRepository do
-  @behaviour Platform.Roleplay.SPI.LoreRepository
+defmodule Platform.Roleplay.Infra.Postgres.LoreRepository do
+  @behaviour Platform.Roleplay.Ports.SPI.LoreRepository
 
   import Ecto.Query
 
-  alias Platform.Roleplay.Infra.Persistence.Postgres.Repo
-  alias Platform.Roleplay.Infra.Persistence.Postgres.Schemas.{Protagonist, Kingdom}
+  alias Platform.Roleplay.Infra.Postgres.Repo
+  alias Platform.Roleplay.Infra.Postgres.Schemas.{Protagonist, Kingdom}
 
   @impl true
   def reject_existing_lore_names(names) do

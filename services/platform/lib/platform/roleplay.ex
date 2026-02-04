@@ -1,15 +1,15 @@
 defmodule Platform.Roleplay do
   @lore_repository_adapter Application.compile_env(:platform, :lore_repository_adapter)
 
-  alias Platform.Roleplay.Core.LoreName
-  alias Platform.Roleplay.API.{GenerateLoreNameQuery, GenerateLoreNameResponse}
+  alias Platform.Roleplay.LoreName
+  alias Platform.Roleplay.Ports.API.GenerateLoreNameResponse
 
   @doc """
-  Generate a random lore name from one of the given models and
+  Generate a random lore name from one of the given archetypes and
   in given bounds.
 
-  If an empty list is given for models, the engine will pick one in
-  all available models.
+  If an empty list is given for archetypes, the engine will pick one in
+  all available archetypes.
 
   Unicity of the name is checked in database.
 
@@ -27,16 +27,22 @@ defmodule Platform.Roleplay do
   #
   # The function recalls itself if all candidates have been
   # rejected. This could never happen in 1000 years, but the
-  # probability is not zero though, since some models can be
-  # narrow on short rolls. (Ex: `:snake` model will often produce
+  # probability is not zero though, since some archetypes can be
+  # narrow on short rolls. (Ex: `:swamp` archetype will often produce
   # “Vess”, “Zaj”, etc.)
-  @spec generate_lore_name(GenerateLoreNameQuery.t()) :: GenerateLoreNameResponse.t()
-  def generate_lore_name(%{models: []} = query) do
-     generate_lore_name(%{query | models: LoreName.Models.keys()})
+  @spec generate_lore_name(
+    %{archetypes: [atom()],
+    min_len: non_neg_integer(),
+    max_len: non_neg_integer()}
+  ) :: GenerateLoreNameResponse.t()
+
+  def generate_lore_name(%{archetypes: []} = query) do
+     generate_lore_name(%{query | archetypes: LoreName.Archetypes.keys()})
   end
-  def generate_lore_name(%{models: models, min_len: min_len, max_len: max_len} = query) do
+
+  def generate_lore_name(%{archetypes: archetypes, min_len: min_len, max_len: max_len} = query) do
     candidates = for _ <- 1..10 do
-      LoreName.Engine.generate(models, min_len, max_len)
+      LoreName.generate(archetypes, min_len, max_len)
     end
     |> @lore_repository_adapter.reject_existing_lore_names()
 

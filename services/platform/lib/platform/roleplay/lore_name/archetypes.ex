@@ -1,6 +1,6 @@
-defmodule Platform.Roleplay.Core.LoreName.Models do
+defmodule Platform.Roleplay.LoreName.Archetypes do
   @moduledoc """
-  Fetch lore names models from sibling .exs files.
+  Fetch lore names archetypes from sibling .exs files.
 
   Won’t compile if a name graph is malformed.
   """
@@ -9,7 +9,7 @@ defmodule Platform.Roleplay.Core.LoreName.Models do
   # COMPILE TIME
   # ---
 
-  validate_model! = fn chain, filename ->
+  validate_archetype! = fn chain, filename ->
     if not Map.has_key?(chain, :start) do
       raise CompileError,
         file: filename,
@@ -39,30 +39,30 @@ defmodule Platform.Roleplay.Core.LoreName.Models do
     chain
   end
 
-  @models_dir Path.join(__DIR__, "models")
-  files = Path.wildcard(Path.join(@models_dir, "*.exs"))
+  @archetypes_dir Path.join(__DIR__, "archetypes")
+  files = Path.wildcard(Path.join(@archetypes_dir, "*.exs"))
 
-  models_map = for file <- files, into: %{} do
+  archetypes_map = for file <- files, into: %{} do
     # Tell to compiler to recompile on change
     @external_resource file
 
     {data, _} = Code.eval_file(file)
 
-    validate_model!.(data, file)
+    validate_archetype!.(data, file)
 
-    model_key = file |> Path.basename(".exs") |> String.to_atom()
+    archetype_key = file |> Path.basename(".exs") |> String.to_atom()
 
-    {model_key, data}
+    {archetype_key, data}
   end
 
-  @models models_map
+  @archetypes archetypes_map
 
 
   # ---
   # RUNTIME
   # ---
 
-  def get(model_key) when is_atom(model_key), do: Map.get(@models, model_key)
-  def all, do: @models
-  def keys, do: Map.keys(@models)
+  def get(archetype_key) when is_atom(archetype_key), do: Map.get(@archetypes, archetype_key)
+  def all, do: @archetypes
+  def keys, do: Map.keys(@archetypes)
 end

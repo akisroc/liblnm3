@@ -18,7 +18,7 @@ defmodule Platform.Sovereignty.Core.War.UnitArchetype do
   > archetypes by B1, B3, B8, etc.
   >
   > "Une armée de B1 et B3" was a thing! I kept this naming tradition in the
-  > codebase by respect to the old LNM.
+  > codebase by respect to the old Platform.
 
   ### Kill rate
 

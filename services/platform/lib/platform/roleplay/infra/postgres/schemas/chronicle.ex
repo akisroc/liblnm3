@@ -1,8 +1,8 @@
-defmodule Platform.Roleplay.Infra.Persistence.Postgres.Schemas.Chronicle do
+defmodule Platform.Roleplay.Infra.Postgres.Schemas.Chronicle do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias Platform.Roleplay.Infra.Persistence.Postgres.Schemas.{Player, Chapter}
+  alias Platform.Roleplay.Infra.Postgres.Schemas.{Player, Chapter}
   alias Platform.Shared.Infra.Persistence.Postgres.Types.{UUID7, Slug, LoreName}
 
   @title_max_length 60

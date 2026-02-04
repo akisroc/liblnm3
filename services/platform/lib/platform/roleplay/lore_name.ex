@@ -1,8 +1,10 @@
-defmodule Platform.Roleplay.Core.LoreName.Engine do
-  alias Platform.Roleplay.Core.LoreName.Models
+defmodule Platform.Roleplay.LoreName do
+  alias Platform.Roleplay.LoreName.Archetypes
+
+  @type t :: String.t()
 
   def generate(min_len, max_len) do
-    Models.keys() |> generate(min_len, max_len)
+    Archetypes.keys() |> generate(min_len, max_len)
   end
 
   def generate([key | _] = keys, min_len, max_len) when is_atom(key) do
@@ -10,7 +12,7 @@ defmodule Platform.Roleplay.Core.LoreName.Engine do
   end
 
   def generate(key, min_len, max_len) when is_atom(key) do
-    model = Models.get(key)
+    model = Archetypes.get(key)
     Stream.repeatedly(fn -> build_name(model) end)
     |> Stream.reject(fn name ->
       len = String.length(name)

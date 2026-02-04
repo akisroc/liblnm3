@@ -1,8 +1,8 @@
-defmodule Platform.Roleplay.Infra.Persistence.Postgres.Schemas.Whisper do
+defmodule Platform.Roleplay.Infra.Postgres.Schemas.Whisper do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias Platform.Roleplay.Infra.Persistence.Postgres.Schemas.Protagonist
+  alias Platform.Roleplay.Infra.Postgres.Schemas.Protagonist
   alias Platform.Shared.Infra.Persistence.Postgres.Types.UUID7
 
   @schema_prefix "roleplay"

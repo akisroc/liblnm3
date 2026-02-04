@@ -8,7 +8,7 @@ defmodule Platform.Roleplay.Infra.Supervisor do
   @impl true
   def init(_init_arg) do
     children = [
-      Platform.Roleplay.Infra.Persistence.Postgres.Repo
+      Platform.Roleplay.Infra.Postgres.Repo
     ]
 
     Supervisor.init(children, strategy: :one_for_one)

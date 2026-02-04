@@ -56,7 +56,7 @@ config :platform, dev_routes: true
 config :platform, cors_origins: [
   "http://localhost",
   "http://www.localhost",
-  "http://platform.localhost",
+  "http://Platform.localhost",
   "http://localhost:3000",
   ~r/^http:\/\/localhost(:\d+)?$/,
   ~r/^http:\/\/.*\.localhost(:\d+)?$/

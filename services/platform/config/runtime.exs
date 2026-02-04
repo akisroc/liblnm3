@@ -28,7 +28,7 @@ if config_env() == :dev do
   if database_url = System.get_env("DATABASE_URL") do
     config :platform, Platform.Shared.Outbox.Infra.Persistence.Postgres.Repo, url: database_url
     config :platform, Platform.IAM.Infra.Persistence.Postgres.Repo, url: database_url
-    config :platform, Platform.Roleplay.Infra.Persistence.Postgres.Repo, url: database_url
+    config :platform, Platform.Roleplay.Infra.Postgres.Repo, url: database_url
     config :platform, Platform.Social.Infra.Persistence.Postgres.Repo, url: database_url
     config :platform, Platform.Sovereignty.Infra.Persistence.Postgres.Repo, url: database_url
   end
@@ -58,7 +58,7 @@ if config_env() == :prod do
     url: database_url,
     pool_size: String.to_integer(System.get_env("POOL_SIZE_IAM") || "15"),
     socket_options: maybe_ipv6
-  config :platform, Platform.Roleplay.Infra.Persistence.Postgres.Repo,
+  config :platform, Platform.Roleplay.Infra.Postgres.Repo,
     ssl: true,
     url: database_url,
     pool_size: String.to_integer(System.get_env("POOL_SIZE_ROLEPLAY") || "8"),

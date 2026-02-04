@@ -12,7 +12,7 @@ defmodule Platform.RoleplayTest do
     test "checks generation" do
       :rand.seed(:exsss, {1, 2, 3})
       %{name: name} = Roleplay.generate_lore_name(%{
-        models: [:kurapika],
+        archetypes: [:kurapika],
         min_len: 3,
         max_len: 12
       })
@@ -20,10 +20,10 @@ defmodule Platform.RoleplayTest do
       assert name == "Bomoroka"
     end
 
-    test "checks integrity with specified models" do
+    test "checks integrity with specified archetypes" do
       for _ <- 1..10 do
         %{name: name} = Roleplay.generate_lore_name(%{
-          models: [:kurapika, :snake],
+          archetypes: [:kurapika, :swamp],
           min_len: 4,
           max_len: 11
         })
@@ -34,7 +34,7 @@ defmodule Platform.RoleplayTest do
 
       for _ <- 1..10 do
         %{name: name} = Roleplay.generate_lore_name(%{
-          models: [:kurapika],
+          archetypes: [:kurapika],
           min_len: 2,
           max_len: 12
         })
@@ -45,7 +45,7 @@ defmodule Platform.RoleplayTest do
 
       for _ <- 1..10 do
         %{name: name} = Roleplay.generate_lore_name(%{
-          models: [:snake],
+          archetypes: [:swamp],
           min_len: 6,
           max_len: 16
         })
@@ -55,10 +55,10 @@ defmodule Platform.RoleplayTest do
       end
     end
 
-    test "checks integrity with omitted models" do
+    test "checks integrity with omitted archetypes" do
       for _ <- 1..10 do
         %{name: name} = Roleplay.generate_lore_name(%{
-          models: [], # Empty list
+          archetypes: [], # Empty list
           min_len: 4,
           max_len: 11
         })

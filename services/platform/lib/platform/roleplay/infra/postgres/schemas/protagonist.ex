@@ -1,8 +1,8 @@
-defmodule Platform.Roleplay.Infra.Persistence.Postgres.Schemas.Protagonist do
+defmodule Platform.Roleplay.Infra.Postgres.Schemas.Protagonist do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias Platform.Roleplay.Infra.Persistence.Postgres.Schemas.{Player, Kingdom, Chapter, Whisper}
+  alias Platform.Roleplay.Infra.Postgres.Schemas.{Player, Kingdom, Chapter, Whisper}
   alias Platform.Shared.Infra.Persistence.Postgres.Types.{UUID7, LoreName, Slug, Url}
 
   @biography_max_length 500000

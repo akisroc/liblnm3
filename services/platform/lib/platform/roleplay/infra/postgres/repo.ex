@@ -1,4 +1,4 @@
-defmodule Platform.Roleplay.Infra.Persistence.Postgres.Repo do
+defmodule Platform.Roleplay.Infra.Postgres.Repo do
   use Ecto.Repo,
     otp_app: :platform,
     adapter: Ecto.Adapters.Postgres
