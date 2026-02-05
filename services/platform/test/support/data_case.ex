@@ -21,7 +21,7 @@ defmodule Platform.DataCase do
     Platform.IAM.Infra.Postgres.Repo,
     Platform.Roleplay.Infra.Postgres.Repo,
     Platform.Social.Infra.Persistence.Postgres.Repo,
-    Platform.Sovereignty.Infra.Persistence.Postgres.Repo
+    Platform.Sovereignty.Infra.Postgres.Repo
   ]
 
   using do
@@ -30,7 +30,7 @@ defmodule Platform.DataCase do
       alias Platform.IAM.Infra.Postgres.Repo, as: IAMRepo
       alias Platform.Roleplay.Infra.Postgres.Repo, as: RoleplayRepo
       alias Platform.Social.Infra.Persistence.Postgres.Repo, as: SocialRepo
-      alias Platform.Sovereignty.Infra.Persistence.Postgres.Repo, as: SovereigntyRepo
+      alias Platform.Sovereignty.Infra.Postgres.Repo, as: SovereigntyRepo
 
       import Ecto
       import Ecto.Changeset

@@ -13,7 +13,7 @@ config :platform,
     Platform.IAM.Infra.Postgres.Repo,
     Platform.Roleplay.Infra.Postgres.Repo,
     Platform.Social.Infra.Persistence.Postgres.Repo,
-    Platform.Sovereignty.Infra.Persistence.Postgres.Repo
+    Platform.Sovereignty.Infra.Postgres.Repo
   ],
   generators: [timestamp_type: :utc_datetime]
 
@@ -66,14 +66,17 @@ config :logger, :default_formatter,
 config :phoenix, :json_library, Jason
 
 # SECONDARY ADAPTERS
+config :platform, :iam_repo_adapter, Platform.IAM.Infra.Postgres.Repo
+config :platform, :roleplay_repo_adapter, Platform.Roleplay.Infra.Postgres.Repo
+config :platform, :social_repo_adapter, Platform.Social.Infra.Postgres.Repo
+config :platform, :sovereignty_repo_adapter, Platform.IAM.Infra.Postgres.Repo
+
 config :platform, :identities_repository_adapter,
-Platform.IAM.Infra.Postgres.Repositories.IdentitiesRepository
-
-config :platform, :kingships_adapter,
-  Platform.Sovereignty.Infra.Persistence.Postgres.Repositories.Kingships
-
+  Platform.IAM.Infra.Postgres.IdentitiesRepositoryAdapter
+config :platform, :kingships_repository_adapter,
+  Platform.Sovereignty.Infra.Postgres.KingshipsRepositoryAdapter
 config :platform, :lore_repository_adapter,
-  Platform.Roleplay.Infra.Postgres.LoreRepository
+  Platform.Roleplay.Infra.Postgres.LoreRepositoryAdapter
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

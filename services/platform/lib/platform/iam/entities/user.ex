@@ -31,7 +31,7 @@ defmodule Platform.IAM.Entities.User do
           updated_at: DateTime.t() | nil
         }
 
-  def from_data(data) do
+  def new(data) do
     %__MODULE__{
       id: data.id,
       nickname: data.nickname,

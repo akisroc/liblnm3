@@ -15,8 +15,8 @@ defmodule PlatformWeb.BattleController do
          :ok <- check_ownership(atk_kingdom, user),
          :ok <- check_active_status(atk_kingdom, def_kingdom),
          {:ok, battle_outcome} <- War.attack(
-           atk_kingdom.attack_troop,
-           def_kingdom.defense_troop,
+           atk_kingdom.atk_troop,
+           def_kingdom.def_troop,
            atk_kingdom.fame,
            def_kingdom.fame
          ),

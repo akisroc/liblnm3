@@ -83,8 +83,8 @@
 #       |> Kingdom.create_changeset(%{
 #         name: Enum.at(names, i - 1),
 #         fame: (:rand.uniform() * 100_000.0) |> Float.round(3),
-#         defense_troop: Enum.map(1..8, fn _ -> Enum.random(0..2000) end),
-#         attack_troop:  Enum.map(1..8, fn _ -> Enum.random(0..2000) end),
+#         def_troop: Enum.map(1..8, fn _ -> Enum.random(0..2000) end),
+#         atk_troop:  Enum.map(1..8, fn _ -> Enum.random(0..2000) end),
 #         is_active: false,
 #         user_id: Enum.at(user_ids, i - 1)
 #       })

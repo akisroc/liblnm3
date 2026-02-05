@@ -5,7 +5,7 @@ repos = [
   Platform.IAM.Infra.Postgres.Repo,
   Platform.Roleplay.Infra.Postgres.Repo,
   Platform.Social.Infra.Persistence.Postgres.Repo,
-  Platform.Sovereignty.Infra.Persistence.Postgres.Repo
+  Platform.Sovereignty.Infra.Postgres.Repo
 ]
 
 Enum.each(repos, fn repo ->

@@ -8,7 +8,7 @@ defmodule Platform.Sovereignty.Infra.Supervisor do
   @impl true
   def init(_init_arg) do
     children = [
-      Platform.Sovereignty.Infra.Persistence.Postgres.Repo
+      Platform.Sovereignty.Infra.Postgres.Repo
     ]
 
     Supervisor.init(children, strategy: :one_for_one)

@@ -5,6 +5,21 @@ import Config
 # The MIX_TEST_PARTITION environment variable can be used
 # to provide built-in test partitioning in CI environment.
 # Run `mix help test` for more information.
+
+config :platform, :outbox_repo_adapter, Platform.TestRepo
+config :platform, :iam_repo_adapter, Platform.TestRepo
+config :platform, :sovereignty_repo_adapter, Platform.TestRepo
+config :platform, :social_repo_adapter, Platform.TestRepo
+config :platform, :sovereignty_repo_adapter, Platform.TestRepo
+
+config :platform, Platform.TestRepo,
+  username: "testdbadmin",
+  password: "testdbadmin",
+  hostname: "test_database",
+  database: "testdb",
+  pool: Ecto.Adapters.SQL.Sandbox,
+  pool_size: System.schedulers_online() * 2
+
 config :platform, Platform.Shared.Outbox.Infra.Persistence.Postgres.Repo,
   username: "testdbadmin",
   password: "testdbadmin",
@@ -37,7 +52,7 @@ config :platform, Platform.Social.Infra.Persistence.Postgres.Repo,
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: System.schedulers_online() * 2
 
-config :platform, Platform.Sovereignty.Infra.Persistence.Postgres.Repo,
+config :platform, Platform.Sovereignty.Infra.Postgres.Repo,
   username: "testdbadmin",
   password: "testdbadmin",
   hostname: "test_database",

@@ -1,9 +1,9 @@
 defmodule Platform.Sovereignty.WarTest do
   use ExUnit.Case, async: true
 
-  alias Platform.Sovereignty.Core.War
-  alias Platform.Sovereignty.Core.Types.BattleOutcome
-  alias Platform.Sovereignty.Core.Entities.Kingdom
+  alias Platform.Sovereignty.War
+  alias Platform.Sovereignty.Types.BattleOutcome
+  alias Platform.Sovereignty.Entities.Kingdom
 
   setup do
     :rand.seed(:exsss, {1, 2, 3})

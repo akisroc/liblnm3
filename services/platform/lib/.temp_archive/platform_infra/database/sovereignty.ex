@@ -30,11 +30,11 @@ defmodule PlatformInfra.Database.Sovereignty do
 
     Multi.new()
     |> Multi.update(:update_attacker, Changeset.change(atk_kingdom, %{
-      attack_troop: atk_final_troop,
+      atk_troop: atk_final_troop,
       fame: atk_kingdom.fame + battle_outcome.attacker_fame_modifier
     }))
     |> Multi.update(:update_defender, Changeset.change(def_kingdom, %{
-      attack_troop: def_final_troop,
+      atk_troop: def_final_troop,
       fame: def_kingdom.fame + battle_outcome.defender_fame_modifier
     }))
     |> Multi.insert(:insert_battle, %Battle{

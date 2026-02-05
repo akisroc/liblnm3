@@ -26,6 +26,8 @@ defmodule Platform.Application do
       PlatformWeb.Endpoint
     ]
 
+    children = if Mix.env() == :test, do: [Platform.TestRepo | children], else: children
+
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Platform.Supervisor]
