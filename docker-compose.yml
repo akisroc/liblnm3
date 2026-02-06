@@ -149,6 +149,8 @@ services:
       PUBLIC_ARCHIVE_URL: ${FRONTEND_PUBLIC_ARCHIVE_URL}
       PLATFORM_URL_INTERNAL: ${FRONTEND_PLATFORM_URL_INTERNAL}
       ARCHIVE_URL_INTERNAL: ${FRONTEND_ARCHIVE_URL_INTERNAL}
+    ports:
+      - "3000:3000"
     volumes:
       - ./services/frontend:/app:rw,cached,z
       - /app/node_modules
