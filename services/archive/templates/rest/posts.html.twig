@@ -1,0 +1,9 @@
+{% block body %}
+<section>
+    {% for post in posts %}
+        <article>
+            {{ post.content }}
+        </article>
+    {% endfor %}
+</section>
+{% endblock %}

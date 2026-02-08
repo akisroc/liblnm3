@@ -1,0 +1,13 @@
+{% block body %}
+<nav>
+    <ul>
+        {% for topic in topics %}
+            <li>
+                <a href="{{ path('topics.view', {id: topic.id}) }}">
+                    {{ topic.title }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+</nav>
+{% endblock %}
