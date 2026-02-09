@@ -1,7 +1,8 @@
 defmodule Platform.Sovereignty.Ports.SPI.KingshipsRepository do
-  alias Platform.Sovereignty.Entities.{Kingdom, Notable}
-
+  @moduledoc false
   alias Platform.Shared.Domain.Types, as: SharedTypes
+  alias Platform.Sovereignty.Entities.Kingdom
+  alias Platform.Sovereignty.Entities.Notable
 
   @callback register_kingdom_and_leader(
               kingdom_name :: SharedTypes.lore_name(),

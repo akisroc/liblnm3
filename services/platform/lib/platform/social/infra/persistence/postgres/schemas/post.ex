@@ -1,9 +1,12 @@
 defmodule Platform.Social.Infra.Persistence.Postgres.Schemas.Post do
+  @moduledoc false
   use Ecto.Schema
+
   import Ecto.Changeset
 
-  alias Platform.Social.Infra.Persistence.Postgres.Schemas.{User, Topic}
   alias Platform.Shared.Infra.Persistence.Postgres.Types.UUID7
+  alias Platform.Social.Infra.Persistence.Postgres.Schemas.Topic
+  alias Platform.Social.Infra.Persistence.Postgres.Schemas.User
 
   @content_max_length 10_000
 
@@ -24,10 +27,8 @@ defmodule Platform.Social.Infra.Persistence.Postgres.Schemas.Post do
     post
     |> cast(attrs, [:content, :user_id, :topic_id])
     |> validate_required([:content, :user_id, :topic_id])
-
     |> update_change(:content, &String.trim/1)
     |> validate_length(:content, min: 1, max: @content_max_length)
-
     |> assoc_constraint(:user)
     |> assoc_constraint(:topic)
   end
@@ -36,7 +37,6 @@ defmodule Platform.Social.Infra.Persistence.Postgres.Schemas.Post do
     post
     |> cast(attrs, [:content])
     |> validate_required(:content)
-
     |> update_change(:content, &String.trim/1)
     |> validate_length(:content, min: 1, max: @content_max_length)
   end

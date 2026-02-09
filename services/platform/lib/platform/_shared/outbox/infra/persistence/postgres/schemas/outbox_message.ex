@@ -1,17 +1,19 @@
 defmodule Platform.Shared.Outbox.Infra.Persistence.Postgres.Schemas.OutboxMessage do
+  @moduledoc false
   use Ecto.Schema
+
   import Ecto.Changeset
 
   @type t :: %__MODULE__{
-    message_type: String.t() | nil,
-    payload: map() | nil,
-    metadata: map() | nil,
-    consumed_by: [String.t()] | nil,
-    failed_attempts: non_neg_integer() | nil,
-    last_error: String.t() | nil,
-    status: String.t() | nil,
-    closed_at: DateTime.t()
-  }
+          message_type: String.t() | nil,
+          payload: map() | nil,
+          metadata: map() | nil,
+          consumed_by: [String.t()] | nil,
+          failed_attempts: non_neg_integer() | nil,
+          last_error: String.t() | nil,
+          status: String.t() | nil,
+          closed_at: DateTime.t()
+        }
 
   @status_pending :pending
   @status_success :success
@@ -47,13 +49,11 @@ defmodule Platform.Shared.Outbox.Infra.Persistence.Postgres.Schemas.OutboxMessag
   end
 
   def add_consumers(outbox_message, consumers) when is_list(consumers) do
-    outbox_message |> change(
-      consumed_by: Enum.uniq(outbox_message.consumed_by ++ consumers)
-    )
+    change(outbox_message, consumed_by: Enum.uniq(outbox_message.consumed_by ++ consumers))
   end
 
   def failed_attempt(outbox_message, error_reason) when is_binary(error_reason) do
-    outbox_message |> change(
+    change(outbox_message,
       failed_attempts: outbox_message.failed_attempts + 1,
       last_error: String.slice(error_reason, 0, @last_error_max_length),
       status: @status_failed
@@ -61,14 +61,14 @@ defmodule Platform.Shared.Outbox.Infra.Persistence.Postgres.Schemas.OutboxMessag
   end
 
   def mark_as_failure(outbox_message) do
-    outbox_message |> change(status: @status_failed)
+    change(outbox_message, status: @status_failed)
   end
 
   def mark_as_success(outbox_message) do
-    outbox_message |> change(status: @status_success)
+    change(outbox_message, status: @status_success)
   end
 
   def close(outbox_message) do
-    outbox_message |> change(closed_at: DateTime.utc_now())
+    change(outbox_message, closed_at: DateTime.utc_now())
   end
 end

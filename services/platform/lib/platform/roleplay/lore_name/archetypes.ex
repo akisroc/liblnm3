@@ -10,27 +10,31 @@ defmodule Platform.Roleplay.LoreName.Archetypes do
   # ---
 
   validate_archetype! = fn chain, filename ->
-    if not Map.has_key?(chain, :start) do
+    unless Map.has_key?(chain, :start) do
       raise CompileError,
         file: filename,
         description: "Lore name graph must contain key “:start”"
     end
 
-    valid_keys = Map.keys(chain) |> MapSet.new()
+    valid_keys = chain |> Map.keys() |> MapSet.new()
 
     errors =
       Enum.reduce(chain, [], fn {source, transitions}, acc ->
         Enum.reduce(transitions, acc, fn {token, _weight}, err_acc ->
           cond do
-            token == :end -> err_acc
-            MapSet.member?(valid_keys, token) -> err_acc
+            token == :end ->
+              err_acc
+
+            MapSet.member?(valid_keys, token) ->
+              err_acc
+
             true ->
               ["[#{filename}] Dead end: token “#{source}” targets undefined “#{token}”" | err_acc]
           end
         end)
       end)
 
-    if not Enum.empty?(errors) do
+    unless Enum.empty?(errors) do
       raise CompileError,
         file: filename,
         description: "\n" <> Enum.join(errors, "\n")
@@ -42,21 +46,21 @@ defmodule Platform.Roleplay.LoreName.Archetypes do
   @archetypes_dir Path.join(__DIR__, "archetypes")
   files = Path.wildcard(Path.join(@archetypes_dir, "*.exs"))
 
-  archetypes_map = for file <- files, into: %{} do
-    # Tell to compiler to recompile on change
-    @external_resource file
+  archetypes_map =
+    for file <- files, into: %{} do
+      # Tell to compiler to recompile on change
+      @external_resource file
 
-    {data, _} = Code.eval_file(file)
+      {data, _} = Code.eval_file(file)
 
-    validate_archetype!.(data, file)
+      validate_archetype!.(data, file)
 
-    archetype_key = file |> Path.basename(".exs") |> String.to_atom()
+      archetype_key = file |> Path.basename(".exs") |> String.to_atom()
 
-    {archetype_key, data}
-  end
+      {archetype_key, data}
+    end
 
   @archetypes archetypes_map
-
 
   # ---
   # RUNTIME

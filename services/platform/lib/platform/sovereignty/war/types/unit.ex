@@ -1,4 +1,5 @@
 defmodule Platform.Sovereignty.Types.Unit do
+  @moduledoc false
   alias Platform.Sovereignty.War.UnitArchetype
 
   defstruct [
@@ -10,12 +11,12 @@ defmodule Platform.Sovereignty.Types.Unit do
   ]
 
   @type t :: %__MODULE__{
-    archetype: UnitArchetype.t(),
-    count: non_neg_integer(),
-    attacker?: boolean(),
-    stroke?: boolean(),
-    stricken?: boolean()
-  }
+          archetype: UnitArchetype.t(),
+          count: non_neg_integer(),
+          attacker?: boolean(),
+          stroke?: boolean(),
+          stricken?: boolean()
+        }
 
   @spec military_strength(__MODULE__.t()) :: non_neg_integer()
   def military_strength(%__MODULE__{} = unit) do

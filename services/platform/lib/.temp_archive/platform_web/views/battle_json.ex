@@ -18,7 +18,6 @@ defmodule PlatformWeb.Views.BattleJSON do
 
   @spec show(Battle.loaded()) :: map()
   def show(battle) do
-    battle
-    |> Map.take(@public_fields)
+    Map.take(battle, @public_fields)
   end
 end

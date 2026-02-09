@@ -1,12 +1,13 @@
 defmodule Platform.IAM.Infra.Postgres.IdentitiesRepositoryAdapter do
+  @moduledoc false
   @behaviour Platform.IAM.Ports.SPI.IdentitiesRepository
 
-  @repo Application.compile_env(:platform, :iam_repo_adapter)
-
   alias Ecto.Changeset
-
-  alias Platform.IAM.Infra.Postgres.Schemas.{User, Session}
   alias Platform.IAM.Entities.User, as: IAMUser
+  alias Platform.IAM.Infra.Postgres.Schemas.Session
+  alias Platform.IAM.Infra.Postgres.Schemas.User
+
+  @repo Application.compile_env(:platform, :iam_repo_adapter)
 
   @impl true
   def get_user(token) when is_binary(token) do
@@ -26,11 +27,14 @@ defmodule Platform.IAM.Infra.Postgres.IdentitiesRepositoryAdapter do
 
   @impl true
   def register_user(nickname, email, password) do
-    result = @repo.insert(User.create(%User{}, %{
-      nickname: nickname,
-      email: email,
-      password: password
-    }))
+    result =
+      @repo.insert(
+        User.create(%User{}, %{
+          nickname: nickname,
+          email: email,
+          password: password
+        })
+      )
 
     case result do
       {:ok, user} -> {:ok, IAMUser.new(user)}
@@ -45,14 +49,16 @@ defmodule Platform.IAM.Infra.Postgres.IdentitiesRepositoryAdapter do
 
   @impl true
   def create_session(user_id, token, inet_addr, expires_at, user_agent \\ nil) do
-    session = Session.create(%Session{}, %{
-      user_id: user_id,
-      token: hash_token(token),
-      context: "session",
-      ip_address: %Postgrex.INET{address: inet_addr},
-      user_agent: user_agent,
-      expires_at: expires_at
-    })
+    session =
+      Session.create(%Session{}, %{
+        user_id: user_id,
+        token: hash_token(token),
+        context: "session",
+        ip_address: %Postgrex.INET{address: inet_addr},
+        user_agent: user_agent,
+        expires_at: expires_at
+      })
+
     @repo.insert(session)
   end
 

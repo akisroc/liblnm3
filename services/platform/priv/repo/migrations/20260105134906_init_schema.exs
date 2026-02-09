@@ -15,12 +15,11 @@ defmodule PlatformInfra.Repo.Migrations.InitSchema do
   use Ecto.Migration
 
   def up do
-    execute_sql_file Application.app_dir(:platform, "priv/repo/migrations/init_db.sql")
-
+    execute_sql_file(Application.app_dir(:platform, "priv/repo/migrations/init_db.sql"))
   end
 
   def down do
-    execute_sql_file Application.app_dir(:platform, "priv/repo/migrations/deinit_db.sql")
+    execute_sql_file(Application.app_dir(:platform, "priv/repo/migrations/deinit_db.sql"))
   end
 
   # Ecto cannot execute multiple `xxx;` SQL commands at once.

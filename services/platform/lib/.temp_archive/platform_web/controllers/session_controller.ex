@@ -6,12 +6,13 @@ defmodule PlatformWeb.SessionController do
   def login(conn, %{"email" => email, "password" => password}) do
     case Accounts.authenticate_user(email, password) do
       {:ok, user} ->
-        token = Accounts.generate_session_token(
-          user,
-          conn.remote_ip |> :inet.ntoa() |> to_string(),
-          conn |> get_req_header("user-agent") |> List.first()
-        )
-        |> Base.url_encode64(padding: false)
+        token =
+          user
+          |> Accounts.generate_session_token(
+            conn.remote_ip |> :inet.ntoa() |> to_string(),
+            conn |> get_req_header("user-agent") |> List.first()
+          )
+          |> Base.url_encode64(padding: false)
 
         conn
         |> put_resp_cookie("_platform_user_token", token,
@@ -37,7 +38,6 @@ defmodule PlatformWeb.SessionController do
         |> json(%{error: "Invalid credentials"})
     end
   end
-
 
   def logout(conn, _params) do
     conn

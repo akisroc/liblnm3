@@ -3,12 +3,14 @@ defmodule Platform.Shared.Outbox.Infra.Persistence.Postgres.Workers.OutboxCleane
   GenServer that periodically cleans up obsolete messages from outbox.
   """
 
-  import Ecto.Query
   use GenServer
-  require Logger
+
+  import Ecto.Query
 
   alias Platform.Shared.Outbox.Infra.Persistence.Postgres.Repo
   alias Platform.Shared.Outbox.Infra.Persistence.Postgres.Schemas.OutboxMessage
+
+  require Logger
 
   @retention_days 7
   @batch_size 2000
@@ -38,11 +40,12 @@ defmodule Platform.Shared.Outbox.Infra.Persistence.Postgres.Workers.OutboxCleane
   end
 
   defp cleanup do
-    threshold = DateTime.utc_now() |> DateTime.add(-@retention_days, :day)
+    threshold = DateTime.add(DateTime.utc_now(), -@retention_days, :day)
 
-    q = from msg in OutboxMessage,
-          where: msg.closed_at < ^threshold,
-          limit: @batch_size
+    q =
+      from msg in OutboxMessage,
+        where: msg.closed_at < ^threshold,
+        limit: @batch_size
 
     case Repo.delete_all(q) do
       {@batch_size, _} ->

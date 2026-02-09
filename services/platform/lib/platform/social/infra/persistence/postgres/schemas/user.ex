@@ -1,7 +1,11 @@
 defmodule Platform.Social.Infra.Persistence.Postgres.Schemas.User do
+  @moduledoc false
   use Ecto.Schema
 
-  alias Platform.Shared.Infra.Persistence.Postgres.Types.{UUID7, Nickname, Slug, Url}
+  alias Platform.Shared.Infra.Persistence.Postgres.Types.Nickname
+  alias Platform.Shared.Infra.Persistence.Postgres.Types.Slug
+  alias Platform.Shared.Infra.Persistence.Postgres.Types.Url
+  alias Platform.Shared.Infra.Persistence.Postgres.Types.UUID7
 
   @role_user :user
   @role_curator :curator

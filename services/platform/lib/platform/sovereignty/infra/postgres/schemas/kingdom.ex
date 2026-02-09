@@ -1,32 +1,37 @@
 defmodule Platform.Sovereignty.Infra.Postgres.Schemas.Kingdom do
+  @moduledoc false
   use Ecto.Schema
+
   import Ecto.Changeset
 
-  alias Platform.Sovereignty.Infra.Postgres.Schemas.{Player, Notable}
-  alias Platform.Sovereignty.Infra.Postgres.Types.Troop
-  alias Platform.Shared.Infra.Persistence.Postgres.Types.{UUID7, LoreName, Slug}
   alias Platform.Shared.Infra.Persistence.Postgres.Types
+  alias Platform.Shared.Infra.Persistence.Postgres.Types.LoreName
+  alias Platform.Shared.Infra.Persistence.Postgres.Types.Slug
+  alias Platform.Shared.Infra.Persistence.Postgres.Types.UUID7
+  alias Platform.Sovereignty.Infra.Postgres.Schemas.Notable
+  alias Platform.Sovereignty.Infra.Postgres.Schemas.Player
+  alias Platform.Sovereignty.Infra.Postgres.Types.Troop
 
   @name_max_length 60
   @slug_max_length 120
 
   @type t :: %__MODULE__{
-    id: UUID7.t() | nil,
-    player_id: UUID7.t() | nil,
-    leader_id: UUID7.t() | nil,
-    name: LoreName.t() | nil,
-    slug: Slug.t() | nil,
-    fame: Types.fame() | nil,
-    total_fame: Types.fame() | nil,
-    def_troop: [non_neg_integer()] | nil,
-    atk_troop: [non_neg_integer()] | nil,
-    active?: boolean() | nil,
-    removed?: boolean() | nil,
-    inserted_at: DateTime.t() | nil,
-    updated_at: DateTime.t() | nil,
-    player: Ecto.Association.NotLoaded.t() | Player.t(),
-    leader: Ecto.Association.NotLoaded.t() | Notable.t()
-  }
+          id: UUID7.t() | nil,
+          player_id: UUID7.t() | nil,
+          leader_id: UUID7.t() | nil,
+          name: LoreName.t() | nil,
+          slug: Slug.t() | nil,
+          fame: Types.fame() | nil,
+          total_fame: Types.fame() | nil,
+          def_troop: [non_neg_integer()] | nil,
+          atk_troop: [non_neg_integer()] | nil,
+          active?: boolean() | nil,
+          removed?: boolean() | nil,
+          inserted_at: DateTime.t() | nil,
+          updated_at: DateTime.t() | nil,
+          player: Ecto.Association.NotLoaded.t() | Player.t(),
+          leader: Ecto.Association.NotLoaded.t() | Notable.t()
+        }
 
   @schema_prefix "sovereignty"
   @primary_key {:id, UUID7, autogenerate: true}
@@ -52,25 +57,20 @@ defmodule Platform.Sovereignty.Infra.Postgres.Schemas.Kingdom do
       foreign_key: :leader_id,
       references: :id
 
-    has_many :notables, Notable,
-      foreign_key: :kingdom_id
+    has_many :notables, Notable, foreign_key: :kingdom_id
   end
 
   def register(kingdom, attrs) do
     kingdom
     |> cast(attrs, [:id, :player_id, :leader_id, :name, :active?])
     |> validate_required([:player_id, :leader_id, :name])
-
     |> UUID7.ensure_generation()
-
     |> update_change(:name, &String.trim/1)
     |> validate_length(:name, min: 1, max: @name_max_length)
     |> unique_constraint(:name, name: :idx_kingdoms_name_not_removed)
-
     |> Slug.generate(:name)
     |> validate_length(:slug, min: 1, max: @slug_max_length)
     |> unique_constraint(:slug, name: :kingdoms_slug_key)
-
     |> assoc_constraint(:player)
     |> assoc_constraint(:leader)
     |> foreign_key_constraint(:leader_id, name: :fk_leader_player_ownership)
@@ -80,7 +80,6 @@ defmodule Platform.Sovereignty.Infra.Postgres.Schemas.Kingdom do
     kingdom
     |> cast(attrs, [:name])
     |> validate_required(:name)
-
     |> update_change(:name, &String.trim/1)
     |> validate_length(:name, min: 1, max: @name_max_length)
     |> unique_constraint(:name, name: :idx_protagonists_name_not_removed)
@@ -102,14 +101,12 @@ defmodule Platform.Sovereignty.Infra.Postgres.Schemas.Kingdom do
     kingdom
     |> cast(attrs, [:leader_id])
     |> validate_required(:leader_id)
-
     |> assoc_constraint(:leader)
   end
 
   def update_troops(kingdom, attrs) do
     kingdom
     |> cast(attrs, [:def_troop, :atk_troop])
-
     |> check_constraint(
       :def_troop,
       name: :chk_kingdoms_def_troop_integrity,
@@ -127,5 +124,4 @@ defmodule Platform.Sovereignty.Infra.Postgres.Schemas.Kingdom do
     |> change()
     |> put_change(:removed?, true)
   end
-
 end

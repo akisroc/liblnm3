@@ -1,9 +1,14 @@
 defmodule Platform.Social.Infra.Persistence.Postgres.Schemas.Topic do
+  @moduledoc false
   use Ecto.Schema
+
   import Ecto.Changeset
 
-  alias Platform.Social.Infra.Persistence.Postgres.Schemas.{User, Board, Post}
-  alias Platform.Shared.Infra.Persistence.Postgres.Types.{UUID7, Slug}
+  alias Platform.Shared.Infra.Persistence.Postgres.Types.Slug
+  alias Platform.Shared.Infra.Persistence.Postgres.Types.UUID7
+  alias Platform.Social.Infra.Persistence.Postgres.Schemas.Board
+  alias Platform.Social.Infra.Persistence.Postgres.Schemas.Post
+  alias Platform.Social.Infra.Persistence.Postgres.Schemas.User
 
   @title_max_length 60
   @slug_max_length 120
@@ -30,15 +35,12 @@ defmodule Platform.Social.Infra.Persistence.Postgres.Schemas.Topic do
     topic
     |> cast(attrs, [:title, :user_id, :board_id])
     |> validate_required([:title, :user_id, :board_id])
-
     |> update_change(:title, &String.trim/1)
     |> validate_length(:title, min: 1, max: @title_max_length)
-
     |> UUID7.ensure_generation()
     |> Slug.generate(:title)
     |> validate_length(:slug, min: 1, max: @slug_max_length)
     |> unique_constraint(:slug, name: :topics_slug_key)
-
     |> assoc_constraint(:user)
     |> assoc_constraint(:board)
   end
@@ -47,19 +49,16 @@ defmodule Platform.Social.Infra.Persistence.Postgres.Schemas.Topic do
     topic
     |> cast(attrs, [:title, :board_id])
     |> validate_required(:title, :board_id)
-
     |> update_change(:title, &String.trim/1)
     |> validate_length(:title, min: 1, max: @title_max_length)
-
     |> assoc_constraint(:board)
   end
 
   def archive(topic) do
-    topic |> change(is_archived: true)
+    change(topic, is_archived: true)
   end
 
   def soft_remove(topic) do
-    topic |> change(is_removed: true)
+    change(topic, is_removed: true)
   end
-
 end

@@ -2,9 +2,10 @@ defmodule PlatformInfra.Database.Workers.SessionCleaner do
   @moduledoc """
   GenServer that periodically cleans up expired sessions from the database.
   """
+  use GenServer
+
   alias PlatformInfra.Database.Accounts
 
-  use GenServer
   require Logger
 
   @cleanup_interval :timer.hours(12)

@@ -1,9 +1,15 @@
 defmodule Platform.IAM.Infra.Postgres.Schemas.User do
+  @moduledoc false
   use Ecto.Schema
+
   import Ecto.Changeset
 
-  alias Platform.Shared.Infra.Persistence.Postgres.Types.{UUID7, Nickname, Slug, Url}
-  alias Platform.IAM.Infra.Postgres.Types.{Email, Password}
+  alias Platform.IAM.Infra.Postgres.Types.Email
+  alias Platform.IAM.Infra.Postgres.Types.Password
+  alias Platform.Shared.Infra.Persistence.Postgres.Types.Nickname
+  alias Platform.Shared.Infra.Persistence.Postgres.Types.Slug
+  alias Platform.Shared.Infra.Persistence.Postgres.Types.Url
+  alias Platform.Shared.Infra.Persistence.Postgres.Types.UUID7
 
   @role_user :user
   @role_curator :curator
@@ -29,7 +35,8 @@ defmodule Platform.IAM.Infra.Postgres.Schemas.User do
   schema "users" do
     field :nickname, Nickname
     field :email, Email
-    field :password, Password, redact: true # Hides password in logs
+    # Hides password in logs
+    field :password, Password, redact: true
     field :profile_picture, Url
     field :slug, Slug
     field :roles, {:array, Ecto.Enum}, values: @roles
@@ -44,22 +51,16 @@ defmodule Platform.IAM.Infra.Postgres.Schemas.User do
     user
     |> cast(attrs, [:nickname, :email, :password])
     |> validate_required([:nickname, :email, :password])
-
     |> validate_length(:nickname, min: @nickname_min_length, max: @nickname_max_length)
-
     |> validate_length(:email, min: @email_min_length, max: @email_max_length)
-
     |> UUID7.ensure_generation()
     |> Slug.generate(:nickname)
     |> validate_length(:slug, min: 1, max: @slug_max_length)
     |> unique_constraint(:slug, name: :users_slug_key)
-
     |> validate_subset(:roles, @roles)
     |> validate_inclusion(:platform_theme, @themes)
-
     |> validate_length(:password, min: @password_min_length, max: @password_max_length)
     |> hash_password()
-
     |> unique_constraint(:nickname, name: :idx_users_nickname_not_removed)
     |> unique_constraint(:email, name: :idx_users_email_not_removed)
     |> unique_constraint(:slug, name: :users_slug_key)
@@ -68,14 +69,11 @@ defmodule Platform.IAM.Infra.Postgres.Schemas.User do
   def update(user, attrs) do
     user
     |> cast(attrs, [:nickname, :email, :profile_picture, :password, :platform_theme])
-
     |> update_change(:nickname, &String.trim/1)
     |> validate_length(:nickname, min: 1, max: @nickname_max_length)
-
     |> update_change(:email, &String.trim/1)
     |> update_change(:email, &String.downcase/1)
     |> validate_length(:email, min: 1, max: @email_max_length)
-
     |> unique_constraint(:nickname, name: :idx_users_nickname_not_removed)
     |> unique_constraint(:email, name: :idx_users_email_not_removed)
   end
@@ -138,28 +136,35 @@ defmodule Platform.IAM.Infra.Postgres.Schemas.User do
   end
 
   # Todo: Could (should) be in global configs
-  defp argon2_config() do
+  defp argon2_config do
     env = Application.get_env(:platform, :env, :prod)
 
     case env do
-      :test -> [
-        t_cost: 1,
-        m_cost: 6,
-        parallelism: 1,
-        argon2_type: 2
-      ]
-      :dev -> [
-        t_cost: 2,
-        m_cost: 12,
-        parallelism: System.schedulers_online(),
-        argon2_type: 2
-      ]
-      :prod -> [
-        t_cost: 4,
-        m_cost: 18,  # 2^18 KiB => 256MiB
-        parallelism: 2,
-        argon2_type: 2  # Argon2id
-      ]
+      :test ->
+        [
+          t_cost: 1,
+          m_cost: 6,
+          parallelism: 1,
+          argon2_type: 2
+        ]
+
+      :dev ->
+        [
+          t_cost: 2,
+          m_cost: 12,
+          parallelism: System.schedulers_online(),
+          argon2_type: 2
+        ]
+
+      :prod ->
+        [
+          t_cost: 4,
+          # 2^18 KiB => 256MiB
+          m_cost: 18,
+          parallelism: 2,
+          # Argon2id
+          argon2_type: 2
+        ]
     end
   end
 end

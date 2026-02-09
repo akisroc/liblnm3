@@ -1,4 +1,5 @@
 defmodule Platform.IAM.Entities.Session do
+  @moduledoc false
   alias Platform.Shared.Domain.Types, as: SharedTypes
 
   @admin_duration 1
@@ -28,6 +29,6 @@ defmodule Platform.IAM.Entities.Session do
 
   def get_expiration_date(%{roles: roles}) do
     days = if Enum.member?(roles, :admin), do: @admin_duration, else: @user_duration
-    DateTime.utc_now() |> DateTime.add(days, :day)
+    DateTime.add(DateTime.utc_now(), days, :day)
   end
 end

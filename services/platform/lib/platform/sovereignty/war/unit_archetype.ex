@@ -1,5 +1,4 @@
 defmodule Platform.Sovereignty.War.UnitArchetype do
-
   @moduledoc """
   Defines the static attributes for unit archetypes.
 
@@ -71,15 +70,15 @@ defmodule Platform.Sovereignty.War.UnitArchetype do
   defstruct @fields
 
   @type t :: %__MODULE__{
-    key: atom(),
-    power: float(),
-    defense: float(),
-    speed: float(),
-    kill_rate: float(),
-    fame_drain_rate: float(),
-    distance?: boolean(),
-    fame_cost: float()
-  }
+          key: atom(),
+          power: float(),
+          defense: float(),
+          speed: float(),
+          kill_rate: float(),
+          fame_drain_rate: float(),
+          distance?: boolean(),
+          fame_cost: float()
+        }
 
   @spec get(non_neg_integer() | atom()) :: __MODULE__.t() | {:error, String.t()}
   def get(1), do: b1()
@@ -98,6 +97,7 @@ defmodule Platform.Sovereignty.War.UnitArchetype do
   def get(:b7), do: b7()
   def get(8), do: b8()
   def get(:b8), do: b8()
+
   def get(wrong_id) do
     {:error, "Wrong identifier `#{wrong_id}` for unit archetype"}
   end

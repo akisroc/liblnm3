@@ -20,14 +20,14 @@ defmodule PlatformWeb.ConnCase do
   using do
     quote do
       # The default endpoint for testing
-      @endpoint PlatformWeb.Endpoint
-
       use PlatformWeb, :verified_routes
 
       # Import conveniences for testing with connections
-      import Plug.Conn
       import Phoenix.ConnTest
       import PlatformWeb.ConnCase
+      import Plug.Conn
+
+      @endpoint PlatformWeb.Endpoint
     end
   end
 

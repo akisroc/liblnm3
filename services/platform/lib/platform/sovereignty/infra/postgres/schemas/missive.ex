@@ -1,9 +1,11 @@
 defmodule Platform.Sovereignty.Infra.Postgres.Schemas.Missive do
+  @moduledoc false
   use Ecto.Schema
+
   import Ecto.Changeset
 
-  alias Platform.Sovereignty.Infra.Postgres.Schemas.Kingdom
   alias Platform.Shared.Infra.Persistence.Postgres.Types.UUID7
+  alias Platform.Sovereignty.Infra.Postgres.Schemas.Kingdom
 
   @content_max_length 10_000
 
@@ -25,13 +27,10 @@ defmodule Platform.Sovereignty.Infra.Postgres.Schemas.Missive do
     missive
     |> cast(attrs, [:content, :sender_id, :receiver_id])
     |> validate_required([:content, :sender_id, :receiver_id])
-
     |> update_change(:content, &String.trim/1)
     |> validate_length(:content, min: 1, max: @content_max_length)
-
     |> assoc_constraint(:sender)
     |> assoc_constraint(:receiver)
-
     |> check_constraint(
       :receiver,
       name: :chk_missives_sender_is_not_receiver,

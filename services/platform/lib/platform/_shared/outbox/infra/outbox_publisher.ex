@@ -1,8 +1,9 @@
 defmodule Platform.Shared.Outbox.Infra.OutboxPublisher do
-  require Logger
+  @moduledoc false
   alias Phoenix.PubSub
-
   alias Platform.Shared.Outbox.Infra.Persistence.Postgres.Schemas.OutboxMessage
+
+  require Logger
 
   # Todo: configure that
   @pubsub_name Platform.PubSub

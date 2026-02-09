@@ -1,5 +1,7 @@
 defmodule Platform.IAM.Infra.Postgres.Schemas.Session do
+  @moduledoc false
   use Ecto.Schema
+
   import Ecto.Changeset
 
   alias Platform.IAM.Infra.Postgres.Schemas.User

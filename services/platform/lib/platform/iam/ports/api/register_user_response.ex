@@ -1,5 +1,5 @@
 defmodule Platform.IAM.Ports.API.RegisterUserResponse do
-
+  @moduledoc false
   alias Platform.IAM.Entities.User
 
   defstruct [
@@ -8,9 +8,9 @@ defmodule Platform.IAM.Ports.API.RegisterUserResponse do
   ]
 
   @type t :: %__MODULE__{
-    user: User.t(),
-    errors: [String.t()]
-  }
+          user: User.t(),
+          errors: [String.t()]
+        }
 
   @callback present(__MODULE__.t()) :: map()
 end

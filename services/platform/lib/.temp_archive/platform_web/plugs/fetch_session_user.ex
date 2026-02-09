@@ -1,4 +1,5 @@
 defmodule PlatformWeb.Plugs.FetchSessionUser do
+  @moduledoc false
   import Plug.Conn
 
   alias PlatformInfra.Database.Accounts

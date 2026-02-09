@@ -1,9 +1,11 @@
 defmodule Platform.Social.Infra.Persistence.Postgres.Schemas.Shout do
+  @moduledoc false
   use Ecto.Schema
+
   import Ecto.Changeset
 
-  alias Platform.Social.Infra.Persistence.Postgres.Schemas.User
   alias Platform.Shared.Infra.Persistence.Postgres.Types.UUID7
+  alias Platform.Social.Infra.Persistence.Postgres.Schemas.User
 
   @content_max_length 500
 
@@ -23,10 +25,8 @@ defmodule Platform.Social.Infra.Persistence.Postgres.Schemas.Shout do
     shout
     |> cast(attrs, [:content, :user_id])
     |> validate_required([:content, :user_id])
-
     |> update_change(:content, &String.trim/1)
     |> validate_length(:content, min: 1, max: @content_max_length)
-
     |> assoc_constraint(:user)
   end
 end

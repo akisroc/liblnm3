@@ -53,14 +53,15 @@ config :platform, PlatformWeb.Endpoint,
 config :platform, dev_routes: true
 
 # CORS origins for development
-config :platform, cors_origins: [
-  "http://localhost",
-  "http://www.localhost",
-  "http://Platform.localhost",
-  "http://localhost:3000",
-  ~r/^http:\/\/localhost(:\d+)?$/,
-  ~r/^http:\/\/.*\.localhost(:\d+)?$/
-]
+config :platform,
+  cors_origins: [
+    "http://localhost",
+    "http://www.localhost",
+    "http://Platform.localhost",
+    "http://localhost:3000",
+    ~r/^http:\/\/localhost(:\d+)?$/,
+    ~r/^http:\/\/.*\.localhost(:\d+)?$/
+  ]
 
 # Do not include metadata nor timestamps in development logs
 config :logger, :default_formatter, format: "[$level] $message\n"

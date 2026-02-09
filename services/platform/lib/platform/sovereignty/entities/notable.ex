@@ -1,6 +1,8 @@
 defmodule Platform.Sovereignty.Entities.Notable do
-  alias Platform.Sovereignty.Entities.{Kingdom, Player}
+  @moduledoc false
   alias Platform.Shared.Domain.Types, as: SharedTypes
+  alias Platform.Sovereignty.Entities.Kingdom
+  alias Platform.Sovereignty.Entities.Player
 
   defstruct [
     :id,
@@ -13,14 +15,14 @@ defmodule Platform.Sovereignty.Entities.Notable do
   ]
 
   @type t :: %__MODULE__{
-    id: SharedTypes.id(),
-    name: String.t(),
-    fame: float(),
-    kingdom_id: SharedTypes.id(),
-    kingdom: Kingdom.t() | nil,
-    player_id: SharedTypes.id(),
-    player: Player.t() | nil
-  }
+          id: SharedTypes.id(),
+          name: String.t(),
+          fame: float(),
+          kingdom_id: SharedTypes.id(),
+          kingdom: Kingdom.t() | nil,
+          player_id: SharedTypes.id(),
+          player: Player.t() | nil
+        }
 
   @spec new(map()) :: __MODULE__.t()
   def new(data) do

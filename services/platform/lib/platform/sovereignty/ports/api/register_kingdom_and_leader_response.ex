@@ -1,5 +1,7 @@
 defmodule Platform.Sovereignty.Ports.API.RegisterKingdomAndLeaderResponse do
-  alias Platform.Sovereignty.Entities.{Kingdom, Notable}
+  @moduledoc false
+  alias Platform.Sovereignty.Entities.Kingdom
+  alias Platform.Sovereignty.Entities.Notable
 
   defstruct [
     :kingdom,
@@ -8,10 +10,10 @@ defmodule Platform.Sovereignty.Ports.API.RegisterKingdomAndLeaderResponse do
   ]
 
   @type t :: %__MODULE__{
-    kingdom: Kingdom.t(),
-    leader: Notable.t(),
-    errors: [String.t()]
-  }
+          kingdom: Kingdom.t(),
+          leader: Notable.t(),
+          errors: [String.t()]
+        }
 
   @callback present(__MODULE__.t()) :: map()
 end

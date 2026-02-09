@@ -1,12 +1,14 @@
 defmodule PlatformInfra.Database.Sovereignty do
-  alias Ecto.{Changeset, Multi}
-
-  alias PlatformInfra.Repo
-  alias PlatformInfra.Database.Types.PrimaryKey
-  alias PlatformInfra.Database.Schemas.Kingdom
-
+  @moduledoc false
+  alias Ecto.Changeset
+  alias Ecto.Multi
+  alias Platform.Sovereignty.War.Types.BattleLogEntry
+  alias Platform.Sovereignty.War.Types.BattleOutcome
+  alias Platform.Sovereignty.War.Types.Troop
   alias PlatformInfra.Database.Schemas.Battle
-  alias Platform.Sovereignty.War.Types.{BattleOutcome, BattleLogEntry, Troop}
+  alias PlatformInfra.Database.Schemas.Kingdom
+  alias PlatformInfra.Database.Types.PrimaryKey
+  alias PlatformInfra.Repo
 
   @spec get_kingdom(PrimaryKey.t()) :: {:ok, Kingdom.t()} | {:error, :not_found}
   def get_kingdom(id) do
@@ -29,14 +31,20 @@ defmodule PlatformInfra.Database.Sovereignty do
     log = Enum.map(battle_outcome.log, &BattleLogEntry.to_raw/1)
 
     Multi.new()
-    |> Multi.update(:update_attacker, Changeset.change(atk_kingdom, %{
-      atk_troop: atk_final_troop,
-      fame: atk_kingdom.fame + battle_outcome.attacker_fame_modifier
-    }))
-    |> Multi.update(:update_defender, Changeset.change(def_kingdom, %{
-      atk_troop: def_final_troop,
-      fame: def_kingdom.fame + battle_outcome.defender_fame_modifier
-    }))
+    |> Multi.update(
+      :update_attacker,
+      Changeset.change(atk_kingdom, %{
+        atk_troop: atk_final_troop,
+        fame: atk_kingdom.fame + battle_outcome.attacker_fame_modifier
+      })
+    )
+    |> Multi.update(
+      :update_defender,
+      Changeset.change(def_kingdom, %{
+        atk_troop: def_final_troop,
+        fame: def_kingdom.fame + battle_outcome.defender_fame_modifier
+      })
+    )
     |> Multi.insert(:insert_battle, %Battle{
       attacker_kingdom_id: atk_kingdom.id,
       defender_kingdom_id: def_kingdom.id,
@@ -53,10 +61,12 @@ defmodule PlatformInfra.Database.Sovereignty do
     |> handle_transaction_result()
   end
 
-  @spec handle_transaction_result({:ok | Battle.loaded()} | {:error, any(), any(), any()}) :: {:ok, Battle.loaded()} | {:error, any()}
+  @spec handle_transaction_result({:ok | Battle.loaded()} | {:error, any(), any(), any()}) ::
+          {:ok, Battle.loaded()} | {:error, any()}
   defp handle_transaction_result({:ok, %{insert_battle: battle}}) do
     {:ok, battle}
   end
+
   defp handle_transaction_result({:error, _step, reason, _changes}) do
     {:error, reason}
   end

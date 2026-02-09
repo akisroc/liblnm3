@@ -1,6 +1,7 @@
 defmodule Platform.Sovereignty.Types.BattleOutcome do
-
-  alias Platform.Sovereignty.Types.{Troop, BattleLogEntry}
+  @moduledoc false
+  alias Platform.Sovereignty.Types.BattleLogEntry
+  alias Platform.Sovereignty.Types.Troop
 
   defstruct [
     :atk_initial_troop,
@@ -16,15 +17,15 @@ defmodule Platform.Sovereignty.Types.BattleOutcome do
   ]
 
   @type t :: %__MODULE__{
-    atk_initial_troop: Troop.t(),
-    def_initial_troop: Troop.t(),
-    atk_final_troop: Troop.t(),
-    def_final_troop: Troop.t(),
-    log: [BattleLogEntry.t()],
-    atk_wins?: boolean(),
-    atk_initial_fame: float(),
-    def_initial_fame: float(),
-    atk_fame_modifier: float(),
-    def_fame_modifier: float()
-  }
+          atk_initial_troop: Troop.t(),
+          def_initial_troop: Troop.t(),
+          atk_final_troop: Troop.t(),
+          def_final_troop: Troop.t(),
+          log: [BattleLogEntry.t()],
+          atk_wins?: boolean(),
+          atk_initial_fame: float(),
+          def_initial_fame: float(),
+          atk_fame_modifier: float(),
+          def_fame_modifier: float()
+        }
 end

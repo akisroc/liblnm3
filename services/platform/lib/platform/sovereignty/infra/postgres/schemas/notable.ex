@@ -1,9 +1,15 @@
 defmodule Platform.Sovereignty.Infra.Postgres.Schemas.Notable do
+  @moduledoc false
   use Ecto.Schema
+
   import Ecto.Changeset
 
-  alias Platform.Shared.Infra.Persistence.Postgres.Types.{UUID7, LoreName, Slug, Url}
-  alias Platform.Sovereignty.Infra.Postgres.Schemas.{Player, Kingdom}
+  alias Platform.Shared.Infra.Persistence.Postgres.Types.LoreName
+  alias Platform.Shared.Infra.Persistence.Postgres.Types.Slug
+  alias Platform.Shared.Infra.Persistence.Postgres.Types.Url
+  alias Platform.Shared.Infra.Persistence.Postgres.Types.UUID7
+  alias Platform.Sovereignty.Infra.Postgres.Schemas.Kingdom
+  alias Platform.Sovereignty.Infra.Postgres.Schemas.Player
 
   @name_max_length 30
   @slug_max_length 60
@@ -36,16 +42,13 @@ defmodule Platform.Sovereignty.Infra.Postgres.Schemas.Notable do
     notable
     |> cast(attrs, [:id, :player_id, :kingdom_id, :name])
     |> validate_required([:player_id, :name])
-
     |> update_change(:name, &String.trim/1)
     |> validate_length(:name, min: 1, max: @name_max_length)
     |> unique_constraint(:name, name: :idx_protagonists_name_not_removed)
-
     |> UUID7.ensure_generation()
     |> Slug.generate(:name)
     |> validate_length(:slug, min: 1, max: @slug_max_length)
     |> unique_constraint(:slug, name: :protagonists_slug_key)
-
     |> assoc_constraint(:player)
     |> assoc_constraint(:kingdom)
   end
@@ -54,7 +57,6 @@ defmodule Platform.Sovereignty.Infra.Postgres.Schemas.Notable do
     notable
     |> cast(attrs, [:kingdom_id])
     |> validate_required(:kingdom_id)
-
     |> assoc_constraint(:kingdom)
     |> foreign_key_constraint(
       :kingdom_id,

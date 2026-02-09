@@ -1,4 +1,5 @@
 defmodule Platform.IAM.Infra.Postgres.Types.Password do
+  @moduledoc false
   use Ecto.Type
 
   @type t :: String.t()
@@ -7,9 +8,11 @@ defmodule Platform.IAM.Infra.Postgres.Types.Password do
 
   @spec cast(any()) :: {:ok, String.t() | nil} | {:error, Keyword.t()}
   def cast(nil), do: {:ok, nil}
+
   def cast(value) when is_binary(value) do
     {:ok, value}
   end
+
   def cast(_), do: {:error, [message: "Password must be a string"]}
 
   def load(data) when is_binary(data), do: {:ok, data}

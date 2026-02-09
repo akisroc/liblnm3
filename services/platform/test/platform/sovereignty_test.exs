@@ -9,10 +9,9 @@ defmodule Platform.SovereigntyTest do
   end
 
   describe "register_kingdom_and_leader/3" do
-
     test "inserts in database" do
       for _ <- 1..5 do
-        suffix = :crypto.strong_rand_bytes(4) |> Base.encode16(case: :lower)
+        suffix = 4 |> :crypto.strong_rand_bytes() |> Base.encode16(case: :lower)
 
         nickname = "Harkka#{suffix}"
         email = "lnm#{suffix}@lnm.lnm"
@@ -21,9 +20,13 @@ defmodule Platform.SovereigntyTest do
         password = "123412341234"
 
         %{user: %{id: player_id}} = IAM.register_user(nickname, email, password)
-        %{kingdom: kingdom, leader: leader, errors: errors} = Sovereignty.register_kingdom_and_leader(
-          kingdom_name, leader_name, player_id
-        )
+
+        %{kingdom: kingdom, leader: leader, errors: errors} =
+          Sovereignty.register_kingdom_and_leader(
+            kingdom_name,
+            leader_name,
+            player_id
+          )
 
         assert errors == []
 

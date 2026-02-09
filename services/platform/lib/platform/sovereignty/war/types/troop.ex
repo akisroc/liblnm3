@@ -1,4 +1,5 @@
 defmodule Platform.Sovereignty.Types.Troop do
+  @moduledoc false
   alias Platform.Sovereignty.Types.Unit
   alias Platform.Sovereignty.War.UnitArchetype
 
@@ -8,9 +9,9 @@ defmodule Platform.Sovereignty.Types.Troop do
   ]
 
   @type t :: %__MODULE__{
-    attacker?: boolean(),
-    units: [Unit.t()]
-  }
+          attacker?: boolean(),
+          units: [Unit.t()]
+        }
 
   @doc """
   `units` parameter must be a list a 8 positive integers.
@@ -23,28 +24,30 @@ defmodule Platform.Sovereignty.Types.Troop do
         :ok,
         %__MODULE__{
           attacker?: attacker?,
-          units: units
-          |> Stream.with_index(1)
-          |> Enum.map(fn {unit_count, identifier} ->
-            %Unit{
-              archetype: UnitArchetype.get(identifier),
-              count: unit_count,
-              attacker?: attacker?,
-              stroke?: false,
-              stricken?: false
-            }
-          end)
+          units:
+            units
+            |> Stream.with_index(1)
+            |> Enum.map(fn {unit_count, identifier} ->
+              %Unit{
+                archetype: UnitArchetype.get(identifier),
+                count: unit_count,
+                attacker?: attacker?,
+                stroke?: false,
+                stricken?: false
+              }
+            end)
         }
       }
     else
       {:error, :invalid_troop_format}
     end
   end
+
   def from_raw(_, _), do: {:error, :invalid_troop_format}
 
   @spec to_raw(__MODULE__.t()) :: [non_neg_integer()]
   def to_raw(%__MODULE__{units: units}) do
-    units |> Enum.map(fn %{count: count} -> count end)
+    Enum.map(units, fn %{count: count} -> count end)
   end
 
   # Merge two raw lists of units into one flat list, having them shuffled
@@ -57,6 +60,7 @@ defmodule Platform.Sovereignty.Types.Troop do
   def format_for_fight(%__MODULE__{units: atk_units}, %__MODULE__{units: def_units}) do
     format_for_fight(atk_units, def_units)
   end
+
   def format_for_fight(atk_units, def_units) do
     (atk_units ++ def_units)
     # Naturally randomize striking order if speed equality
@@ -66,14 +70,13 @@ defmodule Platform.Sovereignty.Types.Troop do
 
   @spec military_strength(__MODULE__.t() | [Unit.t()]) :: non_neg_integer()
   def military_strength(%__MODULE__{units: units}), do: military_strength(units)
+
   def military_strength(units) when is_list(units) do
-    units |> Enum.reduce(0.0, fn unit, acc ->
-      acc + Unit.military_strength(unit)
-    end)
+    Enum.reduce(units, 0.0, fn unit, acc -> acc + Unit.military_strength(unit) end)
   end
 
   @spec count(__MODULE__.t()) :: non_neg_integer()
   def count(%__MODULE__{units: units}) do
-    units |> Enum.reduce(0, fn unit, acc -> acc + unit.count end)
+    Enum.reduce(units, 0, fn unit, acc -> acc + unit.count end)
   end
 end

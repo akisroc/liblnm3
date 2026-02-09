@@ -16,7 +16,6 @@
 #     def_player_id: Types.id()
 #   }
 
-
 #   # @spec execute(__MODULE__.t()) :: {:ok, BattleOutcome.t()} | {:error, any()}
 #   defimpl Platform.Shared.Protocols.Command do
 #     def execute(%{atk_player_id: atk_pid, def_player_id: def_pid}) do

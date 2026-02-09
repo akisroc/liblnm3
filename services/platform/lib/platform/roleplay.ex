@@ -1,8 +1,9 @@
 defmodule Platform.Roleplay do
-  @lore_repository_adapter Application.compile_env(:platform, :lore_repository_adapter)
-
+  @moduledoc false
   alias Platform.Roleplay.LoreName
   alias Platform.Roleplay.Ports.API.GenerateLoreNameResponse
+
+  @lore_repository_adapter Application.compile_env(:platform, :lore_repository_adapter)
 
   @doc """
   Generate a random lore name from one of the given archetypes and
@@ -30,21 +31,24 @@ defmodule Platform.Roleplay do
   # probability is not zero though, since some archetypes can be
   # narrow on short rolls. (Ex: `:swamp` archetype will often produce
   # “Vess”, “Zaj”, etc.)
-  @spec generate_lore_name(
-    %{archetypes: [atom()],
-    min_len: non_neg_integer(),
-    max_len: non_neg_integer()}
-  ) :: GenerateLoreNameResponse.t()
+  @spec generate_lore_name(%{
+          archetypes: [atom()],
+          min_len: non_neg_integer(),
+          max_len: non_neg_integer()
+        }) :: GenerateLoreNameResponse.t()
 
   def generate_lore_name(%{archetypes: []} = query) do
-     generate_lore_name(%{query | archetypes: LoreName.Archetypes.keys()})
+    generate_lore_name(%{query | archetypes: LoreName.Archetypes.keys()})
   end
 
   def generate_lore_name(%{archetypes: archetypes, min_len: min_len, max_len: max_len} = query) do
-    candidates = for _ <- 1..10 do
-      LoreName.generate(archetypes, min_len, max_len)
-    end
-    |> @lore_repository_adapter.reject_existing_lore_names()
+    for_result =
+      for _ <- 1..10 do
+        LoreName.generate(archetypes, min_len, max_len)
+      end
+
+    candidates =
+      @lore_repository_adapter.reject_existing_lore_names(for_result)
 
     case candidates do
       [head | _] -> %GenerateLoreNameResponse{name: head}

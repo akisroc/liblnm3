@@ -1,4 +1,5 @@
 defmodule Platform.IAM.Entities.User do
+  @moduledoc false
   alias Platform.Shared.Domain.Types, as: SharedTypes
 
   defstruct [

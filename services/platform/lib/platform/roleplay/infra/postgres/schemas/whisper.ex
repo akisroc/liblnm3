@@ -1,5 +1,7 @@
 defmodule Platform.Roleplay.Infra.Postgres.Schemas.Whisper do
+  @moduledoc false
   use Ecto.Schema
+
   import Ecto.Changeset
 
   alias Platform.Roleplay.Infra.Postgres.Schemas.Protagonist
@@ -23,13 +25,10 @@ defmodule Platform.Roleplay.Infra.Postgres.Schemas.Whisper do
     whisper
     |> cast(attrs, [:content, :sender_id, :receiver_id])
     |> validate_required([:content, :sender_id, :receiver_id])
-
     |> update_change(:content, &String.trim/1)
     |> validate_length(:content, min: 1, max: 500)
-
     |> assoc_constraint(:sender)
     |> assoc_constraint(:receiver)
-
     |> check_constraint(
       :receiver,
       name: :chk_whispers_sender_is_not_receiver,
@@ -45,7 +44,7 @@ defmodule Platform.Roleplay.Infra.Postgres.Schemas.Whisper do
   end
 
   def read(whisper) do
-    whisper |> change(is_read: true)
+    change(whisper, is_read: true)
   end
 
   defp validate_mutable_content(changeset) do

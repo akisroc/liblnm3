@@ -53,21 +53,25 @@ if config_env() == :prod do
     # For machines with several cores, consider starting multiple pools of `pool_size`
     # pool_count: 4,
     socket_options: maybe_ipv6
+
   config :platform, Platform.IAM.Infra.Postgres.Repo,
     ssl: true,
     url: database_url,
     pool_size: String.to_integer(System.get_env("POOL_SIZE_IAM") || "15"),
     socket_options: maybe_ipv6
+
   config :platform, Platform.Roleplay.Infra.Postgres.Repo,
     ssl: true,
     url: database_url,
     pool_size: String.to_integer(System.get_env("POOL_SIZE_ROLEPLAY") || "8"),
     socket_options: maybe_ipv6
+
   config :platform, Platform.Social.Infra.Persistence.Postgres.Repo,
     ssl: true,
     url: database_url,
     pool_size: String.to_integer(System.get_env("POOL_SIZE_SOCIAL") || "12"),
     socket_options: maybe_ipv6
+
   config :platform, Platform.Sovereignty.Infra.Postgres.Repo,
     ssl: true,
     url: database_url,
@@ -98,7 +102,7 @@ if config_env() == :prod do
       # Set it to  {0, 0, 0, 0, 0, 0, 0, 1} for local network only access.
       # See the documentation on https://hexdocs.pm/bandit/Bandit.html#t:options/0
       # for details about using IPv6 vs IPv4 and loopback vs public addresses.
-#      ip: {0, 0, 0, 0, 0, 0, 0, 0},
+      #      ip: {0, 0, 0, 0, 0, 0, 0, 0},
 
       ip: {0, 0, 0, 0},
       port: port
@@ -107,7 +111,8 @@ if config_env() == :prod do
 
   # CORS configuration for production
   cors_origins =
-    System.get_env("CORS_ORIGINS")
+    "CORS_ORIGINS"
+    |> System.get_env()
     |> case do
       nil -> []
       origins -> String.split(origins, ",")

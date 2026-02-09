@@ -1,6 +1,7 @@
 defmodule Platform.IAM.Ports.API.LoginUserResponse do
-
-  alias Platform.IAM.Entities.{User, Session}
+  @moduledoc false
+  alias Platform.IAM.Entities.Session
+  alias Platform.IAM.Entities.User
 
   defstruct [
     :user,
@@ -9,10 +10,10 @@ defmodule Platform.IAM.Ports.API.LoginUserResponse do
   ]
 
   @type t :: %__MODULE__{
-    user: User.t(),
-    session: Session.t(),
-    errors: [String.t()]
-  }
+          user: User.t(),
+          session: Session.t(),
+          errors: [String.t()]
+        }
 
   @callback present(__MODULE__.t()) :: map()
 end

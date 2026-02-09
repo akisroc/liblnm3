@@ -1,8 +1,11 @@
 defmodule Platform.Roleplay.Infra.Postgres.Schemas.Chapter do
+  @moduledoc false
   use Ecto.Schema
+
   import Ecto.Changeset
 
-  alias Platform.Roleplay.Infra.Postgres.Schemas.{Chronicle, Protagonist}
+  alias Platform.Roleplay.Infra.Postgres.Schemas.Chronicle
+  alias Platform.Roleplay.Infra.Postgres.Schemas.Protagonist
   alias Platform.Shared.Infra.Persistence.Postgres.Types.UUID7
 
   @content_max_length 25_000
@@ -24,10 +27,8 @@ defmodule Platform.Roleplay.Infra.Postgres.Schemas.Chapter do
     chapter
     |> cast(attrs, [:content, :chronicle_id, :protagonist_id])
     |> validate_required([:content, :chronicle_id, :protagonist_id])
-
     |> update_change(:content, &String.trim/1)
     |> validate_length(:content, min: 1, max: @content_max_length)
-
     |> assoc_constraint(:chronicle)
     |> assoc_constraint(:protagonist)
   end
@@ -36,7 +37,6 @@ defmodule Platform.Roleplay.Infra.Postgres.Schemas.Chapter do
     chapter
     |> cast(attrs, [:content])
     |> validate_required(:content)
-
     |> update_change(:content, &String.trim/1)
     |> validate_length(:content, min: 1, max: @content_max_length)
   end

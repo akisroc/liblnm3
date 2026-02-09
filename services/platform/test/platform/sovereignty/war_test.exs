@@ -1,9 +1,9 @@
 defmodule Platform.Sovereignty.WarTest do
   use ExUnit.Case, async: true
 
-  alias Platform.Sovereignty.War
-  alias Platform.Sovereignty.Types.BattleOutcome
   alias Platform.Sovereignty.Entities.Kingdom
+  alias Platform.Sovereignty.Types.BattleOutcome
+  alias Platform.Sovereignty.War
 
   setup do
     :rand.seed(:exsss, {1, 2, 3})
@@ -30,12 +30,12 @@ defmodule Platform.Sovereignty.WarTest do
   end
 
   describe "attack/2 – Clauses and validations" do
-
     test "obvious winner wins", %{kingdom1: k1, kingdom2: k2} do
-      {:ok, %BattleOutcome{} = outcome} = War.attack(
-        %{k1 | atk_troop: [10, 10, 10, 10, 10, 10, 10, 10]},
-        %{k2 | def_troop: [1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000]}
-      )
+      {:ok, %BattleOutcome{} = outcome} =
+        War.attack(
+          %{k1 | atk_troop: [10, 10, 10, 10, 10, 10, 10, 10]},
+          %{k2 | def_troop: [1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000]}
+        )
 
       assert outcome.atk_wins? == false
 

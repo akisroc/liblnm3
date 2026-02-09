@@ -1,4 +1,5 @@
 defmodule Platform.Shared.Infra.Persistence.Postgres.Types.LoreName do
+  @moduledoc false
   use Ecto.Type
 
   @type t :: String.t()
@@ -9,12 +10,15 @@ defmodule Platform.Shared.Infra.Persistence.Postgres.Types.LoreName do
 
   @spec cast(any()) :: {:ok, String.t() | nil} | {:error, Keyword.t()}
   def cast(nil), do: {:ok, nil}
+
   def cast(value) when is_binary(value) do
-    case Regex.match?(@name_regex, value) do
-      false -> {:error, [message: "Invalid name format"]}
-      true -> {:ok, value}
+    if Regex.match?(@name_regex, value) do
+      {:ok, value}
+    else
+      {:error, [message: "Invalid name format"]}
     end
   end
+
   def cast(_), do: {:error, [message: "Name must be a string"]}
 
   def load(data) when is_binary(data), do: {:ok, data}

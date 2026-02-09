@@ -1,4 +1,5 @@
 defmodule Platform.Shared.Infra.Persistence.Postgres.Types.Slug do
+  @moduledoc false
   use Ecto.Type
 
   alias Ecto.Changeset
@@ -14,12 +15,15 @@ defmodule Platform.Shared.Infra.Persistence.Postgres.Types.Slug do
 
   @spec cast(any()) :: {:ok, String.t() | nil} | {:error, Keyword.t()}
   def cast(nil), do: {:ok, nil}
+
   def cast(value) when is_binary(value) do
-    case Regex.match?(@slug_regex, value) do
-      false -> {:error, [message: "Invalid slug format"]}
-      true -> {:ok, value}
+    if Regex.match?(@slug_regex, value) do
+      {:ok, value}
+    else
+      {:error, [message: "Invalid slug format"]}
     end
   end
+
   def cast(_), do: {:error, [message: "Slug must be a string"]}
 
   def load(data) when is_binary(data), do: {:ok, data}
@@ -49,11 +53,12 @@ defmodule Platform.Shared.Infra.Persistence.Postgres.Types.Slug do
     value = Changeset.get_field(changeset, field)
 
     if is_binary(id) && is_binary(value) do
-      changeset |> Changeset.put_change(:slug, generate(id, value))
+      Changeset.put_change(changeset, :slug, generate(id, value))
     else
       changeset
     end
   end
+
   def generate(id, value) when is_binary(id) and is_binary(value) do
     suffix = Slugger.slugify_downcase(value)
 

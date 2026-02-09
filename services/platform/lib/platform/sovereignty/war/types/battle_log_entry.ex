@@ -1,4 +1,5 @@
 defmodule Platform.Sovereignty.Types.BattleLogEntry do
+  @moduledoc false
   alias Platform.Sovereignty.Types.Unit
 
   defstruct [
@@ -8,10 +9,10 @@ defmodule Platform.Sovereignty.Types.BattleLogEntry do
   ]
 
   @type t :: %__MODULE__{
-    attacking_unit: Unit.t(),
-    defending_unit: Unit.t(),
-    kill_steps: [non_neg_integer()]
-  }
+          attacking_unit: Unit.t(),
+          defending_unit: Unit.t(),
+          kill_steps: [non_neg_integer()]
+        }
 
   @spec to_raw(__MODULE__.t()) :: map()
   def to_raw(%__MODULE__{} = log_entry) do
@@ -24,8 +25,7 @@ defmodule Platform.Sovereignty.Types.BattleLogEntry do
         log_entry.attacking_unit.archetype.label
         |> Atom.to_string()
         |> String.downcase(),
-      kill_steps:
-        log_entry.kill_steps
+      kill_steps: log_entry.kill_steps
     }
   end
 end

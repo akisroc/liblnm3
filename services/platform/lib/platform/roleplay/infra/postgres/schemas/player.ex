@@ -1,8 +1,13 @@
 defmodule Platform.Roleplay.Infra.Postgres.Schemas.Player do
+  @moduledoc false
   use Ecto.Schema
 
-  alias Platform.Shared.Infra.Persistence.Postgres.Types.{UUID7, Slug, Url, Nickname}
-  alias Platform.Roleplay.Infra.Postgres.Schemas.{Protagonist, Chronicle}
+  alias Platform.Roleplay.Infra.Postgres.Schemas.Chronicle
+  alias Platform.Roleplay.Infra.Postgres.Schemas.Protagonist
+  alias Platform.Shared.Infra.Persistence.Postgres.Types.Nickname
+  alias Platform.Shared.Infra.Persistence.Postgres.Types.Slug
+  alias Platform.Shared.Infra.Persistence.Postgres.Types.Url
+  alias Platform.Shared.Infra.Persistence.Postgres.Types.UUID7
 
   @schema_prefix "roleplay"
   @primary_key {:id, UUID7, autogenerate: false}

@@ -1,4 +1,5 @@
 defmodule Platform.Shared.Infra.Persistence.Postgres.Types.Url do
+  @moduledoc false
   use Ecto.Type
 
   @url_regex ~r/^https?:\/\/[\w\d\-._~:?#\[\]@!$&'()*+,;=%\/]+$/
@@ -9,8 +10,10 @@ defmodule Platform.Shared.Infra.Persistence.Postgres.Types.Url do
 
   @spec cast(any()) :: {:ok, String.t() | nil} | {:error, Keyword.t()}
   def cast(nil), do: {:ok, nil}
+
   def cast(value) when is_binary(value) do
-    len = byte_size(value) # Faster than String.length/1 for ASCII
+    # Faster than String.length/1 for ASCII
+    len = byte_size(value)
 
     cond do
       len < @min_length -> {:error, [message: "URL length must not be less than #{@min_length}"]}
@@ -19,6 +22,7 @@ defmodule Platform.Shared.Infra.Persistence.Postgres.Types.Url do
       true -> validate_uri(value)
     end
   end
+
   def cast(_), do: {:error, [message: "URL must be a string"]}
 
   def load(data) when is_binary(data), do: {:ok, data}
@@ -43,5 +47,4 @@ defmodule Platform.Shared.Infra.Persistence.Postgres.Types.Url do
         {:error, [message: "Invalid URL component: #{part}"]}
     end
   end
-
 end

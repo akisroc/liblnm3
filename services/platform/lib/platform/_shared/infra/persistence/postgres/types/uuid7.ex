@@ -1,4 +1,5 @@
 defmodule Platform.Shared.Infra.Persistence.Postgres.Types.UUID7 do
+  @moduledoc false
   use Ecto.Type
 
   alias Ecto.Changeset
@@ -10,11 +11,13 @@ defmodule Platform.Shared.Infra.Persistence.Postgres.Types.UUID7 do
   def type, do: :uuid
 
   def cast(binary) when is_binary(binary) do
-    case Regex.match?(@uuidv7_regex, binary) do
-      false -> {:error, [message: "Invalid UUIDv7 format"]}
-      true -> {:ok, binary}
+    if Regex.match?(@uuidv7_regex, binary) do
+      {:ok, binary}
+    else
+      {:error, [message: "Invalid UUIDv7 format"]}
     end
   end
+
   def cast(_), do: :error
 
   def load(binary) do
@@ -24,6 +27,7 @@ defmodule Platform.Shared.Infra.Persistence.Postgres.Types.UUID7 do
   def dump(uuid) when is_binary(uuid) do
     Ecto.UUID.dump(uuid)
   end
+
   def dump(_), do: :error
 
   @doc """
