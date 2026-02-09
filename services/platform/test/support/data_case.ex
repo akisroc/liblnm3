@@ -16,21 +16,21 @@ defmodule Platform.DataCase do
 
   use ExUnit.CaseTemplate
 
-  @repos [
-    Platform.Shared.Outbox.Infra.Persistence.Postgres.Repo,
-    Platform.IAM.Infra.Postgres.Repo,
-    Platform.Roleplay.Infra.Postgres.Repo,
-    Platform.Social.Infra.Persistence.Postgres.Repo,
-    Platform.Sovereignty.Infra.Postgres.Repo
-  ]
+  # @repos [
+  #   Platform.Shared.Outbox.Infra.Persistence.Postgres.Repo,
+  #   Platform.IAM.Infra.Postgres.Repo,
+  #   Platform.Roleplay.Infra.Postgres.Repo,
+  #   Platform.Social.Infra.Persistence.Postgres.Repo,
+  #   Platform.Sovereignty.Infra.Postgres.Repo
+  # ]
 
   using do
     quote do
-      alias Platform.Shared.Outbox.Infra.Persistence.Postgres.Repo, as: OutboxRepo
-      alias Platform.IAM.Infra.Postgres.Repo, as: IAMRepo
-      alias Platform.Roleplay.Infra.Postgres.Repo, as: RoleplayRepo
-      alias Platform.Social.Infra.Persistence.Postgres.Repo, as: SocialRepo
-      alias Platform.Sovereignty.Infra.Postgres.Repo, as: SovereigntyRepo
+      # alias Platform.Shared.Outbox.Infra.Persistence.Postgres.Repo, as: OutboxRepo
+      # alias Platform.IAM.Infra.Postgres.Repo, as: IAMRepo
+      # alias Platform.Roleplay.Infra.Postgres.Repo, as: RoleplayRepo
+      # alias Platform.Social.Infra.Persistence.Postgres.Repo, as: SocialRepo
+      # alias Platform.Sovereignty.Infra.Postgres.Repo, as: SovereigntyRepo
 
       import Ecto
       import Ecto.Changeset
@@ -39,20 +39,20 @@ defmodule Platform.DataCase do
     end
   end
 
-  setup tags do
-    Platform.DataCase.setup_sandbox(tags)
-    :ok
-  end
+  # setup tags do
+  #   Platform.DataCase.setup_sandbox(tags)
+  #   :ok
+  # end
 
-  @doc """
-  Sets up the sandbox based on the test tags.
-  """
-  def setup_sandbox(tags) do
-    Enum.each(@repos, fn repo ->
-      pid = Ecto.Adapters.SQL.Sandbox.start_owner!(repo, shared: not tags[:async])
-      on_exit(fn -> Ecto.Adapters.SQL.Sandbox.stop_owner(pid) end)
-    end)
-  end
+  # @doc """
+  # Sets up the sandbox based on the test tags.
+  # """
+  # def setup_sandbox(tags) do
+  #   Enum.each(@repos, fn repo ->
+  #     pid = Ecto.Adapters.SQL.Sandbox.start_owner!(repo, shared: not tags[:async])
+  #     on_exit(fn -> Ecto.Adapters.SQL.Sandbox.stop_owner(pid) end)
+  #   end)
+  # end
 
   @doc """
   A helper that transforms changeset errors into a map of messages.
