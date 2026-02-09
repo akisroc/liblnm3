@@ -30,7 +30,7 @@ defmodule Platform.Roleplay.LoreName.Archetypes do
         end)
       end)
 
-    if length(errors) > 0 do
+    if not Enum.empty?(errors) do
       raise CompileError,
         file: filename,
         description: "\n" <> Enum.join(errors, "\n")
