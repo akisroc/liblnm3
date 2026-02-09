@@ -13,12 +13,8 @@ defmodule Platform.IAM do
   """
   @spec register_user(String.t(), String.t(), String.t()) :: RegisterUserResponse.t()
   def register_user(nickname, email, password) do
-    with {:ok, user} <- @identities_repository_adapter.register_user(nickname, email, password) do
-      %RegisterUserResponse{
-        user: user,
-        errors: []
-      }
-    else
+    case @identities_repository_adapter.register_user(nickname, email, password) do
+      {:ok, user} -> %RegisterUserResponse{user: user, errors: []}
       {:error, reason} -> %RegisterUserResponse{errors: [reason]}
     end
   end
