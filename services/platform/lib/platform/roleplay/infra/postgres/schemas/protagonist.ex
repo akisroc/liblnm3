@@ -35,7 +35,7 @@ defmodule Platform.Roleplay.Infra.Postgres.Schemas.Protagonist do
     field :fame, :decimal, default: 0.0
     field :profile_picture, Url
     field :is_anonymous, :boolean, default: true
-    field :slug,Slug
+    field :slug, Slug
     field :is_removed, :boolean, default: false
 
     timestamps()
