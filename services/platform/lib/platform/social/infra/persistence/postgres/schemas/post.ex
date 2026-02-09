@@ -5,7 +5,7 @@ defmodule Platform.Social.Infra.Persistence.Postgres.Schemas.Post do
   alias Platform.Social.Infra.Persistence.Postgres.Schemas.{User, Topic}
   alias Platform.Shared.Infra.Persistence.Postgres.Types.UUID7
 
-  @content_max_length 10000
+  @content_max_length 10_000
 
   @schema_prefix "social"
   @primary_key {:id, UUID7, autogenerate: true}

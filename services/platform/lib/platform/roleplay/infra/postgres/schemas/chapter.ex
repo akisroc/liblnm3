@@ -5,7 +5,7 @@ defmodule Platform.Roleplay.Infra.Postgres.Schemas.Chapter do
   alias Platform.Roleplay.Infra.Postgres.Schemas.{Chronicle, Protagonist}
   alias Platform.Shared.Infra.Persistence.Postgres.Types.UUID7
 
-  @content_max_length 25000
+  @content_max_length 25_000
 
   @schema_prefix "roleplay"
   @primary_key {:id, UUID7, autogenerate: true}

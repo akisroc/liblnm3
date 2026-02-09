@@ -7,7 +7,7 @@ defmodule Platform.Roleplay.Infra.Postgres.Schemas.Chronicle do
 
   @title_max_length 60
   @slug_max_length 120
-  @description_max_length 15000
+  @description_max_length 15_000
 
   @schema_prefix "roleplay"
   @primary_key {:id, UUID7, autogenerate: true}

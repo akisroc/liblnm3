@@ -9,7 +9,7 @@ defmodule Platform.Roleplay.LoreNameTest do
 
   describe "generate/2" do
     test "checks integrity for 10000 random generations" do
-      for _ <- 1..10000 do
+      for _ <- 1..10_000 do
         name = LoreName.generate(5, 10)
         len = String.length(name)
         assert is_binary(name)

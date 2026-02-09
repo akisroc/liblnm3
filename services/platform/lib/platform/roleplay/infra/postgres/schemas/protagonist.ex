@@ -5,7 +5,7 @@ defmodule Platform.Roleplay.Infra.Postgres.Schemas.Protagonist do
   alias Platform.Roleplay.Infra.Postgres.Schemas.{Player, Kingdom, Chapter, Whisper}
   alias Platform.Shared.Infra.Persistence.Postgres.Types.{UUID7, LoreName, Slug, Url}
 
-  @biography_max_length 500000
+  @biography_max_length 500_000
   @name_max_length 30
   @slug_max_length 60
 

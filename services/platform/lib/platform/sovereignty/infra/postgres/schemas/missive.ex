@@ -5,7 +5,7 @@ defmodule Platform.Sovereignty.Infra.Postgres.Schemas.Missive do
   alias Platform.Sovereignty.Infra.Postgres.Schemas.Kingdom
   alias Platform.Shared.Infra.Persistence.Postgres.Types.UUID7
 
-  @content_max_length 10000
+  @content_max_length 10_000
 
   @schema_prefix "sovereignty"
   @primary_key {:id, UUID7, autogenerate: true}

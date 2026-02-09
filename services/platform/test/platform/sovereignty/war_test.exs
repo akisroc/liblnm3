@@ -12,7 +12,7 @@ defmodule Platform.Sovereignty.WarTest do
       id: "123",
       def_troop: [2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500],
       atk_troop: [2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500],
-      fame: 30000.0,
+      fame: 30_000.0,
       active?: true,
       player: %{id: "abc"}
     }
@@ -21,7 +21,7 @@ defmodule Platform.Sovereignty.WarTest do
       id: "456",
       def_troop: [2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500],
       atk_troop: [2500, 2500, 2500, 2500, 2500, 2500, 2500, 2500],
-      fame: 30000.0,
+      fame: 30_000.0,
       active?: true,
       player: %{id: "def"}
     }
