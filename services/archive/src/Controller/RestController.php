@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Repository\PostRepository;
 use App\Service\Database;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
@@ -12,11 +11,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Twig\Environment;
 use App\Repository\TopicRepository;
 
-final class RestController extends AbstractController
+final class RestController
 {
     /**
      * Todo: change before prod deploy
@@ -47,7 +47,7 @@ final class RestController extends AbstractController
     {
         $topic = $topicRepo->fetchOne($id);
         if (!$topic) {
-            throw $this->createNotFoundException();
+            throw new NotFoundHttpException();
         }
 
         return new StreamedResponse()
