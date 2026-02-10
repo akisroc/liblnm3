@@ -1,0 +1,9 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<button hx-get="{{ path('topics.list') }}" hx-swap="outerHTML" hx-indicator="#spinner">
+   Click Me
+ </button>
+
+<div id="spinner" class="htmx-indicator"/>Chargement…</div>
+{% endblock %}
