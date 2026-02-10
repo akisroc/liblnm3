@@ -1,4 +1,4 @@
-defmodule Platform.IAM.Ports.API.RegisterAndLoginUserResponse do
+defmodule Platform.IAM.Ports.API.RegisterUserAndCreateSessionResponse do
   @moduledoc false
   alias Platform.IAM.Entities.Session
   alias Platform.IAM.Entities.User

@@ -4,43 +4,25 @@ defmodule PlatformWeb.Router do
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
-    plug :fetch_flash
+    plug :fetch_live_flash
+    plug :put_root_layout, html: {PlatformWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+  end
+
+  pipeline :api do
+    plug :accepts, ["json"]
   end
 
   scope "/", PlatformWeb do
     pipe_through :browser
 
-    get "/onboarding/register-user", OnboardingController, :register_user
-    post "/onboarding/register-user", OnboardingController, :register_user
-    get "/onboarding/register-kingdom-and-leader", OnboardingController, :register_kingdom_and_leader
+    get "/", PageController, :home
   end
 
-  # pipeline :api do
-  # plug :accepts, ["json"]
-  # end
-
-  # pipeline :auth do
-  # Todo
-  # end
-
-  # ---
-  # --- Public routes
-  # ---
-
-  # --- IAM
-  # scope "/", Platform.IAM.Infra.Web do
-  # post "/register-user", IdentitiesController, :register_user
-  # end
-
-  # Todo: Other scope for private?
-  # --- Private routes ---
-  # scope "/", PlatformWeb do
-  # pipe_through [:api, :auth]
-
-  # get "/me", UserController, :me
-  # post "/logout", SessionController, :logout
+  # Other scopes may use custom stacks.
+  # scope "/api", PlatformWeb do
+  #   pipe_through :api
   # end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
@@ -53,7 +35,7 @@ defmodule PlatformWeb.Router do
     import Phoenix.LiveDashboard.Router
 
     scope "/dev" do
-      pipe_through [:fetch_session, :protect_from_forgery]
+      pipe_through :browser
 
       live_dashboard "/dashboard", metrics: PlatformWeb.Telemetry
       forward "/mailbox", Plug.Swoosh.MailboxPreview

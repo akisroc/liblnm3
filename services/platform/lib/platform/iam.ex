@@ -6,7 +6,7 @@ defmodule Platform.IAM do
   alias Platform.IAM.Entities.Session
   alias Platform.IAM.Entities.User
   alias Platform.IAM.Ports.API.LoginUserResponse
-  alias Platform.IAM.Ports.API.RegisterAndLoginUserResponse
+  alias Platform.IAM.Ports.API.RegisterUserAndCreateSessionResponse
   alias Platform.IAM.Ports.API.RegisterUserResponse
 
   @identities_repository_adapter Application.compile_env(
@@ -28,8 +28,8 @@ defmodule Platform.IAM do
   @doc """
   User login.
   """
-  @spec login_user(String.t(), String.t(), String.t(), String.t()) :: LoginUserResponse.t()
-  def login_user(nickname, password, remote_ip, user_agent) do
+  @spec create_session(String.t(), String.t(), String.t(), String.t()) :: LoginUserResponse.t()
+  def create_session(nickname, password, remote_ip, user_agent) do
     with %{id: _} = user_data <- @identities_repository_adapter.get_user(%{nickname: nickname}),
          true <- Argon2.verify_pass(password, user_data.password) do
       user = User.new(user_data)
@@ -53,24 +53,24 @@ defmodule Platform.IAM do
   end
 
   @doc """
-  Register a user, then log this newly created user in.
+  Register a user, then create a session for this user.
   """
-  @spec register_and_login_user(
+  @spec register_user_and_create_session(
           String.t(),
           String.t(),
           String.t(),
           %{remote_ip: String.t(), user_agent: String.t()}
-        ) :: RegisterAndLoginUserResponse.t()
-  def register_and_login_user(nickname, email, password, %{remote_ip: remote_ip, user_agent: user_agent}) do
+        ) :: RegisterUserAndCreateSessionResponse.t()
+  def register_user_and_create_session(nickname, email, password, %{remote_ip: remote_ip, user_agent: user_agent}) do
     with %{errors: [], user: user} <- register_user(nickname, email, password),
-         %{errors: [], session: session} <- login_user(nickname, password, remote_ip, user_agent) do
-      %RegisterAndLoginUserResponse{
+         %{errors: [], session: session} <- create_session(nickname, password, remote_ip, user_agent) do
+      %RegisterUserAndCreateSessionResponse{
         user: user,
         session: session,
         errors: []
       }
     else
-      %{errors: errors} -> %RegisterAndLoginUserResponse{errors: errors}
+      %{errors: errors} -> %RegisterUserAndCreateSessionResponse{errors: errors}
     end
   end
 end

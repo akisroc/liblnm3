@@ -10,6 +10,7 @@ defmodule Platform.MixProject do
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps(),
+      compilers: [:phoenix_live_view] ++ Mix.compilers(),
       listeners: [Phoenix.CodeReloader]
     ]
   end
@@ -39,18 +40,16 @@ defmodule Platform.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      # Dev + Tests
-      {:faker, "~> 0.18", only: :dev},
-      {:phoenix_live_reload, "~> 1.2", only: :dev},
-      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
-      {:styler, "~> 0.7", only: [:dev, :test], runtime: false},
-
-      # All
       {:phoenix, "~> 1.8.1"},
       {:phoenix_ecto, "~> 4.5"},
       {:ecto_sql, "~> 3.13"},
       {:postgrex, ">= 0.0.0"},
+      {:phoenix_html, "~> 4.1"},
+      {:phoenix_live_reload, "~> 1.2", only: :dev},
+      {:phoenix_live_view, "~> 1.1.0"},
+      {:lazy_html, ">= 0.1.0", only: :test},
       {:phoenix_live_dashboard, "~> 0.8.3"},
+      {:esbuild, "~> 0.10", runtime: Mix.env() == :dev},
       {:swoosh, "~> 1.16"},
       {:req, "~> 0.5"},
       {:telemetry_metrics, "~> 1.0"},
@@ -58,14 +57,7 @@ defmodule Platform.MixProject do
       {:gettext, "~> 0.26"},
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.2.0"},
-      {:bandit, "~> 1.5"},
-      {:uuid_v7, "~> 0.6"},
-      {:slugger, "~> 0.3"},
-      {:argon2_elixir, "~> 4.1"},
-      {:ecto_network, "~> 1.6"},
-      {:remote_ip, "~> 1.2"},
-      {:cors_plug, "~> 3.0"},
-      {:phoenix_html, "~> 4.3"}
+      {:bandit, "~> 1.5"}
     ]
   end
 
@@ -77,11 +69,16 @@ defmodule Platform.MixProject do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      setup: ["deps.get", "ecto.setup"],
+      setup: ["deps.get", "ecto.setup", "assets.setup", "assets.build"],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      # test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
-      test: ["test"],
+      test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
+      "assets.setup": ["esbuild.install --if-missing"],
+      "assets.build": ["compile", "esbuild platform"],
+      "assets.deploy": [
+        "esbuild platform --minify",
+        "phx.digest"
+      ],
       precommit: ["compile --warning-as-errors", "deps.unlock --unused", "format", "test"]
     ]
   end
