@@ -24,7 +24,9 @@ config :platform, PlatformWeb.Endpoint,
   code_reloader: true,
   debug_errors: true,
   secret_key_base: "KJDg5dg5l35emcZSeYDU79JpJMTmLvqo4CH2eGLKxQyDOIKwqjInOCiIMwFUFLHI",
-  watchers: []
+  watchers: [
+    npm: ["run", "dev", cd: Path.expand("../assets", __DIR__)]
+  ]
 
 # ## SSL Support
 #

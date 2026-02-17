@@ -1,7 +1,7 @@
 # --- BASE STAGE ---
 FROM elixir:1.19-alpine AS base
 
-RUN apk add --no-cache build-base git
+RUN apk add --no-cache build-base git nodejs npm
 
 WORKDIR /app
 
@@ -17,6 +17,9 @@ RUN apk add --no-cache inotify-tools curl netcat-openbsd
 
 COPY mix.exs mix.lock ./
 RUN mix deps.get
+
+COPY assets/package.json assets/package-lock.json ./assets/
+RUN npm install --prefix assets
 
 COPY . .
 
@@ -35,6 +38,9 @@ COPY mix.exs mix.lock ./
 RUN set -eux; \
     mix deps.get --only prod; \
     mix deps.compile;
+
+COPY assets/package.json assets/package-lock.json ./assets/
+RUN npm ci --prefix assets --audit=false --fund=false
 
 COPY config config
 COPY assets assets

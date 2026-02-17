@@ -7,11 +7,15 @@ defmodule PlatformWeb.Router do
     plug :fetch_flash
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+
+    plug :put_root_layout, {PlatformWeb.Layouts, :root}
+    plug :put_layout, {PlatformWeb.Layouts, :app}
   end
 
   scope "/", PlatformWeb do
     pipe_through :browser
 
+    get "/", HomepageController, :homepage
     get "/onboarding/register-user", OnboardingController, :register_user
     post "/onboarding/register-user", OnboardingController, :register_user
     get "/onboarding/register-kingdom-and-leader", OnboardingController, :register_kingdom_and_leader

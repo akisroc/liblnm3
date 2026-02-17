@@ -8,15 +8,18 @@ defmodule PlatformWeb.OnboardingController do
   alias Platform.Sovereignty
   alias Platform.Sovereignty.Ports.API.RegisterKingdomAndLeaderResponse
 
+  plug :put_layout, false
+
   def register_user(conn, %{} = _params) do
-    conn
-    |> render(:user_form)
+    render(conn, :user_form)
   end
+
   def register_user(conn, %{"nickname" => nickname, "email" => email, "password" => password}) do
     ip = conn.remote_ip |> :inet.ntoa() |> to_string()
     ua = conn |> get_req_header("user-agent") |> List.first()
+
     case IAM.register_user_and_create_session(nickname, email, password, ip, ua) do
-      %RegisterUserAndCreateSessionResponse{user: user, session: session, errors: []} ->
+      %RegisterUserAndCreateSessionResponse{user: _user, session: session, errors: []} ->
         conn
         |> put_session(:token, Base.encode64(session.token))
         |> configure_session(renew: true)
@@ -32,8 +35,7 @@ defmodule PlatformWeb.OnboardingController do
       }) do
     case Sovereignty.register_kingdom_and_leader(kingdom_name, leader_name, player_id) do
       %RegisterKingdomAndLeaderResponse{kingdom: kingdom, leader: leader, errors: []} ->
-        conn
-        |> put_resp_header("hx-redirect", ~p"/dashboard")
+        put_resp_header(conn, "hx-redirect", ~p"/dashboard")
     end
   end
 

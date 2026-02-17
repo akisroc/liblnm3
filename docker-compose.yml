@@ -107,6 +107,7 @@ services:
       - "4000:4000"
     volumes:
       - ./services/platform:/app:rw,cached,z
+      - /app/assets/node_modules
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.platform.rule=Host(`platform.localhost`)"
