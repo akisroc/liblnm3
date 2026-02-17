@@ -1,0 +1,6 @@
+@use "includes/variables" as *;
+
+h1 {
+  font-size: 4rem;
+  color: $color-primary;
+}

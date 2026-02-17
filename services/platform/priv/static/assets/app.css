@@ -1,3 +1,211 @@
 * {
-  background-color: pink !important;
+  box-sizing: border-box;
+  outline: none;
+  vertical-align: baseline;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+html {
+  font-size: 62.5%;
+}
+
+ol, ul {
+  list-style: none;
+}
+
+blockquote:before, blockquote:after, q:before, q:after {
+  content: none;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+img {
+  max-width: 100%;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+a:visited {
+  color: inherit;
+}
+
+/*
+---
+--- COLORS
+---
+*/
+/* GRAPHIC CHARTER */
+/* EVENTS */
+/* BACKGROUNDS */
+/* TYPOGRAPHY */
+/* BREAKPOINTS */
+/* LAYOUT */
+/* GRAPHIC CHARTER */
+/* EVENTS */
+/* BACKGROUNDS */
+/* TYPOGRAPHY */
+/* GLASS */
+body {
+  height: 100vh;
+  background: url("data:image/svg+xml,%3csvg%20xmlns='http://www.w3.org/2000/svg'%20version='1.1'%20xmlns:xlink='http://www.w3.org/1999/xlink'%20xmlns:svgjs='http://svgjs.dev/svgjs'%20viewBox='0%200%20700%20700'%20width='700'%20height='700'%20opacity='0.38'%3e%3cdefs%3e%3cfilter%20id='nnnoise-filter'%20x='-20%25'%20y='-20%25'%20width='140%25'%20height='140%25'%20filterUnits='objectBoundingBox'%20primitiveUnits='userSpaceOnUse'%20color-interpolation-filters='linearRGB'%3e%3cfeTurbulence%20type='turbulence'%20baseFrequency='0.11'%20numOctaves='4'%20seed='15'%20stitchTiles='stitch'%20x='0%25'%20y='0%25'%20width='100%25'%20height='100%25'%20result='turbulence'%3e%3c/feTurbulence%3e%3cfeSpecularLighting%20surfaceScale='12'%20specularConstant='0.25'%20specularExponent='20'%20lighting-color='%23ffffff'%20x='0%25'%20y='0%25'%20width='100%25'%20height='100%25'%20in='turbulence'%20result='specularLighting'%3e%3cfeDistantLight%20azimuth='3'%20elevation='61'%3e%3c/feDistantLight%3e%3c/feSpecularLighting%3e%3c/filter%3e%3c/defs%3e%3crect%20width='700'%20height='700'%20fill='transparent'%3e%3c/rect%3e%3crect%20width='700'%20height='700'%20fill='%23ffffff'%20filter='url(%23nnnoise-filter)'%3e%3c/rect%3e%3c/svg%3e"), radial-gradient(circle at 50% 0%, hsla(60, 50%, 80%, 0.15) 0%, hsla(60, 50%, 40%, 0.05) 40%, transparent 80%), hsl(60, 2%, 11%);
+  background-attachment: fixed;
+  font-family: "Libertinus Serif", "Helvetica", "serif";
+}
+
+form {
+  background: hsla(0, 0%, 0%, 0.08);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid hsla(0, 0%, 100%, 0.08);
+  box-shadow: 0 8px 32px 0 hsla(0, 0%, 0%, 0.2);
+  border-radius: 24px;
+}
+form fieldset {
+  padding: 12px 4px 32px 4px;
+}
+form legend, form label, form button[type=submit] {
+  font-variant: small-caps;
+  color: hsl(0, 0%, 99%);
+}
+form legend {
+  padding-left: 10%;
+  font-size: 3rem;
+}
+form label {
+  display: block;
+  font-size: 1.5rem;
+  text-shadow: 0 0 0 transparent;
+  transition: all 0.1s ease-in-out;
+}
+form input {
+  display: block;
+  width: 40%;
+  padding: 12px 4px 6px 4px;
+  border-radius: 6px;
+  border-bottom: 1px solid hsl(0, 0%, 99%);
+  background-color: transparent;
+  color: hsl(0, 0%, 99%);
+  font-size: 1.8rem;
+  font-weight: bold;
+  transition: all 0.08s ease-in-out;
+}
+form input:hover, form input:focus {
+  border-bottom: 1px solid hsl(0, 0%, 99%);
+  background-color: rgba(252.45, 252.45, 252.45, 0.05);
+}
+form input:hover + label {
+  text-shadow: 0 0 0.5px currentColor;
+}
+form input:focus {
+  padding: 12px 4px 6px 4px;
+  border-radius: 12px;
+  color: hsl(0, 0%, 99%);
+}
+form input:focus + label {
+  text-shadow: 0 0 0.6px currentColor;
+  padding-left: 16px;
+}
+form input.error {
+  border-bottom: 1px solid hsl(0, 85%, 62%);
+  color: rgba(252.45, 252.45, 252.45, 0.7);
+}
+form input.error + label {
+  color: hsl(0, 85%, 62%);
+}
+form input.error:focus, form input.error:hover {
+  border-bottom: 1px solid hsl(0, 85%, 62%);
+  background-color: rgba(240.465, 75.735, 75.735, 0.05);
+}
+form input.success {
+  border-bottom: 1px solid hsl(139, 58%, 53%);
+}
+form input.success + label {
+  color: hsl(139, 58%, 53%);
+}
+form input.success:focus, form input.success:hover {
+  border-bottom: 1px solid hsl(139, 58%, 53%);
+  background-color: rgba(65.637, 204.663, 109.6619, 0.05);
+}
+form button[type=submit] {
+  padding: 12px 24px;
+  font-size: 2.4rem;
+  text-shadow: 0 0 0 transparent;
+  background-color: transparent;
+  border-top: 1px solid rgba(252.45, 252.45, 252.45, 0.5);
+  border-bottom: 1px solid hsl(0, 0%, 99%);
+  border-radius: 12px;
+}
+form button[type=submit]:hover {
+  background-color: rgba(252.45, 252.45, 252.45, 0.05);
+}
+form button[type=submit]:active {
+  text-shadow: 0 0 0.5px currentColor;
+  transform: translateY(2px);
+  background-color: rgba(252.45, 252.45, 252.45, 0.09);
+  border-top: 1px solid rgba(252.45, 252.45, 252.45, 0.5);
+  border-bottom: 1px solid hsl(0, 0%, 99%);
+}
+
+form.onboarding-form {
+  display: grid;
+  place-content: center;
+  height: 60dvh;
+  width: 96dvw;
+  margin-top: 20dvh;
+  margin-left: 2dvw;
+}
+form.onboarding-form fieldset {
+  width: 100%;
+}
+form.onboarding-form input {
+  width: 100%;
+  padding: 12px;
+  font-size: 2.2rem;
+}
+
+button {
+  padding: 8px 6px;
+  background-color: oklch(65% 0.22 275deg);
+  font-family: "Libertinus Sans", "sans-serif";
+  font-weight: bold;
+  font-size: 1.4rem;
+  color: #FFF8D0;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+button:hover {
+  background-color: oklch(78% 0.14 190deg);
+}
+
+a {
+  color: oklch(65% 0.22 275deg);
+  font-weight: bold;
+  transition: color 0.2s ease-in-out;
+}
+a:hover {
+  color: oklch(78% 0.14 190deg);
+}
+
+p {
+  line-height: 1.4;
+  font-family: "Libertinus Serif", "Helvetica", "serif";
+  font-size: 1.8rem;
+  color: oklch(100% 0.01 275deg);
+}
+
+@media all and (min-width: 600px) {
+  p {
+    text-align: justify;
+  }
+}
+h1 {
+  font-size: 4rem;
+  color: oklch(65% 0.22 275deg);
 }
