@@ -22,10 +22,8 @@ COPY . .
 
 RUN chmod +x scripts/wait-for-db.sh
 
-CMD ["scripts/wait-for-db.sh", "lnm3_database", "--", "sh", "-c", "mix ecto.migrate && mix phx.server"]
-
 HEALTHCHECK --interval=10s --timeout=2s --start-period=30s --retries=3 \
-  CMD nc -z 127.0.0.1 4000 || exit 1
+    CMD nc -z 127.0.0.1 4000 || exit 1
 
 CMD ["mix", "phx.server"]
 
@@ -59,7 +57,7 @@ RUN apk add --no-cache libstdc++ openssl ncurses-libs ca-certificates netcat-ope
 COPY --from=builder --chown=1000:1000 /app/_build/prod/rel/platform ./
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
-  CMD nc -z 127.0.0.1 4000 || exit 1
+    CMD nc -z 127.0.0.1 4000 || exit 1
 
 USER 1000
 EXPOSE 4000
