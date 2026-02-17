@@ -9,9 +9,11 @@
 
         {% block javascripts %}
             <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js"></script>
+            {% block importmap %}{{ importmap('app') }}{% endblock %}
         {% endblock %}
     </head>
     <body>
+	    <h1>LNM – Archive</h1>
         {% block body %}{% endblock %}
     </body>
 </html>

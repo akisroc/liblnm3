@@ -96,6 +96,29 @@ final class RestController
         ;
     }
 
+    #[Route(
+        "posts/search/{s}",
+        name: "posts.search",
+        methods: ["GET"]
+    )]
+    public function posts_search(
+        string $s,
+        Environment $twig,
+        PostRepository $postRepo
+    ): StreamedResponse
+    {
+        return new StreamedResponse()
+            ->setPublic()
+            ->setMaxAge(self::RESPONSES_MAX_AGE)
+            ->setSharedMaxAge(self::RESPONSES_MAX_AGE)
+            ->setCallback(function () use ($s, $twig, $postRepo) {
+                $twig->display('rest/posts-search-results.html.twig', [
+                    'posts' => $postRepo->streamSearch($s)
+                ]);
+            })
+        ;
+    }
+
     #[Route("/authors", name: "authors.list", methods: ["GET"])]
     public function authors(Environment $twig, PostRepository $postRepo): StreamedResponse
     {

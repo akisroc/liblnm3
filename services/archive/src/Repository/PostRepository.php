@@ -54,4 +54,18 @@ final readonly class PostRepository
 
         yield from $stmt;
     }
+
+    public function streamSearch(string $s): \Generator
+    {
+        $stmt = $this->db->pdo->prepare(
+            'SELECT * FROM search_index
+            WHERE search_index MATCH ?
+            ORDER BY rank'
+        );
+
+        $stmt->setFetchMode(\PDO::FETCH_ASSOC);
+        $stmt->execute([$s]);
+
+        yield from $stmt;
+    }
 }

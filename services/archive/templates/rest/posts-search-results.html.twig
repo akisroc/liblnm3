@@ -1,0 +1,10 @@
+{% block body %}
+<section>
+    {% for post in posts %}
+        <article>
+            {{ post.post_content }}
+        </article>
+        <hr/>
+    {% endfor %}
+</section>
+{% endblock %}

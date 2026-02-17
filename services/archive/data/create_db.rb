@@ -4,9 +4,15 @@ require 'sqlite3'
 require 'json'
 require 'digest'
 
+DB_FILENAME = "lnm_archive.sqlite"
+
+[DB_FILENAME, "#{DB_FILENAME}-wal", "#{DB_FILENAME}-shm"].each do |f|
+  File.delete(f) if File.exist?(f)
+end
+
 begin
 
-  db = SQLite3::Database.new "lnm_archive.sqlite"
+  db = SQLite3::Database.new DB_FILENAME
   puts "Database file created."
 
   db.execute("PRAGMA journal_mode = OFF;")
@@ -80,6 +86,20 @@ begin
   CREATE INDEX idx_posts_topic_id ON posts(topic_id);
   CREATE INDEX idx_posts_created_at ON posts(created_at);
   CREATE INDEX idx_posts_author ON posts(author);
+
+  CREATE VIRTUAL TABLE search_index USING fts5(
+    topic_title,
+    post_content,
+    author,
+    place,
+    content_rowid='id',
+    tokenize='trigram case_sensitive 0'
+  );
+
+  INSERT INTO search_index(topic_title, post_content, author, place)
+  SELECT t.title, p.content, p.author, p.place
+  FROM posts p
+  LEFT JOIN topics t ON p.topic_id = t.id;
   SQL
 
   db.execute("PRAGMA analyze;")
