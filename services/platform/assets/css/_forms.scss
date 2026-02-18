@@ -2,117 +2,122 @@
 @use "includes/mixins" as mixins;
 
 form {
-  @include mixins.glass-panel;
+    @include mixins.glass-panel;
 
-  fieldset {
-    padding: 12px 4px 32px 4px;
-  }
+    fieldset {
+        padding: 12px 4px 32px 4px;
+    }
 
-  legend, label, button[type="submit"] {
-    font-variant: small-caps;
-    color: colors.$primary;
-  }
+    legend,
+    label,
+    button[type="submit"] {
+        font-variant: small-caps;
+        color: colors.$primary;
+    }
 
-  legend {
-    padding-left: 10%;
-    font-size: 3rem;
-  }
+    legend {
+        padding-left: 10%;
+        font-size: 3rem;
+    }
 
-  label {
-    display: block;
-    font-size: 1.5rem;
-    text-shadow: 0 0 0 transparent;
-    transition: all 0.1s ease-in-out;
-  }
+    label {
+        display: block;
+        font-size: 1.5rem;
+        text-shadow: 0 0 0 transparent;
+        transition: all 0.1s ease-in-out;
+    }
 
-  input {
-    display: block;
-    width: 40%;
-    padding: 12px 4px 6px 4px;
-    border-radius: 6px;
-    border-bottom: 1px solid colors.$primary;
-    background-color: transparent;
-    color: colors.$primary;
-    font-size: 1.8rem;
-    font-weight: bold;
-    transition: all 0.08s ease-in-out;
-    &:hover, &:focus {
-      border-bottom: 1px solid colors.$primary;
-      background-color: rgba(colors.$primary, 0.05);
+    input {
+        display: block;
+        width: 40%;
+        padding: 12px 4px 6px 4px;
+        border-radius: 6px;
+        border-bottom: 1px solid colors.$primary;
+        background-color: transparent;
+        color: colors.$primary;
+        font-size: 1.8rem;
+        font-weight: bold;
+        transition: all 0.08s ease-in-out;
+        &:hover,
+        &:focus {
+            border-bottom: 1px solid colors.$primary;
+            background-color: rgba(colors.$primary, 0.05);
+        }
+        &:hover + label {
+            text-shadow: 0 0 0.5px currentColor;
+        }
+        &:focus {
+            padding: 12px 4px 6px 4px;
+            border-radius: 12px;
+            color: colors.$primary;
+            & + label {
+                text-shadow: 0 0 0.6px currentColor;
+                padding-left: 16px;
+            }
+        }
     }
-    &:hover + label {
-      text-shadow: 0 0 0.5px currentColor;
-    }
-    &:focus {
-      padding: 12px 4px 6px 4px;
-      border-radius: 12px;
-      color: colors.$primary;
-      & + label {
-        text-shadow: 0 0 0.6px currentColor;
-        padding-left: 16px;
-      }
-    }
-  }
 
-  input.error {
-    border-bottom: 1px solid colors.$error;
-    color: rgba(colors.$primary, 0.7);
-    & + label {
-      color: colors.$error;
+    input.error {
+        border-bottom: 1px solid colors.$error;
+        color: rgba(colors.$primary, 0.7);
+        & + label {
+            color: colors.$error;
+        }
+        &:focus,
+        &:hover {
+            border-bottom: 1px solid colors.$error;
+            background-color: rgba(colors.$error, 0.05);
+        }
     }
-    &:focus, &:hover {
-      border-bottom: 1px solid colors.$error;
-      background-color: rgba(colors.$error, 0.05);
-    }
-  }
 
-  input.success {
-    border-bottom: 1px solid colors.$success;
-    & + label {
-      color: colors.$success;
+    input.success {
+        border-bottom: 1px solid colors.$success;
+        & + label {
+            color: colors.$success;
+        }
+        &:focus,
+        &:hover {
+            border-bottom: 1px solid colors.$success;
+            background-color: rgba(colors.$success, 0.05);
+        }
     }
-    &:focus, &:hover {
-      border-bottom: 1px solid colors.$success;
-      background-color: rgba(colors.$success, 0.05);
-    }
-  }
 
-  button[type="submit"] {
-    padding: 12px 24px;
-    font-size: 2.4rem;
-    text-shadow: 0 0 0 transparent;
-    background-color: transparent;
-    border-top: 1px solid rgba(colors.$primary, 0.5);
-    border-bottom: 1px solid colors.$primary;
-    border-radius: 12px;
-    &:hover {
-      background-color: rgba(colors.$primary, 0.05);
+    button[type="submit"] {
+        padding: 12px 24px;
+        font-size: 2.4rem;
+        text-shadow: 0 0 0 transparent;
+        background-color: transparent;
+        border-top: 1px solid rgba(colors.$primary, 0.5);
+        border-bottom: 1px solid colors.$primary;
+        border-radius: 12px;
+        &:hover {
+            background-color: rgba(colors.$primary, 0.05);
+        }
+        &:active {
+            text-shadow: 0 0 0.5px currentColor;
+            transform: translateY(2px);
+            background-color: rgba(colors.$primary, 0.09);
+            border-top: 1px solid rgba(colors.$primary, 0.5);
+            border-bottom: 1px solid colors.$primary;
+        }
     }
-    &:active {
-      text-shadow: 0 0 0.5px currentColor;
-      transform: translateY(2px);
-      background-color: rgba(colors.$primary, 0.09);
-      border-top: 1px solid rgba(colors.$primary, 0.5);
-      border-bottom: 1px solid colors.$primary;
-    }
-  }
 }
 
 form.onboarding-form {
-  display: grid;
-  place-content: center;
-  height: 60dvh;
-  width: 96dvw;
-  margin-top: 20dvh;
-  margin-left: 2dvw;
+    display: grid;
+    place-content: center;
+    height: 60dvh;
+    width: 96dvw;
+    margin-top: 20dvh;
+    margin-left: 2dvw;
 
-  fieldset {
-    width: 100%;
-  }
+    fieldset {
+        width: 100%;
+    }
 
-  input {
-    width: 100%;
-    padding: 12px;
-    font-size: 2.2rem;
-  }
+    input {
+        width: 100%;
+        padding: 12px;
+        font-size: 2.2rem;
+    }
 }

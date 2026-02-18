@@ -1,0 +1,124 @@
+@use "includes/colors" as colors;
+
+.splash {
+    /* TITLES */
+
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -60%);
+
+    text-align: center;
+    font-variant: small-caps;
+    color: colors.$primary;
+
+    h1 {
+        font-size: 6em;
+        padding: 0.3em 0;
+    }
+
+    h2 {
+        font-size: 2.4em;
+        padding: 0.4em 0;
+    }
+
+    nav {
+        display: flex;
+        justify-content: center;
+        gap: 1em;
+        padding: 3em 0;
+
+        a {
+            padding: 12px 14px;
+            color: colors.$primary;
+            text-decoration: none;
+            transition: color 0.3s ease-in-out;
+            font-size: 2.6em;
+            text-shadow: 0 0 0 transparent;
+            background-color: transparent;
+            border-top: 1px solid rgba(colors.$primary, 0.5);
+            border-bottom: 1px solid colors.$primary;
+            border-radius: 12px;
+
+            &:hover {
+                background-color: rgba(colors.$primary, 0.05);
+            }
+
+            &:active {
+                text-shadow: 0 0 0.5px currentColor;
+                transform: translateY(2px);
+                background-color: rgba(colors.$primary, 0.09);
+                border-top: 1px solid rgba(colors.$primary, 0.5);
+                border-bottom: 1px solid colors.$primary;
+            }
+        }
+    }
+
+    /* REVEALS */
+
+    @keyframes blur-reveal {
+        to {
+            opacity: 1;
+            filter: blur(0);
+        }
+    }
+
+    @keyframes smoke-reveal {
+        to {
+            opacity: 1;
+            text-shadow: 0 0 0 whitesmoke;
+        }
+    }
+
+    .blur-reveal {
+        opacity: 0;
+        filter: blur(10px);
+        animation: blur-reveal 2s forwards;
+    }
+
+    .smoke-reveal {
+        opacity: 0;
+        text-shadow: 0 0 0 6em whitesmoke;
+        animation: smoke-reveal 3s forwards;
+    }
+
+    @for $letter from 1 through 7 {
+        // AKISROC
+        .blur-reveal:nth-of-type(#{$letter}) {
+            animation-delay: #{calc($letter/10)}s;
+        }
+    }
+
+    @for $nav-element from 1 to 2 {
+        .smoke-reveal:nth-of-type(#{$nav-element}) {
+            animation-delay: 1.5s;
+        }
+    }
+
+    /* FOG */
+
+    @keyframes fog-translate {
+        from {
+            translate: 130dvw;
+        }
+        to {
+            translate: -130dvw;
+        }
+    }
+
+    .fog {
+        z-index: 0;
+        position: fixed;
+        width: 120dvw;
+        top: 0;
+        left: 0;
+        border-radius: 50%;
+        opacity: 0.3;
+        font-size: 2.4em;
+        text-align: center;
+        filter: blur(30px);
+        text-shadow: 0 0 40px whitesmoke;
+        pointer-events: none;
+        animation: fog-translate 40s infinite;
+    }
+}

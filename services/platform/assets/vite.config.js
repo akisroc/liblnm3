@@ -37,6 +37,11 @@ export default defineConfig(({ cmd }) => {
           },
         },
       },
+      watch: {
+        usePolling: true,
+        interval: 200,
+        include: ["js/**", "css/**", "**/*.scss"],
+      },
     },
   };
 });

@@ -15,7 +15,7 @@ defmodule PlatformWeb.Router do
   scope "/", PlatformWeb do
     pipe_through :browser
 
-    get "/", HomepageController, :homepage
+    get "/", SplashpageController, :splashpage
     get "/onboarding/register-user", OnboardingController, :register_user
     post "/onboarding/register-user", OnboardingController, :register_user
     get "/onboarding/register-kingdom-and-leader", OnboardingController, :register_kingdom_and_leader

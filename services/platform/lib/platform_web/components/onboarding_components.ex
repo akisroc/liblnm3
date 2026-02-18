@@ -12,7 +12,7 @@ defmodule PlatformWeb.OnboardingComponents do
 
   def user_form(assigns) do
     ~H"""
-    <form class="onboarding-form" hx-post={~p"/register-user"} hx-swap="outerHTML">
+    <form class="onboarding-form" hx-post={~p"/onboarding/register-user"} hx-swap="outerHTML">
       <fieldset>
         <legend>Inscription</legend>
 
@@ -39,7 +39,7 @@ defmodule PlatformWeb.OnboardingComponents do
 
   def kingdom_and_leader_form(assigns) do
     ~H"""
-    <form hx-post={~p"/register-kingdom-and-leader"} hx-swap="outerHTML">
+    <form hx-post={~p"/onboarding/register-kingdom-and-leader"} hx-swap="outerHTML">
         <legend>Royaume</legend>
 
         <input type="text" id="kingdom_name" name="kingdom_name">
