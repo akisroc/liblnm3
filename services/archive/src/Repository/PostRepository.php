@@ -55,17 +55,80 @@ final readonly class PostRepository
         yield from $stmt;
     }
 
-    public function streamSearch(string $s): \Generator
+    public function search(string $s): array
     {
-        $stmt = $this->db->pdo->prepare(
-            'SELECT * FROM search_index
-            WHERE search_index MATCH ?
-            ORDER BY rank'
-        );
+        $term = trim($s);
+        $len = mb_strlen($term);
 
-        $stmt->setFetchMode(\PDO::FETCH_ASSOC);
-        $stmt->execute([$s]);
+        // IF term is less than 3 characters, we do
+        // a simple LIKE fulltext search.
+        if ($len < 3) {
+            $stmt = $this->db->pdo->prepare('
+                SELECT
+                    t.title as topic_title,
+                    p.content as post_content,
+                    p.author,
+                    p.place
+                FROM posts p
+                LEFT JOIN topics t ON p.topic_id = t.id
+                WHERE
+                    OR t.title LIKE :term
+                    p.content LIKE :term
+                    OR p.author LIKE :term
+                    OR p.place LIKE :term
+                LIMIT 50
+            ');
 
-        yield from $stmt;
+            $stmt->execute(['term' => "%$term%"]);
+
+            return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        // ELSE, if term is more than 3 characters,
+        // we go brr brr Levenshtein on the FTS trigrams.
+        } else {
+            $trigrams = [];
+            for ($i = 0; $i < $len; ++$i) {
+                $trigrams[] = '"' . substr($term, $i, 3) . '"';
+            }
+
+            $searchQuery = implode(' OR ', $trigrams);
+
+            $stmt = $this->db->pdo->prepare(
+                'SELECT
+                    topic_title,
+                    post_content,
+                    author,
+                    place
+                FROM search_index
+                WHERE search_index MATCH ?
+                ORDER BY rank
+                LIMIT 50'
+            );
+
+            $stmt->execute([$searchQuery]);
+            $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+            usort($results, function($a, $b) use ($term) {
+                $textA = implode(' ', [
+                    $a['topic_title'],
+                    $a['post_content'],
+                    $a['author'],
+                    $a['place']
+                ]);
+                $textB = implode(' ', [
+                    $b['topic_title'],
+                    $b['post_content'],
+                    $b['author'],
+                    $b['place']
+                ]);
+
+                $distA = levenshtein($term, substr($textA, 0, 255));
+                $distB = levenshtein($term, substr($textB, 0, 255));
+
+                return $distA <=> $distB;
+            });
+
+            return $results;
+        }
     }
 }

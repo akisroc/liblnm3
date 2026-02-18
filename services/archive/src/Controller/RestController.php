@@ -105,17 +105,16 @@ final class RestController
         string $s,
         Environment $twig,
         PostRepository $postRepo
-    ): StreamedResponse
+    ): Response
     {
-        return new StreamedResponse()
+        $html = $twig->render('rest/posts-search-results.html.twig', [
+            'posts' => $postRepo->search($s)
+        ]);
+
+        return new Response($html)
             ->setPublic()
             ->setMaxAge(self::RESPONSES_MAX_AGE)
             ->setSharedMaxAge(self::RESPONSES_MAX_AGE)
-            ->setCallback(function () use ($s, $twig, $postRepo) {
-                $twig->display('rest/posts-search-results.html.twig', [
-                    'posts' => $postRepo->streamSearch($s)
-                ]);
-            })
         ;
     }
 

@@ -2,7 +2,10 @@
 <section>
     {% for post in posts %}
         <article>
-            {{ post.post_content }}
+            <p>{{ post.topic_title }}</p>
+            <p>{{ post.post_content }}</p>
+            <p>{{ post.author }}</p>
+            <p>{{ post.place }}</p>
         </article>
         <hr/>
     {% endfor %}
