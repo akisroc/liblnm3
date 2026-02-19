@@ -57,10 +57,17 @@ final readonly class PostRepository
 
     public function search(string $s): array
     {
-        $term = trim($s);
+        // $term = trim($s);
+        // Normalize term before comparison (trimming and handling accents + case)
+        $transliterator = \Transliterator::create('Any-Lower; Any-Latin; Latin-ASCII;');
+        // print_r(\Transliterator::listIDs());
+        // die;
+        // $term = $transliterator->transliterate(trim($s));
+        // $term = strtolower(trim($s));
+        $term = $this->normalizeSearchTerm($s);
         $len = mb_strlen($term);
 
-        // IF term is less than 3 characters, we do
+        // IF term is less than 3 characters long, we do
         // a simple LIKE fulltext search.
         if ($len < 3) {
             $stmt = $this->db->pdo->prepare('
@@ -72,8 +79,8 @@ final readonly class PostRepository
                 FROM posts p
                 LEFT JOIN topics t ON p.topic_id = t.id
                 WHERE
-                    OR t.title LIKE :term
-                    p.content LIKE :term
+                    t.title LIKE :term
+                    OR p.content LIKE :term
                     OR p.author LIKE :term
                     OR p.place LIKE :term
                 LIMIT 50
@@ -83,52 +90,73 @@ final readonly class PostRepository
 
             return $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
-        // ELSE, if term is more than 3 characters,
+        // ELSE, if term is 3 characters long or more,
         // we go brr brr Levenshtein on the FTS trigrams.
         } else {
             $trigrams = [];
-            for ($i = 0; $i < $len; ++$i) {
-                $trigrams[] = '"' . substr($term, $i, 3) . '"';
+            for ($i = 0; $i < $len - 2; ++$i) {
+                $trigrams[] = '"' . mb_substr($term, $i, 3) . '"';
             }
 
             $searchQuery = implode(' OR ', $trigrams);
 
-            $stmt = $this->db->pdo->prepare(
-                'SELECT
-                    topic_title,
-                    post_content,
-                    author,
-                    place
+            $stmt = $this->db->pdo->prepare("
+                SELECT
+                    topic_title, post_content, author, place,
+                    snippet(search_index, -1, '', '', '...', 15) as matching_context
                 FROM search_index
                 WHERE search_index MATCH ?
                 ORDER BY rank
-                LIMIT 50'
-            );
+                LIMIT 50
+            ");
 
             $stmt->execute([$searchQuery]);
             $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
-            usort($results, function($a, $b) use ($term) {
-                $textA = implode(' ', [
-                    $a['topic_title'],
-                    $a['post_content'],
-                    $a['author'],
-                    $a['place']
-                ]);
-                $textB = implode(' ', [
-                    $b['topic_title'],
-                    $b['post_content'],
-                    $b['author'],
-                    $b['place']
-                ]);
+            usort($results, function($a, $b) use ($term, $transliterator) {
+                // Function to find best word in snippet
+                // $getBestDist = function($snippet) use ($term, $transliterator): int {
+                //     if (!$snippet) {
+                //         return 255;
+                //     }
 
-                $distA = levenshtein($term, substr($textA, 0, 255));
-                $distB = levenshtein($term, substr($textB, 0, 255));
+                //     // Cut into words, ignoring punctuation
+                //     $words = preg_split('/[\s\p{P}]+/u', $snippet);
+                //     $bestDist = 255;
+
+                //     foreach ($words as $word) {
+                //         if ($word === '') {
+                //             continue;
+                //         }
+                //         $dist = levenshtein($term, $transliterator->transliterate($word));
+                //         if ($dist < $bestDist) {
+                //             $bestDist = $dist;
+                //         }
+                //     }
+
+                //     return $bestDist;
+                // };
+
+                // $distA = $getBestDist($a['matching_context']);
+                // $distB = $getBestDist($b['matching_context']);
+
+                $distA = levenshtein($term, $this->normalizeSearchTerm($a['matching_context']));
+                $distB = levenshtein($term, $this->normalizeSearchTerm($b['matching_context']));
 
                 return $distA <=> $distB;
             });
 
-            return $results;
+           return $results;
         }
+    }
+
+    private function normalizeSearchTerm(string $term): string
+    {
+        $s = trim($term);
+        $s = mb_strtolower($s);
+        // $s = \Normalizer::normalize($s, \Normalizer::FORM_D);
+        // $s = preg_replace('/\pM/u', '', $s);
+
+        return $s;
     }
 }
