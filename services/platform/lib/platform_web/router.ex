@@ -10,6 +10,8 @@ defmodule PlatformWeb.Router do
 
     plug :put_root_layout, {PlatformWeb.Layouts, :root}
     plug :put_layout, {PlatformWeb.Layouts, :app}
+
+    plug PlatformWeb.Plugs.HTMX
   end
 
   scope "/", PlatformWeb do
