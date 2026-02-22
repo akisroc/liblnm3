@@ -13,6 +13,9 @@ end
 begin
 
   db = SQLite3::Database.new DB_FILENAME
+  db.enable_load_extension true
+  db.load_extension "./spellfix.so"
+
   puts "Database file created."
 
   db.execute("PRAGMA journal_mode = OFF;")
@@ -93,13 +96,25 @@ begin
     author,
     place,
     content_rowid='id',
-    tokenize='trigram case_sensitive 0'
+    tokenize='unicode61 remove_diacritics 1'
   );
 
   INSERT INTO search_index(topic_title, post_content, author, place)
   SELECT t.title, p.content, p.author, p.place
   FROM posts p
   LEFT JOIN topics t ON p.topic_id = t.id;
+
+  CREATE VIRTUAL TABLE vocab USING spellfix1;
+
+  CREATE VIRTUAL TABLE fts_words USING fts5_vocab(search_index, 'row');
+
+  INSERT INTO vocab(word)
+  SELECT term FROM fts_words;
+
+  DROP TABLE fts_words;
+
+  # INSERT INTO vocab(word)
+  # SELECT DISTINCT word FROM fts5_vocab('search_index', 'row');
   SQL
 
   db.execute("PRAGMA analyze;")
