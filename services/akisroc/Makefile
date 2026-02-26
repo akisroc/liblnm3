@@ -1,7 +1,7 @@
 .PHONY         =  help test run build
 .DEFAULT_GOAL  =  help
 
-ENTRYPOINT = ./cmd/main.go
+ENTRYPOINT_HTTP = ./cmd/http/main.go
 EXECUTABLE_NAME = akisroc
 
 ## --------------------------------
@@ -15,8 +15,8 @@ test: ## Test project
 	go test -v -race ./...
 
 run: ## Run project
-	go run $(ENTRYPOINT)
+	go run $(ENTRYPOINT_HTTP)
 
 build: ## Build project
-	go build -o $(EXECUTABLE_NAME) $(ENTRYPOINT)
+	go build -o $(EXECUTABLE_NAME) $(ENTRYPOINT_HTTP)
 
