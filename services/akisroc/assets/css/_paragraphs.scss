@@ -1,0 +1,14 @@
+@use "includes/variables" as *;
+
+p {
+  line-height: 1.4;
+  font-family: "Libertinus Serif", "Helvetica", "serif";
+  font-size: 1.8rem;
+  color: $color-text;
+}
+
+@media all and (min-width: $breakpoint-tablet-portrait) {
+  p {
+    text-align: justify;
+  }
+}

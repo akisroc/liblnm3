@@ -1,0 +1,13 @@
+version: "2"
+sql:
+  - engine: "postgresql"
+    schema: "../../infrastructure/database/postgres/initial-schema/structure.sql"
+    queries: "internal/iam/infra/db/postgres/query.sql"
+    gen:
+      go:
+        package: "db"
+        out: "internal/iam/db/sqlcgen"
+        overrides:
+          - db_type: uuid
+            go_type: string
+

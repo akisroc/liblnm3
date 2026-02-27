@@ -1,0 +1,15 @@
+@use "includes/variables" as *;
+
+button {
+  padding: 8px 6px;
+  background-color: $color-primary;
+  font-family: "Libertinus Sans", "sans-serif";
+  font-weight: bold;
+  font-size: 1.4rem;
+  color: $color-page;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  &:hover {
+    background-color: $color-secondary;
+  }
+}
